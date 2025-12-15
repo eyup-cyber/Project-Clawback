@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Project Clawback — Scroungers Multimedia
+
+Production-ready Next.js app with structured logging, security hardening, Supabase backend, R2 media storage, Resend email, and comprehensive tests.
+
+## Features
+- Structured logging with request correlation and performance metrics.
+- Centralized API error handling, consistent responses, and Zod validation.
+- CSRF protection for state-changing routes; security headers + sanitization.
+- Supabase schema with RLS; migrations under `supabase/migrations`.
+- Email templates + queue (Resend), plus alerting hooks.
+- Media storage via Cloudflare R2 with presigned uploads.
+- Metrics endpoint (`/api/metrics`) and health checks.
+- Jest unit/integration tests; Husky hooks for lint, type-check, tests.
+
+## Tech Stack
+Next.js (App Router), TypeScript, Supabase, Cloudflare R2, Resend, Redis (optional cache), Jest, ESLint/Prettier, Husky/Commitlint.
 
 ## Getting Started
-
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+App runs at http://localhost:3000.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Environment
+Copy `.env.example` (if provided) or set variables:
+- `NEXT_PUBLIC_SITE_URL`, `SITE_URL`, `SITE_NAME`
+- `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY`
+- `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_ACCOUNT_ID`, `R2_PUBLIC_URL`
+- `RESEND_API_KEY`, `ADMIN_EMAIL`
+- `CSRF_SECRET`
+- `ALERT_WEBHOOK_URL` (optional)
+- `REDIS_URL` (optional cache; rate limiting is disabled)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Migrations
+```bash
+# adjust to your supabase CLI setup
+supabase db push
+```
+SQL files live in `supabase/migrations`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Scripts
+- `npm run dev` — start dev server
+- `npm run lint` — lint via ESLint
+- `npm run test` — unit + integration tests
+- `npm run type-check` — TypeScript diagnostics
+- `npm run prepare` — Husky install
 
-## Learn More
+### Testing Notes
+Jest configured in `jest.config.js`; setup in `lib/test/setup.ts`. Integration tests target API routes in `__tests__/integration`.
 
-To learn more about Next.js, take a look at the following resources:
+### APIs & Docs
+- API handlers under `app/api/**` wrapped with `withRouteHandler`.
+- OpenAPI draft: `docs/openapi.yaml`.
+- Metrics: `GET /api/metrics` (Prometheus format).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Security
+- CSRF double-submit cookie for POST/PUT/PATCH/DELETE via `requiresCsrfProtection`.
+- Security headers applied globally; XSS/input sanitization helpers in `lib/security`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Email
+Templates in `lib/email/templates.ts`; queue with retries in `lib/email/queue.ts` using Resend client.
 
-## Deploy on Vercel
+### Caching
+In-memory cache with TTL in `lib/cache`. Redis optional for future cache features (rate limiting is off per requirements).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Monitoring & Alerts
+Health checks in `lib/monitoring/health.ts`; alerts helper in `lib/monitoring/alerts.ts` (email/webhook).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Contributing
+Husky hooks run lint-staged, commitlint, type-check, and tests on push. Use conventional commits. PRs welcome.
