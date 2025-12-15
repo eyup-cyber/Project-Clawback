@@ -1,0 +1,20 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://scroungers.media/sitemap.xml
+
+# Disallow admin and dashboard routes from indexing
+Disallow: /admin/*
+Disallow: /dashboard/*
+Disallow: /api/*
+
+
+
+
+
+
+
+
+

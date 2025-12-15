@@ -1,0 +1,516 @@
+@import "tailwindcss";
+
+/* ===== KINDERGARTEN DISPLAY FONT ===== */
+@font-face {
+  font-family: 'Kindergarten';
+  src: url('./fonts/kindergarten.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kindergarten';
+  src: url('./fonts/Kindergarten 2.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ===== HELVETICA NOW FONT FAMILY ===== */
+@font-face {
+  font-family: 'HelveticaNow';
+  src: url('./fonts/HelveticaNowText-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HelveticaNow';
+  src: url('./fonts/HelveticaNowText-ThinItalic.ttf') format('truetype');
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HelveticaNow';
+  src: url('./fonts/HelveticaNowText-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HelveticaNow';
+  src: url('./fonts/HelveticaNowText-ExtLtIta.ttf') format('truetype');
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HelveticaNow';
+  src: url('./fonts/HelveticaNowText-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HelveticaNow';
+  src: url('./fonts/HelveticaNowText-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HelveticaNow';
+  src: url('./fonts/HelveticaNowText-RegIta.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HelveticaNow';
+  src: url('./fonts/HelveticaNowText-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HelveticaNow';
+  src: url('./fonts/HelveticaNowText-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HelveticaNow';
+  src: url('./fonts/HelveticaNowText-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HelveticaNow';
+  src: url('./fonts/HelveticaNowText-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HelveticaNow';
+  src: url('./fonts/HelveticaNowText-ExtBdIta.ttf') format('truetype');
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HelveticaNow';
+  src: url('./fonts/HelveticaNowText-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Core */
+  --background: #013220;      /* Deep Forest Green */
+  --foreground: #E0E0E0;      /* Off-White */
+  
+  /* Brand */
+  --primary: #32CD32;         /* Lime Green - "scroungers" text */
+  --secondary: #FFD700;       /* Gold - "MULTIMEDIA" text */
+  --accent: #FF00FF;          /* Hot Pink - SPARSE micro-accents only */
+  
+  /* UI */
+  --border: rgba(224, 224, 224, 0.15);
+  --border-hover: rgba(224, 224, 224, 0.3);
+  --surface: rgba(1, 50, 32, 0.8);
+  --surface-elevated: rgba(1, 50, 32, 0.95);
+  
+  /* Glows */
+  --glow-primary: rgba(50, 205, 50, 0.4);
+  --glow-secondary: rgba(255, 215, 0, 0.3);
+  --glow-accent: rgba(255, 0, 255, 0.2);
+  
+  /* Typography */
+  --font-display: 'Kindergarten', cursive;
+  --font-body: 'HelveticaNow', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  /* Native smooth scroll for anchor links only */
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-body);
+  font-weight: 500; /* Minimum font weight - Medium */
+  line-height: 1.5;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Selection - Hot Pink is appropriate here */
+::selection {
+  background: var(--accent);
+  color: #000;
+}
+
+::-moz-selection {
+  background: var(--accent);
+  color: #000;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary);
+}
+
+/* Logo text styles */
+.logo-scroungers {
+  font-family: var(--font-display);
+  color: var(--primary);
+  text-shadow: 
+    0 0 20px var(--glow-primary),
+    0 0 40px var(--glow-primary),
+    0 0 60px rgba(50, 205, 50, 0.2);
+}
+
+.logo-multimedia {
+  font-family: var(--font-display);
+  color: var(--secondary);
+  text-shadow: 0 0 10px var(--glow-secondary);
+  letter-spacing: 0.3em;
+}
+
+/* Heading styles - Kindergarten font for h1 and h2 only */
+h1, h2 {
+  font-family: var(--font-display);
+}
+
+/* h3 and below use HelveticaNow */
+h3, h4, h5, h6 {
+  font-family: var(--font-body);
+}
+
+/* Typography scale with consistent line-heights and letter-spacing */
+h1 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+}
+
+h3 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+}
+
+h4 {
+  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  line-height: 1.4;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+
+h5 {
+  font-size: clamp(1.125rem, 2vw, 1.25rem);
+  line-height: 1.4;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+
+h6 {
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  font-weight: 600;
+}
+
+/* Body text - HelveticaNow with minimum Medium weight */
+p, span, div, li, td, th {
+  font-family: var(--font-body);
+  font-weight: 500;
+}
+
+/* Paragraphs - tighter line spacing */
+p {
+  line-height: 1.6;
+  margin-bottom: 0.75em;
+}
+
+/* Bold text with drop shadow */
+strong, b, .font-bold, .font-extrabold, .font-black {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+h1, h2, h3 {
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Typography utilities */
+.text-display {
+  font-family: var(--font-display);
+}
+
+.text-body {
+  font-family: var(--font-body);
+}
+
+/* Font weight utilities for HelveticaNow */
+.font-thin { font-weight: 100; }
+.font-extralight { font-weight: 200; }
+.font-light { font-weight: 300; }
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-bold { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+.font-black { font-weight: 900; }
+
+/* Focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Link base styles */
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--primary);
+}
+
+/* Button base reset */
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+/* Scroll progress bar */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--primary);
+  z-index: 9999;
+  transform-origin: left;
+}
+
+/* ===== ACCESSIBILITY ===== */
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Make sr-only content visible on focus */
+.sr-only-focusable:focus,
+.sr-only-focusable:focus-within {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Reduced motion - respect user preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode adjustments */
+@media (prefers-contrast: high) {
+  :root {
+    --border: rgba(224, 224, 224, 0.5);
+    --glow-primary: rgba(50, 205, 50, 0.6);
+    --glow-secondary: rgba(255, 215, 0, 0.5);
+  }
+}
+
+/* Focus-visible for keyboard navigation only */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ===== PERFORMANCE ===== */
+
+/* GPU acceleration for animated elements */
+.will-animate {
+  will-change: transform, opacity;
+}
+
+/* Contain layout for performance */
+.contain-layout {
+  contain: layout;
+}
+
+.contain-paint {
+  contain: paint;
+}
+
+.contain-strict {
+  contain: strict;
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+/* Text truncation */
+.line-clamp-1 { 
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 { 
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 { 
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass morphism */
+.glass {
+  background: rgba(1, 50, 32, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+/* Glow effects */
+.glow-primary {
+  box-shadow: 0 0 20px var(--glow-primary);
+}
+
+.glow-secondary {
+  box-shadow: 0 0 20px var(--glow-secondary);
+}
+
+.text-glow-primary {
+  text-shadow: 0 0 20px var(--glow-primary);
+}
+
+.text-glow-secondary {
+  text-shadow: 0 0 10px var(--glow-secondary);
+}
+
+/* Interactive states */
+.interactive {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.interactive:active {
+  transform: translateY(0);
+}
+
+/* ===== PRINT STYLES ===== */
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  nav,
+  footer,
+  .scroll-progress,
+  .no-print {
+    display: none !important;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    opacity: 0.7;
+  }
+}

@@ -1,0 +1,1184 @@
+openapi: 3.1.0
+info:
+  title: Scroungers Multimedia API
+  description: |
+    Backend API for Scroungers Multimedia platform.
+    
+    ## Authentication
+    Most endpoints require authentication via Supabase Auth. Include the session cookie or Bearer token in requests.
+    
+    ## Rate Limiting
+    Rate limiting is currently disabled.
+    
+    ## Error Responses
+    All errors follow a standard format:
+    ```json
+    {
+      "success": false,
+      "error": {
+        "code": "ERROR_CODE",
+        "message": "Human readable message",
+        "details": {}
+      }
+    }
+    ```
+  version: 1.0.0
+  contact:
+    name: Scroungers Multimedia
+    url: https://scroungers.co
+
+servers:
+  - url: /api
+    description: API routes
+
+tags:
+  - name: Posts
+    description: Content management
+  - name: Comments
+    description: Comment system
+  - name: Reactions
+    description: Post and comment reactions
+  - name: Users
+    description: User profiles
+  - name: Categories
+    description: Content categories
+  - name: Auth
+    description: Authentication
+  - name: Contact
+    description: Contact form
+  - name: Newsletter
+    description: Newsletter subscriptions
+  - name: Media
+    description: File uploads
+  - name: Admin
+    description: Admin operations
+  - name: Health
+    description: System health
+
+paths:
+  # =========================================================================
+  # POSTS
+  # =========================================================================
+  /posts:
+    get:
+      tags: [Posts]
+      summary: List posts
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: category_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, pending, published, rejected, archived]
+        - name: content_type
+          in: query
+          schema:
+            type: string
+            enum: [written, video, audio, visual]
+        - name: author_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Paginated list of posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPostsResponse'
+    post:
+      tags: [Posts]
+      summary: Create a new post
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostInput'
+      responses:
+        '201':
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /posts/{id}:
+    get:
+      tags: [Posts]
+      summary: Get post by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Post details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Posts]
+      summary: Update a post
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePostInput'
+      responses:
+        '200':
+          description: Post updated
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Posts]
+      summary: Delete a post
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Post deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /posts/slug/{slug}:
+    get:
+      tags: [Posts]
+      summary: Get post by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Post details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /posts/featured:
+    get:
+      tags: [Posts]
+      summary: Get featured posts
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 6
+      responses:
+        '200':
+          description: Featured posts list
+
+  /posts/trending:
+    get:
+      tags: [Posts]
+      summary: Get trending posts
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Trending posts list
+
+  # =========================================================================
+  # COMMENTS
+  # =========================================================================
+  /comments:
+    get:
+      tags: [Comments]
+      summary: List comments for a post
+      parameters:
+        - name: post_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: with_replies
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Comments list
+    post:
+      tags: [Comments]
+      summary: Create a comment
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentInput'
+      responses:
+        '201':
+          description: Comment created
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /comments/{id}:
+    get:
+      tags: [Comments]
+      summary: Get comment by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Comment details
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Comments]
+      summary: Update a comment
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+      responses:
+        '200':
+          description: Comment updated
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags: [Comments]
+      summary: Delete a comment
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Comment deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # =========================================================================
+  # REACTIONS
+  # =========================================================================
+  /reactions:
+    get:
+      tags: [Reactions]
+      summary: Get reaction summary for a post
+      parameters:
+        - name: post_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Reaction summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReactionSummary'
+    post:
+      tags: [Reactions]
+      summary: Toggle a reaction on a post
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [post_id, type]
+              properties:
+                post_id:
+                  type: string
+                  format: uuid
+                type:
+                  type: string
+                  enum: [star, heart, fire, clap, think]
+      responses:
+        '200':
+          description: Reaction toggled
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # =========================================================================
+  # USERS
+  # =========================================================================
+  /users/me:
+    get:
+      tags: [Users]
+      summary: Get current user profile
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: User profile
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [Users]
+      summary: Update current user profile
+      security:
+        - cookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileInput'
+      responses:
+        '200':
+          description: Profile updated
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users/{username}:
+    get:
+      tags: [Users]
+      summary: Get user profile by username
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Public user profile
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /users/check-username:
+    get:
+      tags: [Users]
+      summary: Check if username is available
+      parameters:
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Availability status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  available:
+                    type: boolean
+
+  # =========================================================================
+  # CATEGORIES
+  # =========================================================================
+  /categories:
+    get:
+      tags: [Categories]
+      summary: List categories
+      parameters:
+        - name: with_counts
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Categories list
+
+  # =========================================================================
+  # AUTH
+  # =========================================================================
+  /auth/callback:
+    get:
+      tags: [Auth]
+      summary: OAuth callback handler
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: next
+          in: query
+          schema:
+            type: string
+            default: /dashboard
+      responses:
+        '307':
+          description: Redirect to dashboard or error page
+
+  # =========================================================================
+  # CONTACT
+  # =========================================================================
+  /contact:
+    post:
+      tags: [Contact]
+      summary: Submit contact form
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactSubmission'
+      responses:
+        '201':
+          description: Message submitted
+
+  # =========================================================================
+  # NEWSLETTER
+  # =========================================================================
+  /newsletter:
+    post:
+      tags: [Newsletter]
+      summary: Subscribe to newsletter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '201':
+          description: Subscribed successfully
+    delete:
+      tags: [Newsletter]
+      summary: Unsubscribe from newsletter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Unsubscribed successfully
+
+  # =========================================================================
+  # MEDIA
+  # =========================================================================
+  /media/presigned-url:
+    post:
+      tags: [Media]
+      summary: Get presigned URL for upload
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [filename, contentType]
+              properties:
+                filename:
+                  type: string
+                contentType:
+                  type: string
+      responses:
+        '200':
+          description: Presigned URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                  key:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /media/upload:
+    post:
+      tags: [Media]
+      summary: Upload media file
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: File uploaded
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # =========================================================================
+  # ADMIN
+  # =========================================================================
+  /admin/users:
+    get:
+      tags: [Admin]
+      summary: List all users (admin only)
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: role
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Users list
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/users/{id}:
+    get:
+      tags: [Admin]
+      summary: Get user by ID (admin only)
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User details
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    put:
+      tags: [Admin]
+      summary: Update user (admin only)
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User updated
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/stats:
+    get:
+      tags: [Admin]
+      summary: Get dashboard statistics
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Dashboard statistics
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/applications:
+    get:
+      tags: [Admin]
+      summary: List contributor applications
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, approved, rejected]
+      responses:
+        '200':
+          description: Applications list
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/applications/{id}:
+    get:
+      tags: [Admin]
+      summary: Get application by ID
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Application details
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/applications/{id}/review:
+    put:
+      tags: [Admin]
+      summary: Review application (approve/reject)
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action:
+                  type: string
+                  enum: [approve, reject]
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Application reviewed
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/posts:
+    get:
+      tags: [Admin]
+      summary: List all posts (admin view)
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Posts list
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/posts/pending:
+    get:
+      tags: [Admin]
+      summary: List pending posts for review
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Pending posts list
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/posts/{id}/moderate:
+    put:
+      tags: [Admin]
+      summary: Moderate a post
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action:
+                  type: string
+                  enum: [approve, reject, feature, unfeature]
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Post moderated
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # =========================================================================
+  # HEALTH & MONITORING
+  # =========================================================================
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check endpoint
+      responses:
+        '200':
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+        '503':
+          description: System is unhealthy
+
+  /metrics:
+    get:
+      tags: [Health]
+      summary: Prometheus metrics
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [prometheus, json]
+            default: prometheus
+      responses:
+        '200':
+          description: Metrics data
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # =========================================================================
+  # OTHER
+  # =========================================================================
+  /search:
+    get:
+      tags: [Posts]
+      summary: Search posts and users
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [posts, users, all]
+            default: all
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Search results
+
+  /homepage:
+    get:
+      tags: [Posts]
+      summary: Get homepage data
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Homepage data
+
+  /site/content:
+    get:
+      tags: [Posts]
+      summary: Get site content
+      responses:
+        '200':
+          description: Site content
+
+  /views:
+    post:
+      tags: [Posts]
+      summary: Record a post view
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [post_id]
+              properties:
+                post_id:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: View recorded
+
+  /youtube/playlist:
+    get:
+      tags: [Posts]
+      summary: Get YouTube playlist videos
+      parameters:
+        - name: max_results
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Playlist videos
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sb-access-token
+
+  schemas:
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        slug:
+          type: string
+        excerpt:
+          type: string
+        content:
+          type: object
+        content_type:
+          type: string
+          enum: [written, video, audio, visual]
+        status:
+          type: string
+          enum: [draft, pending, published, rejected, archived]
+        author_id:
+          type: string
+          format: uuid
+        category_id:
+          type: string
+          format: uuid
+        view_count:
+          type: integer
+        reaction_count:
+          type: integer
+        comment_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreatePostInput:
+      type: object
+      required: [title, content_type, category_id]
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 200
+        subtitle:
+          type: string
+          maxLength: 300
+        content:
+          type: string
+        content_type:
+          type: string
+          enum: [written, video, audio, visual]
+        category_id:
+          type: string
+          format: uuid
+        featured_image_url:
+          type: string
+          format: uri
+
+    UpdatePostInput:
+      type: object
+      properties:
+        title:
+          type: string
+        subtitle:
+          type: string
+        content:
+          type: string
+        status:
+          type: string
+          enum: [draft, pending]
+
+    CreateCommentInput:
+      type: object
+      required: [post_id, content]
+      properties:
+        post_id:
+          type: string
+          format: uuid
+        content:
+          type: string
+          minLength: 1
+          maxLength: 5000
+        parent_id:
+          type: string
+          format: uuid
+
+    UpdateProfileInput:
+      type: object
+      properties:
+        display_name:
+          type: string
+          maxLength: 100
+        bio:
+          type: string
+          maxLength: 500
+        avatar_url:
+          type: string
+          format: uri
+        website:
+          type: string
+          format: uri
+        twitter_username:
+          type: string
+        kofi_username:
+          type: string
+
+    ContactSubmission:
+      type: object
+      required: [name, email, subject, message, category]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        subject:
+          type: string
+        message:
+          type: string
+        category:
+          type: string
+          enum: [general, partnership, bug, feedback, other]
+
+    ReactionSummary:
+      type: object
+      properties:
+        postId:
+          type: string
+          format: uuid
+        counts:
+          type: object
+          properties:
+            star:
+              type: integer
+            heart:
+              type: integer
+            fire:
+              type: integer
+            clap:
+              type: integer
+            think:
+              type: integer
+        userReaction:
+          type: string
+          nullable: true
+
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        timestamp:
+          type: string
+          format: date-time
+        checks:
+          type: object
+
+    PostResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Post'
+
+    PaginatedPostsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+            limit:
+              type: integer
+            total:
+              type: integer
+            totalPages:
+              type: integer
+            hasNext:
+              type: boolean
+            hasPrev:
+              type: boolean
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
