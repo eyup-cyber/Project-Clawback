@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, ReactNode, useEffect, useState } from 'react';
+import { useRef, type ReactNode, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { EASING, COLORS, prefersReducedMotion, getDuration, DURATION } from '@/lib/animations/gsap-config';
 

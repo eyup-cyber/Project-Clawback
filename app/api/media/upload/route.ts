@@ -1,9 +1,9 @@
-import { NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { r2Client } from '@/lib/r2/client';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { success, handleApiError, unauthorized, forbidden, badRequest } from '@/lib/api';
+import { success, handleApiError, badRequest } from '@/lib/api';
 import { requireContributor } from '@/lib/api/middleware';
 import { rateLimitByUser } from '@/lib/security/rate-limit';
 import { sanitizeFilename } from '@/lib/security/sanitize';

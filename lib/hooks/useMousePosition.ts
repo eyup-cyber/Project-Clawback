@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, RefObject } from "react";
+import { useState, useEffect, useRef, useCallback, type RefObject } from "react";
 import { prefersReducedMotion } from "../animations/gsap-config";
 
 interface MousePosition {
@@ -142,8 +142,10 @@ export function useMousePosition(
       });
     }
 
-    if (targetRef?.current) {
-      targetRef.current.addEventListener("mouseleave", handleMouseLeave);
+    const targetElement = targetRef?.current;
+
+    if (targetElement) {
+      targetElement.addEventListener("mouseleave", handleMouseLeave);
     }
 
     return () => {
@@ -154,8 +156,8 @@ export function useMousePosition(
           handleTouchMove as EventListener
         );
       }
-      if (targetRef?.current) {
-        targetRef.current.removeEventListener("mouseleave", handleMouseLeave);
+      if (targetElement) {
+        targetElement.removeEventListener("mouseleave", handleMouseLeave);
       }
     };
   }, [includeTouch, targetRef, updatePosition]);

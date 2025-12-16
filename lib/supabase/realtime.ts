@@ -21,7 +21,7 @@ export const subscribeToTable = (
 ): RealtimeChannel => {
   const client = createClient(supabaseUrl, supabaseAnonKey);
   
-  let channel = client
+  const channel = client
     .channel(`${table}-changes`)
     .on(
       'postgres_changes',

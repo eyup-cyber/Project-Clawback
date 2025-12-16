@@ -3,7 +3,7 @@
  * Provides logging, error handling, security headers, and request context
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, type NextResponse } from 'next/server';
 import { generateRequestId, createContext, clearContext } from '@/lib/logger/context';
 import { logger } from '@/lib/logger';
 import { handleApiError } from './error-handler';

@@ -1,12 +1,6 @@
-import { NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { z } from 'zod';
-import {
-  success,
-  paginated,
-  handleApiError,
-  parseParams,
-  requireAdmin,
-} from '@/lib/api';
+import { paginated, handleApiError, parseParams, requireAdmin } from '@/lib/api';
 import { listUsers } from '@/lib/db';
 
 const listUsersSchema = z.object({

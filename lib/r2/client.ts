@@ -1,18 +1,81 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+  ListObjectsV2Command,
+  HeadObjectCommand,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { config } from '@/lib/config';
+import { logger } from '@/lib/logger';
 
-// R2 client configuration
-export const r2Client = new S3Client({
-  region: 'auto',
-  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || '',
-  },
-});
+// ============================================================================
+// CONFIGURATION
+// ============================================================================
 
+const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID || '';
+const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID || '';
+const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY || '';
 const BUCKET_NAME = process.env.R2_BUCKET_NAME || 'scroungers-media';
 const PUBLIC_URL = process.env.R2_PUBLIC_URL || '';
+
+// File size limits (in bytes)
+export const FILE_SIZE_LIMITS = {
+  image: 10 * 1024 * 1024, // 10MB
+  video: 100 * 1024 * 1024, // 100MB
+  document: 25 * 1024 * 1024, // 25MB
+  default: 10 * 1024 * 1024, // 10MB
+};
+
+// Allowed MIME types
+export const ALLOWED_MIME_TYPES = {
+  image: ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif'],
+  video: ['video/mp4', 'video/webm', 'video/quicktime'],
+  document: ['application/pdf'],
+  audio: ['audio/mpeg', 'audio/wav', 'audio/ogg'],
+};
+
+// Presigned URL expiration times (in seconds)
+export const PRESIGNED_URL_EXPIRY = {
+  upload: 3600, // 1 hour
+  download: 86400, // 24 hours
+};
+
+// ============================================================================
+// R2 CLIENT
+// ============================================================================
+
+function isR2Configured(): boolean {
+  return Boolean(R2_ACCOUNT_ID && R2_ACCESS_KEY_ID && R2_SECRET_ACCESS_KEY);
+}
+
+// Lazy-initialized R2 client
+let _r2Client: S3Client | null = null;
+
+export function getR2Client(): S3Client {
+  if (!_r2Client) {
+    if (!isR2Configured()) {
+      throw new Error('R2 storage is not configured. Set R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, and R2_SECRET_ACCESS_KEY.');
+    }
+    _r2Client = new S3Client({
+      region: 'auto',
+      endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+      credentials: {
+        accessKeyId: R2_ACCESS_KEY_ID,
+        secretAccessKey: R2_SECRET_ACCESS_KEY,
+      },
+    });
+  }
+  return _r2Client;
+}
+
+// Export for backwards compatibility
+export const r2Client = new Proxy({} as S3Client, {
+  get(_target, prop) {
+    return getR2Client()[prop as keyof S3Client];
+  },
+});
 
 /**
  * Generate a presigned URL for direct browser upload

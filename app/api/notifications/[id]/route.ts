@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { success, noContent, handleApiError, requireAuth } from '@/lib/api';
 import { markNotificationsRead, deleteNotification } from '@/lib/db/notifications';
 

@@ -1,0 +1,44 @@
+# Production environment template
+
+# Core
+NODE_ENV=production
+NEXT_PUBLIC_SITE_URL=https://scroungers.co
+NEXT_PUBLIC_APP_NAME=Scroungers Multimedia
+
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+
+# Cloudflare R2
+R2_ACCOUNT_ID=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET_NAME=scroungers-media-prod
+R2_PUBLIC_URL=https://media.scroungers.co
+
+# Email (Resend)
+RESEND_API_KEY=
+FROM_EMAIL="Scroungers <hello@scroungers.co>"
+ADMIN_EMAIL=admin@scroungers.co
+
+# Redis (optional cache)
+REDIS_URL=
+
+# Security
+CSRF_SECRET=change_me_32_chars_min
+JWT_SECRET=change_me_64_chars_min
+
+# Monitoring / Analytics (optional)
+SENTRY_DSN=
+LOGROCKET_APP_ID=
+NEXT_PUBLIC_GA_ID=
+PLAUSIBLE_DOMAIN=scroungers.co
+
+# Feature flags / logging
+FEATURE_EMAIL_NOTIFICATIONS=true
+FEATURE_REDIS_CACHE=true
+FEATURE_MONITORING=true
+RATE_LIMIT_ENABLED=false
+LOG_LEVEL=info
+

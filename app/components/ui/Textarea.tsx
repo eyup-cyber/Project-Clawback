@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, TextareaHTMLAttributes, useState, useEffect, useRef } from 'react';
+import { forwardRef, type TextareaHTMLAttributes, useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import gsap from 'gsap';
 import { EASING, prefersReducedMotion, getDuration, DURATION } from '@/lib/animations/gsap-config';

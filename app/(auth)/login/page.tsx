@@ -281,7 +281,7 @@ export default function LoginPage() {
         Sign in to your account
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={(event) => void handleSubmit(event)} className="space-y-5">
         <FormInput
           id="email"
           name="email"

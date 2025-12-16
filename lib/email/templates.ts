@@ -256,7 +256,7 @@ export function newCommentEmail(
 // ============================================================================
 // NEWSLETTER WELCOME EMAIL
 // ============================================================================
-export function newsletterWelcomeEmail(email: string): { html: string; subject: string } {
+export function newsletterWelcomeEmail(_email: string): { html: string; subject: string } {
   const content = `
     <h1 style="margin: 0 0 20px; color: #ffffff; font-size: 24px; font-weight: 600;">
       You're Subscribed! 📬

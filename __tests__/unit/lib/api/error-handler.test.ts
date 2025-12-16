@@ -2,7 +2,7 @@
  * Unit tests for API error handler
  */
 
-import { ZodError, z } from 'zod';
+import { type ZodError, z } from 'zod';
 import { handleApiError } from '@/lib/api/error-handler';
 import { ApiError } from '@/lib/api/response';
 
@@ -99,8 +99,6 @@ describe('API Error Handler', () => {
       const error = new Error('Test error');
       const response = handleApiError(error, 'req-123');
 
-      const json = await response.json();
-      // Request ID might be included in the response or just logged
       expect(response.status).toBe(500);
     });
   });

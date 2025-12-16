@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { success, handleApiError } from '@/lib/api';
 import { getProfileByUsername, getPublicProfile, getPostsByAuthor } from '@/lib/db';
 

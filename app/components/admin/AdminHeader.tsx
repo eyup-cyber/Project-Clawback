@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks';
 import { getInitials } from '@/lib/utils';
-import { User } from '@supabase/supabase-js';
+import { type User } from '@supabase/supabase-js';
 
 interface AdminHeaderProps {
   user: User;

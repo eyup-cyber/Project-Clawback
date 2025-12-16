@@ -68,7 +68,7 @@ export default function PostModerationActions({ postId, postTitle }: PostModerat
     <>
       <div className="mt-3 pt-3 border-t flex gap-3" style={{ borderColor: 'var(--border)' }}>
         <button
-          onClick={handlePublish}
+          onClick={() => void handlePublish()}
           disabled={loading}
           className="px-4 py-2 rounded-lg font-medium text-sm disabled:opacity-50"
           style={{ background: 'var(--primary)', color: 'var(--background)' }}
@@ -136,7 +136,7 @@ export default function PostModerationActions({ postId, postTitle }: PostModerat
               </button>
               <button
                 type="button"
-                onClick={handleReject}
+                onClick={() => void handleReject()}
                 disabled={loading || !rejectReason.trim()}
                 className="px-4 py-2 rounded-lg disabled:opacity-50"
                 style={{ background: 'var(--secondary)', color: 'var(--background)' }}

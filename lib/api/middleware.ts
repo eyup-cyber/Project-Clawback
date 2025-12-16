@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
 import { ApiError } from './response';
-import type { User } from '@supabase/supabase-js';
 
 // ============================================================================
 // TYPES

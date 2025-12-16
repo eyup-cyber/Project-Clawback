@@ -2,8 +2,6 @@
  * Integration tests for Auth API
  */
 
-import { NextRequest } from 'next/server';
-
 // Mock dependencies
 jest.mock('@/lib/supabase/server', () => ({
   createClient: jest.fn(),

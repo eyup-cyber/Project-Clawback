@@ -1,4 +1,4 @@
-import { useEffect, RefObject } from 'react';
+import { useEffect, type RefObject } from 'react';
 import gsap from 'gsap';
 
 // ============================================
@@ -154,7 +154,7 @@ export const measureAnimationPerformance = (
 ) => {
   const startTime = performance.now();
   let frameCount = 0;
-  let lastFrameTime = performance.now();
+  const lastFrameTime = performance.now();
 
   const measureFrame = () => {
     frameCount++;

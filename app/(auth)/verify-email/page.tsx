@@ -61,7 +61,7 @@ export default function VerifyEmailPage() {
 
       <div className="space-y-4">
         <button
-          onClick={handleResend}
+          onClick={() => void handleResend()}
           disabled={resending}
           className="w-full py-3 rounded-lg font-medium transition-all hover:opacity-90 disabled:opacity-50 border"
           style={{

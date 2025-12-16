@@ -1,13 +1,7 @@
-import { NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
-import {
-  success,
-  handleApiError,
-  parseParams,
-  requireAuth,
-  requireContributor,
-} from '@/lib/api';
+import { success, handleApiError, parseParams, requireContributor } from '@/lib/api';
 import { getUserStats, getPostsByAuthor } from '@/lib/db';
 
 const querySchema = z.object({

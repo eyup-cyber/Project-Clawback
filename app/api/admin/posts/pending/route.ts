@@ -1,6 +1,6 @@
-import { NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { z } from 'zod';
-import { success, paginated, handleApiError, parseParams, requireEditor } from '@/lib/api';
+import { paginated, handleApiError, parseParams, requireEditor } from '@/lib/api';
 import { getPendingPosts } from '@/lib/db';
 
 const querySchema = z.object({

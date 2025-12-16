@@ -8,7 +8,7 @@ import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import Underline from '@tiptap/extension-underline';
 import Youtube from '@tiptap/extension-youtube';
-import { useCallback, useState, ReactNode } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 
 // SVG Icons for toolbar
 const Icons = {

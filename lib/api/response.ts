@@ -231,22 +231,6 @@ export function handleApiError(err: unknown, requestId?: string): NextResponse<A
   }
 }
 
-// Type guards
-function isSupabaseError(err: unknown): boolean {
-  return (
-    typeof err === "object" && err !== null && "code" in err && "message" in err
-  );
-}
-
-function isZodError(err: unknown): boolean {
-  return (
-    typeof err === "object" &&
-    err !== null &&
-    "errors" in err &&
-    Array.isArray((err as { errors: unknown }).errors)
-  );
-}
-
 // ============================================================================
 // CUSTOM API ERROR CLASS
 // ============================================================================

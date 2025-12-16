@@ -1,10 +1,11 @@
 'use client';
 
 import { Toaster } from 'react-hot-toast';
+import { ThemeProvider } from './ThemeProvider';
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <>
+    <ThemeProvider>
       {children}
       <Toaster
         position="bottom-right"
@@ -29,7 +30,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           },
         }}
       />
-    </>
+    </ThemeProvider>
   );
 }
 

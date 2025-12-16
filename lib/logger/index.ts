@@ -3,6 +3,8 @@
  * Provides consistent, structured logging with request correlation
  */
 
+/* eslint-disable no-console */
+
 import { getContext, type RequestContext } from './context';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
@@ -99,9 +101,7 @@ class Logger {
       const requestInfo = entry.requestId ? `[${entry.requestId}]` : '';
       const duration = entry.duration ? ` (+${entry.duration}ms)` : '';
 
-      console.log(
-        `${prefix} ${timestamp} ${requestInfo}${duration} ${entry.message}`
-      );
+      console.log(`${prefix} ${timestamp} ${requestInfo}${duration} ${entry.message}`);
 
       if (entry.context && Object.keys(entry.context).length > 0) {
         console.log('  Context:', entry.context);
@@ -190,14 +190,6 @@ export const log = {
     context?: Record<string, unknown>,
     requestId?: string
   ) => logger.performance(operation, duration, context, requestId),
-  query: (
-    query: string,
-    duration: number,
-    context?: Record<string, unknown>,
-    requestId?: string
-  ) => logger.query(query, duration, context, requestId),
+  query: (query: string, duration: number, context?: Record<string, unknown>, requestId?: string) =>
+    logger.query(query, duration, context, requestId),
 };
-
-
-
-

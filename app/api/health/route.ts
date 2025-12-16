@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { success } from '@/lib/api';
 import { getHealthStatus } from '@/lib/monitoring/health';
 import { applySecurityHeaders } from '@/lib/security/headers';

@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, ButtonHTMLAttributes, ReactNode, useState, useRef, useCallback } from 'react';
+import { forwardRef, type ButtonHTMLAttributes, type ReactNode, useState, useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
 interface RippleType {

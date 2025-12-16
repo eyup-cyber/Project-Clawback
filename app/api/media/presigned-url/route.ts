@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { r2Client } from '@/lib/r2/client';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { generateId } from '@/lib/utils';
 import { handleApiError, ApiError } from '@/lib/api';
 import { logger } from '@/lib/logger';

@@ -1,0 +1,44 @@
+# Local development environment template
+
+# Core
+NODE_ENV=development
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_APP_NAME=Scroungers Multimedia (Local)
+
+# Supabase (use dev project or local emulator)
+NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+
+# Cloudflare R2 (optional for local)
+R2_ACCOUNT_ID=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET_NAME=scroungers-media-dev
+R2_PUBLIC_URL=http://localhost:8787
+
+# Email (Resend) - optional for local
+RESEND_API_KEY=
+FROM_EMAIL="Scroungers <hello@localhost>"
+ADMIN_EMAIL=admin@localhost
+
+# Redis (optional cache)
+REDIS_URL=redis://localhost:6379
+
+# Security
+CSRF_SECRET=change_me_32_chars_min
+JWT_SECRET=change_me_64_chars_min
+
+# Monitoring / Analytics (optional)
+SENTRY_DSN=
+LOGROCKET_APP_ID=
+NEXT_PUBLIC_GA_ID=
+PLAUSIBLE_DOMAIN=localhost
+
+# Feature flags / logging
+FEATURE_EMAIL_NOTIFICATIONS=false
+FEATURE_REDIS_CACHE=false
+FEATURE_MONITORING=false
+RATE_LIMIT_ENABLED=false
+LOG_LEVEL=debug
+

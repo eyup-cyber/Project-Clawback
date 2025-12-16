@@ -1,12 +1,6 @@
-import { NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { z } from 'zod';
-import {
-  success,
-  paginated,
-  handleApiError,
-  parseParams,
-  requireEditor,
-} from '@/lib/api';
+import { success, handleApiError, parseParams, requireEditor } from '@/lib/api';
 import { listApplications, getApplicationStats } from '@/lib/db';
 
 const listApplicationsSchema = z.object({

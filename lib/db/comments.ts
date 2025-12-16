@@ -318,7 +318,12 @@ export async function flagComment(
   }
 
   // Log the flag (you might want a separate table for this)
-  console.log(`[FLAG] Comment ${commentId} flagged by ${reporterId}: ${reason} - ${details || 'No details'}`);
+  logger.info('[flagComment] Flagged comment', {
+    commentId,
+    reporterId,
+    reason,
+    details: details || 'No details',
+  });
 }
 
 /**
