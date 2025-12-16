@@ -5,9 +5,6 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Link from 'next/link';
 import { formatRelativeTime, getContentTypeIcon } from '@/lib/utils';
-import { createScrollReveal } from '@/lib/animations/scroll-animations';
-import { EASING, DURATION, prefersReducedMotion, getDuration } from '@/lib/animations/gsap-config';
-import AnimatedCard from '@/app/components/ui/AnimatedCard';
 import BackgroundEffects from '@/app/components/effects/BackgroundEffects';
 import { FloatingParticles } from '@/app/components/effects/Particles';
 

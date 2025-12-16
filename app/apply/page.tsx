@@ -183,7 +183,7 @@ export default function ApplyPage() {
       }
     };
 
-    check();
+    void check();
   }, [user, supabase]);
 
   // Animate step transitions
@@ -782,7 +782,7 @@ export default function ApplyPage() {
                   ) : (
                     <button
                       type="button"
-                      onClick={handleSubmit}
+                      onClick={() => void handleSubmit()}
                       disabled={loading || !user}
                       className="px-8 py-3 rounded-lg font-bold transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                       style={{ background: 'var(--primary)', color: 'var(--background)', fontFamily: 'var(--font-kindergarten)' }}

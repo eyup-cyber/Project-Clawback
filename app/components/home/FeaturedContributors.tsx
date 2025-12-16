@@ -236,7 +236,7 @@ export default function FeaturedContributors() {
       }
     };
 
-    fetchContributors();
+    void fetchContributors();
   }, [supabase]);
 
   useEffect(() => {

@@ -1,7 +1,6 @@
 import { type NextRequest } from 'next/server';
 import { z } from 'zod';
 import {
-  success,
   paginated,
   handleApiError,
   parseParams,

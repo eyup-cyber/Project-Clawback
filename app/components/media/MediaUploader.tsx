@@ -266,7 +266,7 @@ export default function MediaUploader({
       {/* Upload button */}
       {selectedFile && !uploading && (
         <button
-          onClick={uploadFile}
+          onClick={() => void uploadFile()}
           className="w-full py-3 rounded-lg font-medium transition-colors"
           style={{ background: 'var(--primary)', color: 'var(--background)' }}
         >

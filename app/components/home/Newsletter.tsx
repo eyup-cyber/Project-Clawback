@@ -280,7 +280,7 @@ export default function Newsletter() {
 
         <form
           ref={formRef}
-          onSubmit={handleSubmit}
+          onSubmit={(e) => void handleSubmit(e)}
           className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto"
         >
           {/* Email input with focus glow */}

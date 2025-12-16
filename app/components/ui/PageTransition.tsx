@@ -11,8 +11,8 @@ interface PageTransitionProps {
   duration?: number;
 }
 
-export default function PageTransition({ 
-  children, 
+export default function PageTransition({
+  children,
   variant = 'fade',
   duration = DURATION.medium,
 }: PageTransitionProps) {
@@ -21,16 +21,24 @@ export default function PageTransition({
   const overlayRef = useRef<HTMLDivElement>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [displayChildren, setDisplayChildren] = useState(children);
-  const previousPathname = useRef(pathname);
+  const [previousPathname, setPreviousPathname] = useState(pathname);
+
+  // Always show children directly when reduced motion is preferred
+  const reducedMotion = prefersReducedMotion();
+
+  // Track displayed children directly when not animating
+  const effectiveChildren = reducedMotion || !isAnimating ? children : displayChildren;
 
   useEffect(() => {
     // Skip animation on initial load or if reduced motion
-    if (previousPathname.current === pathname || prefersReducedMotion()) {
-      setDisplayChildren(children);
+    if (previousPathname === pathname || reducedMotion) {
       return;
     }
 
-    previousPathname.current = pathname;
+    // Animation state management - intentional synchronous setState in effect
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Required for page transition animation
+    setPreviousPathname(pathname);
+     
     setIsAnimating(true);
 
     const animationDuration = getDuration(duration);
@@ -38,18 +46,18 @@ export default function PageTransition({
     // Exit animation
     const exitAnimation = getExitAnimation(variant, containerRef.current, overlayRef.current, animationDuration);
 
-    exitAnimation.then(() => {
+    void exitAnimation.then(() => {
       setDisplayChildren(children);
-      
+
       // Enter animation
       const enterAnimation = getEnterAnimation(variant, containerRef.current, overlayRef.current, animationDuration);
-      
-      enterAnimation.then(() => {
+
+      void enterAnimation.then(() => {
         setIsAnimating(false);
       });
     });
 
-  }, [pathname, children, variant, duration]);
+  }, [pathname, children, variant, duration, previousPathname, reducedMotion]);
 
   return (
     <div className="page-transition-wrapper relative">
@@ -66,11 +74,11 @@ export default function PageTransition({
       />
       
       {/* Content container */}
-      <div 
-        ref={containerRef} 
+      <div
+        ref={containerRef}
         className={isAnimating ? 'pointer-events-none' : ''}
       >
-        {displayChildren}
+        {effectiveChildren}
       </div>
     </div>
   );
@@ -262,19 +270,24 @@ export function TransitionWrapper({
   className = '',
 }: TransitionWrapperProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [shouldRender, setShouldRender] = useState(show);
+  // Track whether we're in exit animation - only false after exit completes
+  const [isExiting, setIsExiting] = useState(false);
+
+  // When reduced motion is preferred, sync directly with show
+  const reducedMotion = prefersReducedMotion();
+  // Show element if: show is true OR we're in exit animation (still visible during fade out)
+  const shouldRender = reducedMotion ? show : (show || isExiting);
 
   useEffect(() => {
-    if (!ref.current || prefersReducedMotion()) {
-      setShouldRender(show);
+    if (!ref.current || reducedMotion) {
       return;
     }
 
     const animDuration = getDuration(duration);
 
     if (show) {
-      setShouldRender(true);
-      
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Required for enter animation coordination
+      setIsExiting(false);
       const animations = {
         fade: { from: { opacity: 0 }, to: { opacity: 1 } },
         slideUp: { from: { opacity: 0, y: 20 }, to: { opacity: 1, y: 0 } },
@@ -292,6 +305,8 @@ export function TransitionWrapper({
         ease: EASING.snappy,
       });
     } else {
+       
+      setIsExiting(true);
       const animations = {
         fade: { opacity: 0 },
         slideUp: { opacity: 0, y: -20 },
@@ -305,10 +320,10 @@ export function TransitionWrapper({
         ...animations[animation],
         duration: animDuration,
         ease: EASING.smooth,
-        onComplete: () => setShouldRender(false),
+        onComplete: () => setIsExiting(false),
       });
     }
-  }, [show, animation, duration, delay]);
+  }, [show, animation, duration, delay, reducedMotion]);
 
   if (!shouldRender) return null;
 
@@ -338,22 +353,28 @@ export function StaggeredTransition({
   className = '',
 }: StaggeredTransitionProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [shouldRender, setShouldRender] = useState(show);
+  // Track whether we're in exit animation
+  const [isExiting, setIsExiting] = useState(false);
+
+  // When reduced motion is preferred, sync directly with show
+  const reducedMotion = prefersReducedMotion();
+  // Show element if: show is true OR we're in exit animation
+  const shouldRender = reducedMotion ? show : (show || isExiting);
 
   useEffect(() => {
-    if (!ref.current || prefersReducedMotion()) {
-      setShouldRender(show);
+    if (!ref.current || reducedMotion) {
       return;
     }
 
-    const children = ref.current.children;
-    if (!children.length) return;
+    const childElements = ref.current.children;
+    if (!childElements.length) return;
 
     const animDuration = getDuration(duration);
 
     if (show) {
-      setShouldRender(true);
-      
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Required for enter animation coordination
+      setIsExiting(false);
+
       const animations = {
         fade: { from: { opacity: 0 }, to: { opacity: 1 } },
         slideUp: { from: { opacity: 0, y: 20 }, to: { opacity: 1, y: 0 } },
@@ -361,24 +382,26 @@ export function StaggeredTransition({
       };
 
       const anim = animations[animation];
-      gsap.fromTo(children, anim.from, {
+      gsap.fromTo(childElements, anim.from, {
         ...anim.to,
         duration: animDuration,
         stagger,
         ease: EASING.snappy,
       });
     } else {
-      gsap.to(children, {
+       
+      setIsExiting(true);
+      gsap.to(childElements, {
         opacity: 0,
         y: animation === 'slideUp' ? -10 : 0,
         scale: animation === 'scale' ? 0.95 : 1,
         duration: animDuration * 0.5,
         stagger: stagger * 0.5,
         ease: EASING.smooth,
-        onComplete: () => setShouldRender(false),
+        onComplete: () => setIsExiting(false),
       });
     }
-  }, [show, animation, duration, stagger]);
+  }, [show, animation, duration, stagger, reducedMotion]);
 
   if (!shouldRender) return null;
 

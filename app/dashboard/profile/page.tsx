@@ -46,7 +46,7 @@ export default function ProfilePage() {
       setLoading(false);
     };
     
-    loadProfile();
+    void loadProfile();
   }, [supabase]);
 
   const handleSave = async () => {
@@ -352,7 +352,7 @@ export default function ProfilePage() {
         {/* Save button */}
         <div className="flex justify-end pt-6 border-t" style={{ borderColor: 'var(--border)' }}>
           <button
-            onClick={handleSave}
+            onClick={() => void handleSave()}
             disabled={saving}
             className="px-8 py-3 rounded-lg font-medium"
             style={{ background: 'var(--primary)', color: 'var(--background)' }}

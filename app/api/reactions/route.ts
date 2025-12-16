@@ -3,7 +3,6 @@ import {
   success,
   handleApiError,
   parseBody,
-  parseParams,
   toggleReactionSchema,
   requireAuth,
   getAuthUser,
@@ -15,7 +14,7 @@ import { applySecurityHeaders } from '@/lib/security/headers';
 import { assertCsrfOrThrow } from '@/lib/security/csrf';
 import { z } from 'zod';
 
-const getReactionsSchema = z.object({
+const _getReactionsSchema = z.object({
   post_id: z.string().uuid(),
 });
 

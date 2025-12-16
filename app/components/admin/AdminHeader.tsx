@@ -145,7 +145,7 @@ export default function AdminHeader({ user, profile }: AdminHeaderProps) {
               </Link>
               <hr className="my-2" style={{ borderColor: 'var(--border)' }} />
               <button
-                onClick={() => signOut()}
+                onClick={() => void signOut()}
                 className="w-full text-left px-4 py-2 text-sm hover:bg-[var(--surface)]"
                 style={{ color: 'var(--accent)' }}
               >

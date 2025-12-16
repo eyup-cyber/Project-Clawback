@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef, useId } from "react";
 import { prefersReducedMotion } from "@/lib/animations/gsap-config";
 
 interface NoiseProps {
@@ -102,10 +102,8 @@ export function SVGNoise({
   baseFrequency?: number;
   className?: string;
 }) {
-  const filterId = useMemo(
-    () => `noise-${Math.random().toString(36).substr(2, 9)}`,
-    []
-  );
+  const id = useId();
+  const filterId = `noise-${id.replace(/:/g, '')}`;
 
   return (
     <>
@@ -200,10 +198,8 @@ export function GridPattern({
   opacity = 0.05,
   className = "",
 }: GridPatternProps) {
-  const patternId = useMemo(
-    () => `grid-${Math.random().toString(36).substr(2, 9)}`,
-    []
-  );
+  const id = useId();
+  const patternId = `grid-${id.replace(/:/g, '')}`;
 
   return (
     <>

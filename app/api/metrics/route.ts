@@ -4,7 +4,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { getMetrics, getMetricsByName, getMetricsSummary } from '@/lib/monitoring/metrics';
+import { getMetricsSummary } from '@/lib/monitoring/metrics';
 import { logger } from '@/lib/logger';
 import { requireRole } from '@/lib/api/middleware';
 import { handleApiError } from '@/lib/api/error-handler';

@@ -325,7 +325,7 @@ export default function Nav() {
                 </span>
               </Link>
               <button
-                onClick={() => signOut()}
+                onClick={() => void signOut()}
                 className="text-sm px-3 py-1.5 rounded-full border transition-all hover:border-[var(--accent)] hover:text-[var(--accent)]"
                 style={{ borderColor: "var(--border)", color: "var(--foreground)", fontFamily: "var(--font-body)" }}
               >

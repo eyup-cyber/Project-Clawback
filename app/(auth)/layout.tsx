@@ -1,21 +1,27 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
+
+// Seeded random for deterministic particle generation
+function seededRandom(seed: number) {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
 
 // Floating particles for background
 function FloatingParticles() {
-  const particles = useMemo(() => 
+  const [particles] = useState(() =>
     Array.from({ length: 20 }, (_, i) => ({
       id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 3 + 1,
-      duration: Math.random() * 20 + 15,
-      delay: Math.random() * 10,
-    })), 
-  []);
+      x: seededRandom(i * 1) * 100,
+      y: seededRandom(i * 2) * 100,
+      size: seededRandom(i * 3) * 3 + 1,
+      duration: seededRandom(i * 4) * 20 + 15,
+      delay: seededRandom(i * 5) * 10,
+    }))
+  );
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden">

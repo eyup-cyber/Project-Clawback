@@ -9,9 +9,7 @@ import Nav from '@/app/components/Nav';
 import Footer from '@/app/components/layout/Footer';
 import { formatDate, getInitials } from '@/lib/utils';
 import { REACTION_TYPES } from '@/lib/constants';
-import { EASING, DURATION, prefersReducedMotion, getDuration } from '@/lib/animations/gsap-config';
-import { createScrollReveal } from '@/lib/animations/scroll-animations';
-import MagneticButton from '@/app/components/ui/MagneticButton';
+import { prefersReducedMotion } from '@/lib/animations/gsap-config';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -113,7 +111,6 @@ const tocEntries = [
 
 // Reading Progress Bar Component with animation
 function ReadingProgressBar() {
-  const [progress, setProgress] = useState(0);
   const progressRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -124,15 +121,14 @@ function ReadingProgressBar() {
       const documentHeight = document.documentElement.scrollHeight - windowHeight;
       const scrollTop = window.scrollY;
       const newProgress = Math.min((scrollTop / documentHeight) * 100, 100);
-      
+
       if (progressRef.current) {
         gsap.to(progressRef.current, {
           width: `${newProgress}%`,
           duration: 0.1,
-          ease: EASING.smooth,
+          ease: 'power2.out',
         });
       }
-      setProgress(newProgress);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -221,7 +217,7 @@ function ShareButtons({ title, url }: { title: string; url: string }) {
         '_blank'
       );
     } else if (platform === 'copy') {
-      navigator.clipboard.writeText(url);
+      void navigator.clipboard.writeText(url);
       setCopied(true);
       
       if (button && !prefersReducedMotion()) {

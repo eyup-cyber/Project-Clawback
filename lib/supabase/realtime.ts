@@ -67,7 +67,7 @@ export const useRealtimeReactions = (
   });
 
   return () => {
-    channel.unsubscribe();
+    void channel.unsubscribe();
   };
 };
 
@@ -83,7 +83,7 @@ export const useRealtimeComments = (
   });
 
   return () => {
-    channel.unsubscribe();
+    void channel.unsubscribe();
   };
 };
 
@@ -101,7 +101,7 @@ export const useRealtimeViews = (
   });
 
   return () => {
-    channel.unsubscribe();
+    void channel.unsubscribe();
   };
 };
 
@@ -117,7 +117,7 @@ export const useRealtimeNotifications = (
   });
 
   return () => {
-    channel.unsubscribe();
+    void channel.unsubscribe();
   };
 };
 

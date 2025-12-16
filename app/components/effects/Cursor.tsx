@@ -243,7 +243,7 @@ export function CursorTrail({
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      pointsRef.current.forEach((point, i) => {
+      pointsRef.current.forEach((point) => {
         point.age *= decay;
         
         if (point.age > 0.01) {

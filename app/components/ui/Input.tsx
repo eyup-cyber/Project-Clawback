@@ -26,12 +26,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     const errorRef = useRef<HTMLParagraphElement>(null);
     const successRef = useRef<HTMLDivElement>(null);
     const [isFocused, setIsFocused] = useState(false);
-    const [hasValue, setHasValue] = useState(!!value || !!(props.defaultValue as string));
+    // Derive hasValue and charCount directly from value prop
+    const hasValue = !!value || !!(props.defaultValue as string);
+    const charCount = typeof value === 'string' ? value.length : 0;
     const actualRef = (ref as React.RefObject<HTMLInputElement>) || inputRef;
-
-    useEffect(() => {
-      setHasValue(!!value || !!(inputRef.current?.value));
-    }, [value]);
 
     useEffect(() => {
       if (!actualRef.current || prefersReducedMotion()) return;
@@ -127,7 +125,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       }
     }, [success]);
 
-    const characterCount = typeof value === 'string' ? value.length : (inputRef.current?.value.length || 0);
+    const characterCount = typeof value === 'string' ? value.length : charCount;
 
     return (
       <div className="w-full">

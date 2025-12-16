@@ -30,7 +30,7 @@ function validateUrl(key) {
   try {
     new URL(process.env[key]);
     return true;
-  } catch (err) {
+  } catch {
     console.error(`Invalid URL format for ${key}: ${process.env[key]}`);
     return false;
   }
@@ -74,7 +74,8 @@ function run() {
   }
 
   if (!process.exitCode) {
-    console.log("Environment validation passed.");
+    // eslint-disable-next-line no-console
+    console.info("Environment validation passed.");
   }
 }
 

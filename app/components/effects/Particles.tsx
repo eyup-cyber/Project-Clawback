@@ -1,9 +1,28 @@
 'use client';
 
-import { useEffect, useRef, useMemo, useState } from 'react';
+import { useRef, useState, useSyncExternalStore } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import type * as THREE from 'three';
 import { prefersReducedMotion } from '@/lib/animations/gsap-config';
+
+// Hook to check if we're on the client side (hydration-safe)
+const emptySubscribe = () => () => {};
+function useIsMounted() {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => true,  // Client: mounted
+    () => false  // Server: not mounted
+  );
+}
+
+// Seeded random for deterministic particle generation
+function createSeededRandom(seed: number) {
+  let s = seed;
+  return () => {
+    s = (s * 9301 + 49297) % 233280;
+    return s / 233280;
+  };
+}
 
 interface ParticlesProps {
   count?: number;
@@ -73,29 +92,30 @@ function ParticleField({
   const pointsRef = useRef<THREE.Points>(null);
   const mousePosition = useRef({ x: 0, y: 0 });
 
-  // Generate initial positions
-  const particles = useMemo(() => {
+  // Generate initial positions using seeded random for determinism
+  const [particles] = useState(() => {
     const positions = new Float32Array(count * 3);
     const velocities = new Float32Array(count * 3);
     const originalPositions = new Float32Array(count * 3);
+    const random = createSeededRandom(42);
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
-      positions[i3] = (Math.random() - 0.5) * spread;
-      positions[i3 + 1] = (Math.random() - 0.5) * spread;
-      positions[i3 + 2] = (Math.random() - 0.5) * spread;
+      positions[i3] = (random() - 0.5) * spread;
+      positions[i3 + 1] = (random() - 0.5) * spread;
+      positions[i3 + 2] = (random() - 0.5) * spread;
 
       originalPositions[i3] = positions[i3];
       originalPositions[i3 + 1] = positions[i3 + 1];
       originalPositions[i3 + 2] = positions[i3 + 2];
 
-      velocities[i3] = (Math.random() - 0.5) * speed;
-      velocities[i3 + 1] = (Math.random() - 0.5) * speed;
-      velocities[i3 + 2] = (Math.random() - 0.5) * speed;
+      velocities[i3] = (random() - 0.5) * speed;
+      velocities[i3 + 1] = (random() - 0.5) * speed;
+      velocities[i3 + 2] = (random() - 0.5) * speed;
     }
 
     return { positions, velocities, originalPositions };
-  }, [count, spread, speed]);
+  });
 
   // Track mouse position
   useEffect(() => {
@@ -198,33 +218,22 @@ export function FloatingParticles({
   maxSize = 6,
   className = '',
 }: FloatingParticlesProps) {
-  const [mounted, setMounted] = useState(false);
-  
-  const particles = useMemo(() => {
-    // Use a seeded random function for consistent SSR/client values
-    let seed = 0;
-    const seededRandom = () => {
-      seed = (seed * 9301 + 49297) % 233280;
-      return seed / 233280;
-    };
-    
-    return Array.from({ length: count }, (_, i) => {
-      seed = i * 1000; // Reset seed for each particle based on index
+  const mounted = useIsMounted();
+
+  const [particles] = useState(() =>
+    Array.from({ length: count }, (_, i) => {
+      const random = createSeededRandom(i * 1000);
       return {
         id: i,
-        x: seededRandom() * 100,
-        y: seededRandom() * 100,
-        size: minSize + seededRandom() * (maxSize - minSize),
-        duration: 10 + seededRandom() * 20,
-        delay: seededRandom() * 10,
-        opacity: 0.3 + seededRandom() * 0.3,
+        x: random() * 100,
+        y: random() * 100,
+        size: minSize + random() * (maxSize - minSize),
+        duration: 10 + random() * 20,
+        delay: random() * 10,
+        opacity: 0.3 + random() * 0.3,
       };
-    });
-  }, [count, minSize, maxSize]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+    })
+  );
 
   if (prefersReducedMotion() || !mounted) {
     return null;
@@ -285,16 +294,17 @@ export function Sparkle({
   count = 3,
   className = '',
 }: SparkleProps) {
-  const sparkles = useMemo(() => {
+  const [sparkles] = useState(() => {
+    const random = createSeededRandom(123);
     return Array.from({ length: count }, (_, i) => ({
       id: i,
-      x: 20 + Math.random() * 60,
-      y: 20 + Math.random() * 60,
-      size: 4 + Math.random() * 8,
-      duration: 1 + Math.random() * 2,
-      delay: Math.random() * 2,
+      x: 20 + random() * 60,
+      y: 20 + random() * 60,
+      size: 4 + random() * 8,
+      duration: 1 + random() * 2,
+      delay: random() * 2,
     }));
-  }, [count]);
+  });
 
   if (prefersReducedMotion()) {
     return null;

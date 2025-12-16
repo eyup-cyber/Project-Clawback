@@ -7,7 +7,6 @@ import {
   parseParams,
   createPostSchema,
   listPostsSchema,
-  requireAuth,
   requireContributor,
 } from '@/lib/api';
 import { rateLimitByUser } from '@/lib/security/rate-limit';

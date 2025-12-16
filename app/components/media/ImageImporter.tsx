@@ -123,12 +123,12 @@ export default function ImageImporter({ onImageSelect, currentImage }: ImageImpo
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              handleFetch();
+              void handleFetch();
             }
           }}
         />
         <button
-          onClick={handleFetch}
+          onClick={() => void handleFetch()}
           disabled={loading || !url.trim()}
           className="px-6 py-2 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
@@ -166,7 +166,7 @@ export default function ImageImporter({ onImageSelect, currentImage }: ImageImpo
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleUploadAndSelect(image.url);
+                      void handleUploadAndSelect(image.url);
                     }}
                     disabled={uploading}
                     className="px-4 py-2 rounded-lg text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"

@@ -25,12 +25,10 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const errorRef = useRef<HTMLParagraphElement>(null);
     const successRef = useRef<HTMLDivElement>(null);
     const [isFocused, setIsFocused] = useState(false);
-    const [hasValue, setHasValue] = useState(!!value || !!(props.defaultValue as string));
+    // Derive hasValue and charCount directly from value prop
+    const hasValue = !!value || !!(props.defaultValue as string);
+    const charCount = typeof value === 'string' ? value.length : 0;
     const actualRef = (ref as React.RefObject<HTMLTextAreaElement>) || textareaRef;
-
-    useEffect(() => {
-      setHasValue(!!value || !!(textareaRef.current?.value));
-    }, [value]);
 
     // Auto-resize
     useEffect(() => {
@@ -137,7 +135,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       }
     }, [success]);
 
-    const characterCount = typeof value === 'string' ? value.length : (textareaRef.current?.value.length || 0);
+    const characterCount = typeof value === 'string' ? value.length : charCount;
 
     return (
       <div className="w-full">

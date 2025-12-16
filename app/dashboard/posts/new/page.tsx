@@ -72,7 +72,7 @@ export default function NewPostPage() {
         .order("sort_order");
       if (data) setCategories(data);
     };
-    fetchCategories();
+    void fetchCategories();
   }, [supabase]);
 
   const handleContentTypeSelect = (type: ContentType) => {
@@ -602,7 +602,7 @@ export default function NewPostPage() {
               style={{ borderColor: "var(--border)" }}
             >
               <button
-                onClick={() => handleSave("draft")}
+                onClick={() => void handleSave("draft")}
                 disabled={saving}
                 className="px-6 py-3 rounded-lg font-medium border"
                 style={{
@@ -613,7 +613,7 @@ export default function NewPostPage() {
                 {saving ? "Saving..." : "Save as Draft"}
               </button>
               <button
-                onClick={() => handleSave("pending")}
+                onClick={() => void handleSave("pending")}
                 disabled={saving}
                 className="px-6 py-3 rounded-lg font-medium"
                 style={{

@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import gsap from 'gsap';
-import { EASING, DURATION, prefersReducedMotion, getDuration } from '@/lib/animations/gsap-config';
+import { EASING, prefersReducedMotion, getDuration } from '@/lib/animations/gsap-config';
 import { useIntersectionObserver } from '@/lib/animations/performance';
 
 interface AnimatedStatCardProps {

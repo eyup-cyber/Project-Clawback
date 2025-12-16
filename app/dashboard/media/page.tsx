@@ -32,7 +32,9 @@ export default function MediaLibraryPage() {
   const [showImporter, setShowImporter] = useState(false);
 
   useEffect(() => {
-    fetchMedia();
+    void fetchMedia();
+    // fetchMedia is defined inside component and uses supabase/filterType
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterType]);
 
   const fetchMedia = async () => {
@@ -79,7 +81,7 @@ export default function MediaLibraryPage() {
       if (error) throw error;
 
       toast.success("Media deleted");
-      fetchMedia();
+      void fetchMedia();
       if (selectedMedia?.id === id) {
         setSelectedMedia(null);
       }
@@ -89,19 +91,19 @@ export default function MediaLibraryPage() {
     }
   };
 
-  const handleImageImported = (imageUrl: string) => {
+  const handleImageImported = (_imageUrl: string) => {
     toast.success("Image imported successfully!");
-    fetchMedia();
+    void fetchMedia();
     setShowImporter(false);
   };
 
   const handleMediaUploaded = () => {
     toast.success("Media uploaded successfully!");
-    fetchMedia();
+    void fetchMedia();
   };
 
   const copyUrl = (url: string) => {
-    navigator.clipboard.writeText(url);
+    void navigator.clipboard.writeText(url);
     toast.success("URL copied to clipboard!");
   };
 
@@ -290,7 +292,7 @@ export default function MediaLibraryPage() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDelete(item.id);
+                        void handleDelete(item.id);
                       }}
                       className="px-3 py-1.5 rounded text-sm font-medium"
                       style={{ background: "#ef4444", color: "#fff" }}
@@ -358,7 +360,7 @@ export default function MediaLibraryPage() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDelete(item.id);
+                      void handleDelete(item.id);
                     }}
                     className="px-3 py-1.5 rounded text-sm font-medium"
                     style={{ background: "#ef4444", color: "#fff" }}
@@ -486,7 +488,7 @@ export default function MediaLibraryPage() {
                   </button>
                   <button
                     onClick={() => {
-                      handleDelete(selectedMedia.id);
+                      void handleDelete(selectedMedia.id);
                       setSelectedMedia(null);
                     }}
                     className="px-4 py-2 rounded font-medium"

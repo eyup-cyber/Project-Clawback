@@ -10,15 +10,14 @@ import {
 } from "@/lib/animations/gsap-config";
 import { FloatingParticles } from "./effects/Particles";
 import { GridPattern } from "./effects/Noise";
-import BackgroundEffects from "./effects/BackgroundEffects";
-import { createScrollReveal, createParallaxLayer } from "@/lib/animations/scroll-animations";
 
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
   const scroungerRef = useRef<HTMLHeadingElement>(null);
   const multimediaRef = useRef<HTMLSpanElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  // Initialize to true if user prefers reduced motion (no animation needed)
+  const [isLoaded, setIsLoaded] = useState(() => prefersReducedMotion());
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   // Track mouse for parallax effect
@@ -36,11 +35,8 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
-    if (prefersReducedMotion()) {
-      // Set final states immediately
-      setIsLoaded(true);
-      return;
-    }
+    // Skip animation if user prefers reduced motion (already set loaded=true via useState initializer)
+    if (prefersReducedMotion()) return;
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({

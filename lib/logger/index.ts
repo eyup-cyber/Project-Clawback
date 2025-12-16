@@ -5,7 +5,7 @@
 
 /* eslint-disable no-console */
 
-import { getContext, type RequestContext } from './context';
+import { getContext } from './context';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 

@@ -20,7 +20,7 @@ interface ImageFetchResult {
  * Extract images from a Patreon post URL
  * Note: Patreon doesn't have a public API, so we'll need to use their RSS feed or web scraping
  */
-export async function fetchPatreonImages(postUrl: string): Promise<ImageFetchResult> {
+export async function fetchPatreonImages(_postUrl: string): Promise<ImageFetchResult> {
   try {
     // Patreon post URLs typically look like:
     // https://www.patreon.com/posts/[post-id]

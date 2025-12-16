@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user's posts
-    const { posts, total: totalPosts } = await getPostsByAuthor(user.id, {
+    const { posts } = await getPostsByAuthor(user.id, {
       limit: 100,
     });
 

@@ -31,7 +31,7 @@ const MagneticButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Magneti
       radius = 100,
       scale = 1.002,
       glow = true,
-      ripple = true,
+      ripple: _ripple = true,
       particleTrail = false,
       liquidMorph = false,
       variant = 'primary',
@@ -46,7 +46,7 @@ const MagneticButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Magneti
     const buttonRef = useRef<HTMLButtonElement | HTMLAnchorElement>(null);
     const contentRef = useRef<HTMLSpanElement>(null);
     const glowRef = useRef<HTMLSpanElement>(null);
-    const rippleRef = useRef<HTMLSpanElement>(null);
+    const _rippleRef = useRef<HTMLSpanElement>(null);
     const particleContainerRef = useRef<HTMLDivElement>(null);
     const liquidRef = useRef<HTMLDivElement>(null);
     const boundingRef = useRef<DOMRect | null>(null);
@@ -309,9 +309,9 @@ const MagneticButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Magneti
         particlesRef.current.forEach(p => p.element.remove());
         particlesRef.current = [];
       };
-    }, [ref, strength, radius, scale, glow, particleTrail, liquidMorph, disabled]);
+    }, [ref, strength, radius, scale, glow, styles.glowColor, particleTrail, liquidMorph, disabled]);
 
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+    const handleClick = (_e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
       if (disabled) return;
 
       // Ripple effect removed - no white spots

@@ -139,7 +139,7 @@ export default function ContactPage() {
                   </p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
                   <div>
                     <label
                       className="block text-sm font-medium mb-2"

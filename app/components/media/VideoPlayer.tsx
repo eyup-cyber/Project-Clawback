@@ -56,7 +56,7 @@ export default function VideoPlayer({ src, poster, title }: VideoPlayerProps) {
     if (playing) {
       video.pause();
     } else {
-      video.play();
+      void video.play();
     }
     setPlaying(!playing);
   };
@@ -91,11 +91,11 @@ export default function VideoPlayer({ src, poster, title }: VideoPlayerProps) {
 
     if (!fullscreen) {
       if (containerRef.current.requestFullscreen) {
-        containerRef.current.requestFullscreen();
+        void containerRef.current.requestFullscreen();
       }
     } else {
       if (document.exitFullscreen) {
-        document.exitFullscreen();
+        void document.exitFullscreen();
       }
     }
     setFullscreen(!fullscreen);

@@ -150,9 +150,9 @@ describe('Admin API Integration', () => {
             error: null,
           }),
         },
-        from: jest.fn().mockImplementation((table) => {
+        from: jest.fn().mockImplementation((_table) => {
           return {
-            select: jest.fn().mockImplementation((cols, opts) => {
+            select: jest.fn().mockImplementation((_cols, opts) => {
               if (opts?.count === 'exact' && opts?.head) {
                 return {
                   eq: jest.fn().mockResolvedValue({

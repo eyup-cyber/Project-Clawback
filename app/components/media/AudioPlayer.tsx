@@ -44,7 +44,7 @@ export default function AudioPlayer({ src, title, artist, coverImage }: AudioPla
     if (playing) {
       audio.pause();
     } else {
-      audio.play();
+      void audio.play();
     }
     setPlaying(!playing);
   };

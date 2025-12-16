@@ -46,10 +46,10 @@ export interface NotificationWithDetails extends Notification {
 
 // Helper to get an untyped supabase client for notifications table
 // (until the migration is applied and types are regenerated)
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 async function getNotificationsTable(): Promise<any> {
   const supabase = await createClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   return (supabase as any).from('notifications');
 }
 
@@ -102,7 +102,7 @@ export async function getNotifications(options: {
     .eq('is_read', false);
 
   // Transform the data to match expected shape
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const notifications = (data || []).map((n: any) => ({
     ...n,
     post_title: n.post?.title || null,

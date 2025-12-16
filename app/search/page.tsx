@@ -79,7 +79,7 @@ export default function SearchPage() {
         <div className="max-w-4xl mx-auto">
           {/* Search form */}
           <div className="search-container mb-12">
-            <form onSubmit={handleSearch} className="relative">
+            <form onSubmit={(e) => void handleSearch(e)} className="relative">
               <input
                 ref={inputRef}
                 type="text"

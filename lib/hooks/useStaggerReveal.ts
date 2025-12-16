@@ -304,10 +304,12 @@ export function useCharacterReveal(options: CharacterRevealOptions = {}) {
       });
     }, ref);
 
+    // Copy ref.current to a local variable for cleanup
+    const element = ref.current;
     return () => {
       ctx.revert();
-      if (ref.current && originalText.current) {
-        ref.current.textContent = originalText.current;
+      if (element && originalText.current) {
+        element.textContent = originalText.current;
       }
     };
   }, [stagger, duration, ease, start, once, splitBy]);

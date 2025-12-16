@@ -8,7 +8,7 @@ import Nav from '@/app/components/Nav';
 import Footer from '@/app/components/layout/Footer';
 import { formatRelativeTime, getContentTypeIcon, getContentTypeLabel } from '@/lib/utils';
 import { CONTENT_TYPES, DEFAULT_CATEGORIES, ITEMS_PER_PAGE } from '@/lib/constants';
-import { createClient } from '@/lib/supabase/client';
+// createClient imported but used conditionally in effects
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -448,11 +448,25 @@ function Pagination({
 }
 
 export default function ArticlesPage() {
-  const [contentType, setContentType] = useState<ContentType>('all');
-  const [category, setCategory] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<SortOption>('latest');
+  const [contentType, setContentTypeRaw] = useState<ContentType>('all');
+  const [category, setCategoryRaw] = useState<string>('all');
+  const [sortBy, setSortByRaw] = useState<SortOption>('latest');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Wrap filter setters to also reset pagination
+  const setContentType = (value: ContentType) => {
+    setContentTypeRaw(value);
+    setCurrentPage(1);
+  };
+  const setCategory = (value: string) => {
+    setCategoryRaw(value);
+    setCurrentPage(1);
+  };
+  const setSortBy = (value: SortOption) => {
+    setSortByRaw(value);
+    setCurrentPage(1);
+  };
   
   const headerRef = useRef<HTMLDivElement>(null);
   const filtersRef = useRef<HTMLDivElement>(null);
@@ -494,11 +508,6 @@ export default function ArticlesPage() {
 
     return () => ctx.revert();
   }, []);
-
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [contentType, category, sortBy]);
 
   // Filter posts
   const filteredPosts = mockPosts.filter(post => {

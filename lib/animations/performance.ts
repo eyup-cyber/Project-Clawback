@@ -82,10 +82,11 @@ export const useIntersectionObserver = (
   callback: (isIntersecting: boolean) => void,
   options: IntersectionObserverOptions = {}
 ) => {
+  const { threshold = 0.2, rootMargin = '0px', triggerOnce = false } = options;
+
   useEffect(() => {
     if (!ref.current) return;
 
-    const { threshold = 0.2, rootMargin = '0px', triggerOnce = false } = options;
     let hasTriggered = false;
 
     const observer = new IntersectionObserver(
@@ -112,7 +113,7 @@ export const useIntersectionObserver = (
     return () => {
       observer.disconnect();
     };
-  }, [ref, callback, options.threshold, options.rootMargin, options.triggerOnce]);
+  }, [ref, callback, threshold, rootMargin, triggerOnce]);
 };
 
 // ============================================

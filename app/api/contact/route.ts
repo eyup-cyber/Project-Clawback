@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { type NextRequest } from 'next/server';
-import { success, handleApiError, parseBody, validationError } from '@/lib/api';
+import { success, handleApiError, parseBody } from '@/lib/api';
 import { contactSubmissionSchema } from '@/lib/api/validation';
 import { applySecurityHeaders } from '@/lib/security/headers';
 import { rateLimitByIp } from '@/lib/security/rate-limit';

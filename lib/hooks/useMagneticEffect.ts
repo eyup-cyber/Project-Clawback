@@ -168,28 +168,65 @@ export function useMagneticButton(options: MagneticButtonOptions = {}): {
         });
       }
     } else if (isHovering.current) {
-      resetPosition();
+      // Reset position when mouse leaves radius
+      isHovering.current = false;
+      gsap.to(ref.current, {
+        x: 0,
+        y: 0,
+        scale: 1,
+        duration: duration * 1.5,
+        ease: EASING.elastic,
+      });
+      if (innerRef.current) {
+        gsap.to(innerRef.current, {
+          x: 0,
+          y: 0,
+          duration: duration * 1.5,
+          ease: EASING.elastic,
+        });
+      }
     }
-  }, [strength, innerStrength, radius, ease, duration, scale, resetPosition]);
+  }, [strength, innerStrength, radius, ease, duration, scale]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (!ref.current || prefersReducedMotion()) return;
+
+    isHovering.current = false;
+    gsap.to(ref.current, {
+      x: 0,
+      y: 0,
+      scale: 1,
+      duration: duration * 1.5,
+      ease: EASING.elastic,
+    });
+    if (innerRef.current) {
+      gsap.to(innerRef.current, {
+        x: 0,
+        y: 0,
+        duration: duration * 1.5,
+        ease: EASING.elastic,
+      });
+    }
+  }, [duration]);
 
   useEffect(() => {
     const element = ref.current;
     if (!element || prefersReducedMotion()) return;
 
     updateBounding();
-    
+
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('resize', updateBounding);
     window.addEventListener('scroll', updateBounding);
-    element.addEventListener('mouseleave', resetPosition);
+    element.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', updateBounding);
       window.removeEventListener('scroll', updateBounding);
-      element.removeEventListener('mouseleave', resetPosition);
+      element.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [handleMouseMove, resetPosition, updateBounding]);
+  }, [handleMouseMove, handleMouseLeave, updateBounding]);
 
   return { 
     ref: ref as RefObject<HTMLElement | null>, 

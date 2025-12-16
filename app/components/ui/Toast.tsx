@@ -7,8 +7,19 @@ import {
   useContext,
   useCallback,
   useRef,
+  useSyncExternalStore,
 } from "react";
 import { createPortal } from "react-dom";
+
+// Hook to check if we're on the client side (hydration-safe)
+const emptySubscribe = () => () => {};
+function useIsMounted() {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => true,  // Client: mounted
+    () => false  // Server: not mounted
+  );
+}
 
 type ToastType = "success" | "error" | "info" | "warning";
 
@@ -138,6 +149,11 @@ export function Toast({
   const [isExiting, setIsExiting] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
+  const handleDismiss = useCallback(() => {
+    setIsExiting(true);
+    setTimeout(() => onRemove(toast.id), 300);
+  }, [toast.id, onRemove]);
+
   useEffect(() => {
     // Trigger enter animation
     requestAnimationFrame(() => setIsVisible(true));
@@ -153,12 +169,7 @@ export function Toast({
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [toast.duration]);
-
-  const handleDismiss = useCallback(() => {
-    setIsExiting(true);
-    setTimeout(() => onRemove(toast.id), 300);
-  }, [toast.id, onRemove]);
+  }, [toast.duration, handleDismiss]);
 
   const color = colors[toast.type];
 
@@ -250,11 +261,7 @@ export function ToastContainer({
   toasts: ToastData[];
   onRemove: (id: string) => void;
 }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useIsMounted();
 
   if (!mounted) return null;
 

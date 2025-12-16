@@ -227,7 +227,7 @@ export default function CategoriesShowcase() {
       }
     };
 
-    fetchCategories();
+    void fetchCategories();
   }, [supabase]);
 
   useEffect(() => {

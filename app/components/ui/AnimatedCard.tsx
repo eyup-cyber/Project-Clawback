@@ -227,7 +227,7 @@ export default function AnimatedCard({
     observer.observe(card);
 
     return () => observer.disconnect();
-  }, [revealAnimation]);
+  }, []);
 
   const handleClick = () => {
     if (disabled) return;
