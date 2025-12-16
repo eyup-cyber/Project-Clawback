@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable react-hooks/refs, react-hooks/set-state-in-effect */
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import gsap from 'gsap';
 import { EASING, DURATION, prefersReducedMotion, getDuration } from '../animations/gsap-config';

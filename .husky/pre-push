@@ -3,8 +3,8 @@
 
 # Run type checking and tests before pushing
 echo "Running type check..."
-pnpm type-check
+npm run typecheck -- --pretty false
 
 echo "Running tests..."
-pnpm test --passWithNoTests
+npm test -- --passWithNoTests
 

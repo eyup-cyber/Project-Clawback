@@ -19,7 +19,7 @@ interface ErrorDetails {
 /**
  * Map error to standardized error details
  */
-export function mapErrorToDetails(err: unknown, requestId?: string): ErrorDetails {
+export function mapErrorToDetails(err: unknown, _requestId?: string): ErrorDetails {
   // Handle ApiError instances
   if (err instanceof ApiError) {
     return {

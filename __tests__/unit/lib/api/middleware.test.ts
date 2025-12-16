@@ -2,8 +2,6 @@
  * Unit tests for API middleware
  */
 
-import { NextRequest } from 'next/server';
-
 // Mock Supabase client
 jest.mock('@/lib/supabase/server', () => ({
   createClient: jest.fn(() => ({
@@ -116,8 +114,6 @@ describe('API Middleware', () => {
   });
 
   describe('requireMinRole', () => {
-    const roleHierarchy = ['reader', 'contributor', 'editor', 'admin'];
-
     it('should allow admin to access contributor routes', async () => {
       const mockUser = { id: 'user-123', email: 'admin@example.com' };
       const mockProfile = {

@@ -98,12 +98,12 @@ describe('Validation Schemas', () => {
     });
 
     it('should require title', () => {
-      const { title, ...noTitle } = validPost;
+      const { title: _title, ...noTitle } = validPost;
       expect(() => createPostSchema.parse(noTitle)).toThrow();
     });
 
     it('should require category_id', () => {
-      const { category_id, ...noCategory } = validPost;
+      const { category_id: _categoryId, ...noCategory } = validPost;
       expect(() => createPostSchema.parse(noCategory)).toThrow();
     });
 
@@ -153,7 +153,7 @@ describe('Validation Schemas', () => {
     });
 
     it('should require all mandatory fields', () => {
-      const { full_name, ...noName } = validApplication;
+      const { full_name: _fullName, ...noName } = validApplication;
       expect(() => contributorApplicationSchema.parse(noName)).toThrow();
     });
   });

@@ -1,13 +1,6 @@
-import { NextRequest } from 'next/server';
-import {
-  success,
-  handleApiError,
-  parseBody,
-  moderatePostSchema,
-  requireEditor,
-  requireAdmin,
-} from '@/lib/api';
-import { updatePostStatus, toggleFeatured, getPostById } from '@/lib/db';
+import { type NextRequest } from 'next/server';
+import { success, handleApiError, parseBody, moderatePostSchema, requireEditor } from '@/lib/api';
+import { updatePostStatus, toggleFeatured } from '@/lib/db';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -19,7 +12,7 @@ interface RouteContext {
 export async function POST(request: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
-    const { user } = await requireEditor();
+    await requireEditor();
 
     const body = await parseBody(request, moderatePostSchema.omit({ post_id: true }));
 

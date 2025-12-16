@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { Database } from '@/types/database';
+import { type Database } from '@/types/database';
 import { logger } from '@/lib/logger';
 
 type Category = Database['public']['Tables']['categories']['Row'];
@@ -8,7 +8,7 @@ type CategoryWithCount = Category & { post_count: number };
 /**
  * Get all categories
  */
-export async function getCategories(includeCounts = false): Promise<Category[]> {
+export async function getCategories(): Promise<Category[]> {
   const supabase = await createClient();
   
   const { data, error } = await supabase

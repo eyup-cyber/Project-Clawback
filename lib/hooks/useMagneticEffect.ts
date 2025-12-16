@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback, RefObject } from 'react';
+import { useEffect, useRef, useCallback, type RefObject } from 'react';
 import gsap from 'gsap';
 import { EASING, prefersReducedMotion } from '../animations/gsap-config';
 
@@ -34,6 +34,29 @@ export function useMagneticEffect(options: MagneticOptions = {}): UseMagneticEff
       boundingRef.current = ref.current.getBoundingClientRect();
     }
   }, []);
+
+  const resetPosition = useCallback(() => {
+    isHovering.current = false;
+    
+    if (ref.current) {
+      gsap.to(ref.current, {
+        x: 0,
+        y: 0,
+        scale: 1,
+        duration: duration * 1.5,
+        ease: EASING.elastic,
+      });
+    }
+
+    if (innerRef.current) {
+      gsap.to(innerRef.current, {
+        x: 0,
+        y: 0,
+        duration: duration * 1.5,
+        ease: EASING.elastic,
+      });
+    }
+  }, [duration]);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!ref.current || !boundingRef.current || prefersReducedMotion()) return;
@@ -170,30 +193,7 @@ export function useMagneticButton(options: MagneticButtonOptions = {}): {
     } else if (isHovering.current) {
       resetPosition();
     }
-  }, [strength, innerStrength, radius, ease, duration, scale]);
-
-  const resetPosition = useCallback(() => {
-    isHovering.current = false;
-    
-    if (ref.current) {
-      gsap.to(ref.current, {
-        x: 0,
-        y: 0,
-        scale: 1,
-        duration: duration * 1.5,
-        ease: EASING.elastic,
-      });
-    }
-
-    if (innerRef.current) {
-      gsap.to(innerRef.current, {
-        x: 0,
-        y: 0,
-        duration: duration * 1.5,
-        ease: EASING.elastic,
-      });
-    }
-  }, [duration]);
+  }, [strength, innerStrength, radius, ease, duration, scale, resetPosition]);
 
   useEffect(() => {
     const element = ref.current;

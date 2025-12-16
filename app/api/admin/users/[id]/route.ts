@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 import {
   success,
   handleApiError,
@@ -7,7 +7,7 @@ import {
   requireAdmin,
   ApiError,
 } from '@/lib/api';
-import { getProfileById, updateUserRole, toggleFeaturedContributor } from '@/lib/db';
+import { getProfileById, updateUserRole } from '@/lib/db';
 
 interface RouteContext {
   params: Promise<{ id: string }>;

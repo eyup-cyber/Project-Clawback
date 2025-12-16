@@ -1,13 +1,7 @@
-import { NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { z } from 'zod';
-import {
-  success,
-  paginated,
-  handleApiError,
-  parseParams,
-  requireEditor,
-} from '@/lib/api';
-import { listPosts, getPendingPosts } from '@/lib/db';
+import { paginated, handleApiError, parseParams, requireEditor } from '@/lib/api';
+import { listPosts } from '@/lib/db';
 
 const listAdminPostsSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),

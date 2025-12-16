@@ -21,7 +21,6 @@ export default function ApplicationActions({ applicationId, userId }: Applicatio
     setLoading(true);
     try {
       // Update application status - using type assertion to bypass strict typing
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error: appError } = await (supabase as any)
         .from('contributor_applications')
         .update({
@@ -33,7 +32,6 @@ export default function ApplicationActions({ applicationId, userId }: Applicatio
       if (appError) throw appError;
 
       // Update user role to contributor
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error: profileError } = await (supabase as any)
         .from('profiles')
         .update({ role: 'contributor' })
@@ -59,7 +57,6 @@ export default function ApplicationActions({ applicationId, userId }: Applicatio
 
     setLoading(true);
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase as any)
         .from('contributor_applications')
         .update({
@@ -86,7 +83,7 @@ export default function ApplicationActions({ applicationId, userId }: Applicatio
     <>
       <div className="mt-4 pt-4 border-t flex gap-3" style={{ borderColor: 'var(--border)' }}>
         <button
-          onClick={handleApprove}
+          onClick={() => void handleApprove()}
           disabled={loading}
           className="px-4 py-2 rounded-lg font-medium disabled:opacity-50"
           style={{ background: 'var(--primary)', color: 'var(--background)' }}
@@ -147,7 +144,7 @@ export default function ApplicationActions({ applicationId, userId }: Applicatio
               </button>
               <button
                 type="button"
-                onClick={handleReject}
+                onClick={() => void handleReject()}
                 disabled={loading}
                 className="px-4 py-2 rounded-lg"
                 style={{ background: 'var(--accent)', color: 'var(--background)' }}

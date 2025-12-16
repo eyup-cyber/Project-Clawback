@@ -48,7 +48,7 @@ describe('Email Templates', () => {
 
   describe('applicationRejectedEmail', () => {
     it('should include rejection message', () => {
-      const { html, subject } = applicationRejectedEmail('John Doe', 'Incomplete application');
+      const { html, subject: _subject } = applicationRejectedEmail('John Doe', 'Incomplete application');
 
       expect(html).toContain('John Doe');
       expect(html).toContain('Incomplete application');
