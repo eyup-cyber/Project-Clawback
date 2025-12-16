@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, forwardRef, useRef, useEffect } from 'react';
+import { type ReactNode, forwardRef, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';

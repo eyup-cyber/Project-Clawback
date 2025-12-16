@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { success, handleApiError, requireAuth } from '@/lib/api';
 import {
   fetchImagesFromUrl,

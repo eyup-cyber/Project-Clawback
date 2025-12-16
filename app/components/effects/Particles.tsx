@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useMemo, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
+import type * as THREE from 'three';
 import { prefersReducedMotion } from '@/lib/animations/gsap-config';
 
 interface ParticlesProps {

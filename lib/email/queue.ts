@@ -3,7 +3,7 @@
  */
 
 import { logger } from '@/lib/logger';
-import { sendEmail, SendEmailOptions } from './client';
+import { sendEmail, type SendEmailOptions } from './client';
 
 // ============================================================================
 // TYPES

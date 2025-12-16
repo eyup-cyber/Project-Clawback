@@ -3,7 +3,7 @@
  * Provides security headers for all API responses
  */
 
-import { NextResponse } from 'next/server';
+import { type NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /**

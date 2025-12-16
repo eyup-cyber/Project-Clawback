@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { z } from 'zod';
 import { success, handleApiError, parseParams } from '@/lib/api';
 import { getFeaturedPosts } from '@/lib/db';

@@ -47,15 +47,6 @@ export function useMagneticEffect(options: MagneticOptions = {}): UseMagneticEff
         ease: EASING.elastic,
       });
     }
-
-    if (innerRef.current) {
-      gsap.to(innerRef.current, {
-        x: 0,
-        y: 0,
-        duration: duration * 1.5,
-        ease: EASING.elastic,
-      });
-    }
   }, [duration]);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {

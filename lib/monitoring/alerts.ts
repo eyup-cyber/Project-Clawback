@@ -277,7 +277,7 @@ export async function checkConditions(): Promise<Alert[]> {
 // ============================================================================
 
 // Track error counts for threshold-based alerting
-let errorCountWindow: number[] = [];
+const errorCountWindow: number[] = [];
 const ERROR_WINDOW_SIZE = 100;
 
 export function recordError(): void {
@@ -303,7 +303,7 @@ export const highErrorRateCondition: AlertCondition = {
 };
 
 // Track response times
-let responseTimeWindow: number[] = [];
+const responseTimeWindow: number[] = [];
 const RESPONSE_TIME_WINDOW_SIZE = 100;
 
 export function recordResponseTime(durationMs: number): void {

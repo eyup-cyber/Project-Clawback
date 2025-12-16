@@ -78,7 +78,7 @@ describe('Admin API Integration', () => {
             error: null,
           }),
         },
-        from: jest.fn().mockImplementation((_table) => {
+        from: jest.fn().mockImplementation((table) => {
           if (table === 'profiles') {
             return {
               select: jest.fn().mockImplementation(() => ({

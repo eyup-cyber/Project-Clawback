@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { success, handleApiError, requireEditor } from '@/lib/api';
 import { getApplicationById } from '@/lib/db';
 

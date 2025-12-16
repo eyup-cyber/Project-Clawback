@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { success, handleApiError, parseBody, validationError } from '@/lib/api';
 import { contactSubmissionSchema } from '@/lib/api/validation';
 import { applySecurityHeaders } from '@/lib/security/headers';

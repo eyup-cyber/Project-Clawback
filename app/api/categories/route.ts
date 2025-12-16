@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { success, ApiError } from '@/lib/api';
 import { withRouteHandler } from '@/lib/api/route-wrapper';
