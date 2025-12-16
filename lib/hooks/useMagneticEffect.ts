@@ -35,6 +35,29 @@ export function useMagneticEffect(options: MagneticOptions = {}): UseMagneticEff
     }
   }, []);
 
+  const resetPosition = useCallback(() => {
+    isHovering.current = false;
+    
+    if (ref.current) {
+      gsap.to(ref.current, {
+        x: 0,
+        y: 0,
+        scale: 1,
+        duration: duration * 1.5,
+        ease: EASING.elastic,
+      });
+    }
+
+    if (innerRef.current) {
+      gsap.to(innerRef.current, {
+        x: 0,
+        y: 0,
+        duration: duration * 1.5,
+        ease: EASING.elastic,
+      });
+    }
+  }, [duration]);
+
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!ref.current || !boundingRef.current || prefersReducedMotion()) return;
 
@@ -168,65 +191,28 @@ export function useMagneticButton(options: MagneticButtonOptions = {}): {
         });
       }
     } else if (isHovering.current) {
-      // Reset position when mouse leaves radius
-      isHovering.current = false;
-      gsap.to(ref.current, {
-        x: 0,
-        y: 0,
-        scale: 1,
-        duration: duration * 1.5,
-        ease: EASING.elastic,
-      });
-      if (innerRef.current) {
-        gsap.to(innerRef.current, {
-          x: 0,
-          y: 0,
-          duration: duration * 1.5,
-          ease: EASING.elastic,
-        });
-      }
+      resetPosition();
     }
-  }, [strength, innerStrength, radius, ease, duration, scale]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (!ref.current || prefersReducedMotion()) return;
-
-    isHovering.current = false;
-    gsap.to(ref.current, {
-      x: 0,
-      y: 0,
-      scale: 1,
-      duration: duration * 1.5,
-      ease: EASING.elastic,
-    });
-    if (innerRef.current) {
-      gsap.to(innerRef.current, {
-        x: 0,
-        y: 0,
-        duration: duration * 1.5,
-        ease: EASING.elastic,
-      });
-    }
-  }, [duration]);
+  }, [strength, innerStrength, radius, ease, duration, scale, resetPosition]);
 
   useEffect(() => {
     const element = ref.current;
     if (!element || prefersReducedMotion()) return;
 
     updateBounding();
-
+    
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('resize', updateBounding);
     window.addEventListener('scroll', updateBounding);
-    element.addEventListener('mouseleave', handleMouseLeave);
+    element.addEventListener('mouseleave', resetPosition);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', updateBounding);
       window.removeEventListener('scroll', updateBounding);
-      element.removeEventListener('mouseleave', handleMouseLeave);
+      element.removeEventListener('mouseleave', resetPosition);
     };
-  }, [handleMouseMove, handleMouseLeave, updateBounding]);
+  }, [handleMouseMove, resetPosition, updateBounding]);
 
   return { 
     ref: ref as RefObject<HTMLElement | null>, 
