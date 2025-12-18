@@ -44,10 +44,6 @@ const MagneticButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Magneti
       onClick,
       href,
       type = 'button',
-      rainbowBend = false,
-      rainbowBendAmount = 14,
-      rainbowBox = false,
-      rainbowBoxDirection = 'up',
     },
     forwardedRef
   ) => {

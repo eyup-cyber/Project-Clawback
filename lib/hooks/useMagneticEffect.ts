@@ -74,31 +74,17 @@ export function useMagneticEffect(options: MagneticOptions = {}): UseMagneticEff
           ease,
         });
       } else if (isHovering.current) {
-        isHovering.current = false;
-        gsap.to(ref.current, {
-          x: 0,
-          y: 0,
-          scale: 1,
-          duration: duration * 1.5,
-          ease: EASING.elastic,
-        });
+        resetPosition();
       }
     },
-    [strength, radius, ease, duration, scale]
+    [strength, radius, ease, duration, scale, resetPosition]
   );
 
   const handleMouseLeave = useCallback(() => {
     if (!ref.current || prefersReducedMotion()) return;
 
-    isHovering.current = false;
-    gsap.to(ref.current, {
-      x: 0,
-      y: 0,
-      scale: 1,
-      duration: duration * 1.5,
-      ease: EASING.elastic,
-    });
-  }, [duration]);
+    resetPosition();
+  }, [resetPosition]);
 
   useEffect(() => {
     const element = ref.current;
@@ -154,7 +140,7 @@ export function useMagneticButton(options: MagneticButtonOptions = {}): {
 
   const resetPosition = useCallback(() => {
     isHovering.current = false;
-    
+
     if (ref.current) {
       gsap.to(ref.current, {
         x: 0,
