@@ -28,6 +28,10 @@ jest.mock('@/lib/logger/context', () => ({
   updateContext: jest.fn(),
 }));
 
+jest.mock('@/lib/security/csrf', () => ({
+  assertCsrfOrThrow: jest.fn().mockResolvedValue(undefined),
+}));
+
 describe('Comments API Integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
