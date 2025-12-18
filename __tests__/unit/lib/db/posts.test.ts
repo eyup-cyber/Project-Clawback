@@ -3,16 +3,15 @@
  */
 
 import { createMockSupabaseClient } from '@/lib/test/mocks';
+import { mockPost } from '@/lib/test/fixtures';
 
 // Create a persistent mock instance
 const mockSupabaseClient = createMockSupabaseClient();
 
-// Mock Supabase client to return our persistent mock
+// Mock Supabase client to return our mock asynchronously
 jest.mock('@/lib/supabase/server', () => ({
-  createClient: jest.fn(() => mockSupabaseClient),
+  createClient: jest.fn().mockResolvedValue(mockSupabaseClient),
 }));
-
-import { mockPost } from '@/lib/test/fixtures';
 
 describe('Posts Database Operations', () => {
   beforeEach(() => {

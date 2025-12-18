@@ -194,8 +194,8 @@ function isZodError(err: unknown): boolean {
   return (
     typeof err === 'object' &&
     err !== null &&
-    'errors' in err &&
-    Array.isArray((err as { errors: unknown }).errors)
+    'issues' in err &&
+    Array.isArray((err as { issues: unknown }).issues)
   );
 }
 

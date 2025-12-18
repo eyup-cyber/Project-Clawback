@@ -2,28 +2,16 @@
  * Unit tests for profiles database operations
  */
 
-// Mock Supabase client
-jest.mock('@/lib/supabase/server', () => ({
-  createClient: jest.fn(() => ({
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          single: jest.fn(),
-        })),
-        in: jest.fn(),
-        order: jest.fn(() => ({
-          limit: jest.fn(),
-        })),
-      })),
-      update: jest.fn(() => ({
-        eq: jest.fn(),
-      })),
-    })),
-  })),
-}));
-
-import { createClient } from '@/lib/supabase/server';
+import { createMockSupabaseClient } from '@/lib/test/mocks';
 import { mockUser } from '@/lib/test/fixtures';
+
+// Create a persistent mock instance
+const mockSupabaseClient = createMockSupabaseClient();
+
+// Mock Supabase client to return our mock asynchronously
+jest.mock('@/lib/supabase/server', () => ({
+  createClient: jest.fn().mockResolvedValue(mockSupabaseClient),
+}));
 
 describe('Profiles Database Operations', () => {
   beforeEach(() => {
@@ -32,7 +20,6 @@ describe('Profiles Database Operations', () => {
 
   describe('getProfileById', () => {
     it('should fetch profile by ID', async () => {
-      const mockSupabase = await createClient();
       const mockProfile = {
         id: mockUser.id,
         username: mockUser.profile.username,
@@ -42,7 +29,7 @@ describe('Profiles Database Operations', () => {
         bio: 'Test bio',
       };
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -61,9 +48,7 @@ describe('Profiles Database Operations', () => {
     });
 
     it('should throw not found for non-existent profile', async () => {
-      const mockSupabase = await createClient();
-
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -81,7 +66,6 @@ describe('Profiles Database Operations', () => {
 
   describe('getProfileByUsername', () => {
     it('should fetch profile by username', async () => {
-      const mockSupabase = await createClient();
       const mockProfile = {
         id: mockUser.id,
         username: mockUser.profile.username,
@@ -89,7 +73,7 @@ describe('Profiles Database Operations', () => {
         role: mockUser.role,
       };
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -109,13 +93,12 @@ describe('Profiles Database Operations', () => {
 
   describe('updateProfile', () => {
     it('should update profile fields', async () => {
-      const mockSupabase = await createClient();
       const updates = {
         display_name: 'New Name',
         bio: 'Updated bio',
       };
 
-      (mockSupabase.from as jest.Mock).mockReturnValueOnce({
+      (mockSupabaseClient.from as jest.Mock).mockReturnValueOnce({
         update: jest.fn().mockReturnValue({
           eq: jest.fn().mockResolvedValue({
             error: null,
@@ -124,7 +107,7 @@ describe('Profiles Database Operations', () => {
       });
 
       // Mock refetch
-      (mockSupabase.from as jest.Mock).mockReturnValueOnce({
+      (mockSupabaseClient.from as jest.Mock).mockReturnValueOnce({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -144,13 +127,12 @@ describe('Profiles Database Operations', () => {
 
   describe('getFeaturedContributors', () => {
     it('should return featured contributors', async () => {
-      const mockSupabase = await createClient();
       const mockContributors = [
         { id: '1', username: 'contributor1', display_name: 'Contributor 1' },
         { id: '2', username: 'contributor2', display_name: 'Contributor 2' },
       ];
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           in: jest.fn().mockReturnValue({
             order: jest.fn().mockReturnValue({
@@ -172,9 +154,7 @@ describe('Profiles Database Operations', () => {
 
   describe('isUsernameAvailable', () => {
     it('should return true for available username', async () => {
-      const mockSupabase = await createClient();
-
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -192,9 +172,7 @@ describe('Profiles Database Operations', () => {
     });
 
     it('should return false for taken username', async () => {
-      const mockSupabase = await createClient();
-
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({

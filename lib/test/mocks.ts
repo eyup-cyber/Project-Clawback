@@ -4,45 +4,67 @@
  */
 
 /**
- * Creates a mock Supabase query builder
- * Returns a chainable mock that can be customized per test
+ * Creates a chainable mock query builder
+ * All chain methods return the mock itself for unlimited chaining
+ */
+export function createChainableMock() {
+  const mock: Record<string, jest.Mock> = {};
+
+  // Chain methods that return the mock itself
+  const chainMethods = [
+    'select',
+    'insert',
+    'update',
+    'delete',
+    'upsert',
+    'eq',
+    'neq',
+    'gt',
+    'gte',
+    'lt',
+    'lte',
+    'like',
+    'ilike',
+    'is',
+    'in',
+    'contains',
+    'containedBy',
+    'rangeLt',
+    'rangeGt',
+    'rangeGte',
+    'rangeLte',
+    'rangeAdjacent',
+    'overlaps',
+    'textSearch',
+    'match',
+    'not',
+    'or',
+    'filter',
+    'order',
+    'limit',
+    'range',
+  ];
+
+  chainMethods.forEach((method) => {
+    mock[method] = jest.fn().mockReturnValue(mock);
+  });
+
+  // Terminal methods that return promises
+  mock.single = jest.fn().mockResolvedValue({ data: null, error: null });
+  mock.maybeSingle = jest.fn().mockResolvedValue({ data: null, error: null });
+
+  // Make the mock thenable so it can be awaited directly
+  mock.then = jest.fn((resolve) => resolve({ data: null, error: null, count: null }));
+
+  return mock;
+}
+
+/**
+ * Creates a mock Supabase client with chainable query builder
+ * Returns a client that can be customized per test
  */
 export function createMockSupabaseClient() {
-  const mockQuery = {
-    select: jest.fn().mockReturnThis(),
-    insert: jest.fn().mockReturnThis(),
-    update: jest.fn().mockReturnThis(),
-    delete: jest.fn().mockReturnThis(),
-    eq: jest.fn().mockReturnThis(),
-    neq: jest.fn().mockReturnThis(),
-    gt: jest.fn().mockReturnThis(),
-    gte: jest.fn().mockReturnThis(),
-    lt: jest.fn().mockReturnThis(),
-    lte: jest.fn().mockReturnThis(),
-    like: jest.fn().mockReturnThis(),
-    ilike: jest.fn().mockReturnThis(),
-    is: jest.fn().mockReturnThis(),
-    in: jest.fn().mockReturnThis(),
-    contains: jest.fn().mockReturnThis(),
-    containedBy: jest.fn().mockReturnThis(),
-    rangeLt: jest.fn().mockReturnThis(),
-    rangeGt: jest.fn().mockReturnThis(),
-    rangeGte: jest.fn().mockReturnThis(),
-    rangeLte: jest.fn().mockReturnThis(),
-    rangeAdjacent: jest.fn().mockReturnThis(),
-    overlaps: jest.fn().mockReturnThis(),
-    textSearch: jest.fn().mockReturnThis(),
-    match: jest.fn().mockReturnThis(),
-    not: jest.fn().mockReturnThis(),
-    or: jest.fn().mockReturnThis(),
-    filter: jest.fn().mockReturnThis(),
-    order: jest.fn().mockReturnThis(),
-    limit: jest.fn().mockReturnThis(),
-    range: jest.fn().mockReturnThis(),
-    single: jest.fn().mockResolvedValue({ data: null, error: null }),
-    maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
-    then: jest.fn((resolve) => resolve({ data: null, error: null, count: null })),
-  };
+  const mockQuery = createChainableMock();
 
   return {
     auth: {
@@ -52,6 +74,7 @@ export function createMockSupabaseClient() {
       signOut: jest.fn().mockResolvedValue({ error: null }),
     },
     from: jest.fn().mockReturnValue(mockQuery),
+    _query: mockQuery, // Expose for test customization
   };
 }
 
