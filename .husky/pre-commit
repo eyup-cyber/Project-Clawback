@@ -4,5 +4,5 @@
 npm run lint-staged
 
 # Type-check the project to catch regressions early
-npm run typecheck -- --pretty false
+npm run typecheck
 
