@@ -69,58 +69,50 @@ export default function IntroSection() {
     <section
       ref={sectionRef}
       className="pt-4 pb-16 px-4 md:px-8 relative overflow-hidden"
-      style={{ background: 'var(--background)' }}
     >
       {/* Subtle floating particles */}
       <FloatingParticles count={15} color="var(--secondary)" minSize={1} maxSize={3} />
 
-      {/* Background gradient */}
-      <div 
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse at center, rgba(255, 215, 0, 0.03) 0%, transparent 70%)',
-        }}
-      />
-
       <div className="max-w-4xl mx-auto text-center relative z-10">
         {/* Mission statement paragraphs */}
-        <div ref={paragraphsRef} className="space-y-4 text-base md:text-lg">
-          <p className="intro-paragraph font-medium" style={{ color: 'var(--foreground)', lineHeight: 1.5 }}>
-            For years, the left media has been owned, controlled, and profited by two friend groups.
-          </p>
-          
-          <p 
-            className="intro-paragraph font-bold text-lg md:text-xl"
-            style={{ 
-              color: COLORS.secondary,
-              textShadow: `0 0 20px ${COLORS.glowSecondary}, 0 2px 4px rgba(0,0,0,0.3)`,
-              lineHeight: 1.4,
-            }}
+        <div ref={paragraphsRef} className="space-y-6 text-base md:text-lg">
+          <p
+            className="intro-paragraph font-extrabold"
+            style={{ color: 'var(--foreground)', lineHeight: 1.6, fontSize: 22, fontWeight: 700 }}
           >
-            We are taking back the media and giving you the keys.
-          </p>
-
-          <p className="intro-paragraph font-medium" style={{ color: 'var(--foreground)', lineHeight: 1.5 }}>
+            For years, the left media has been owned, controlled, and profited by two friend groups.{' '}
+            <span
+              className="font-extrabold text-lg md:text-xl"
+              style={{
+                color: COLORS.secondary,
+                textShadow: `0 0 20px ${COLORS.glowSecondary}, 0 2px 4px rgba(0,0,0,0.3)`,
+                lineHeight: 1.4,
+                fontWeight: 700,
+                fontSize: 22,
+              }}
+            >
+              We are taking back the media and giving you the keys.
+            </span>{' '}
             Want to write an article? Want to make a video? Want to make some art?
           </p>
 
-          <p className="intro-paragraph font-medium" style={{ color: 'var(--foreground)', lineHeight: 1.5 }}>
-            <ScroungersBrand size="xl" glow animated /> is giving real people with skin in the game the opportunity to profit from their own political analysis.
-          </p>
-
-          <p className="intro-paragraph font-medium" style={{ color: 'var(--foreground)', lineHeight: 1.5 }}>
-            All posts come with a user-inputted Ko-fi link. Want to support the creator? Go ahead!
-          </p>
-
           <p
-            className="intro-paragraph font-bold text-lg md:text-xl"
-            style={{ 
-              color: COLORS.secondary,
-              textShadow: `0 0 20px ${COLORS.glowSecondary}, 0 2px 4px rgba(0,0,0,0.3)`,
-              lineHeight: 1.4,
-            }}
+            className="intro-paragraph font-extrabold"
+            style={{ color: 'var(--foreground)', lineHeight: 1.6, fontWeight: 700, fontSize: 22 }}
           >
-            We retain 0% of the creators&apos; intellectual property and we don&apos;t take a penny from their profit.
+            <ScroungersBrand size="xl" glow animated /> is giving real people with skin in the game the opportunity to profit from their own political analysis. All posts come with a user-inputted Ko-fi link. Want to support the creator? Go ahead!{' '}
+            <span
+              className="font-extrabold text-lg md:text-xl"
+              style={{
+                color: COLORS.secondary,
+                textShadow: `0 0 20px ${COLORS.glowSecondary}, 0 2px 4px rgba(0,0,0,0.3)`,
+                lineHeight: 1.4,
+                fontWeight: 700,
+                fontSize: 22,
+              }}
+            >
+              We retain precisely the cost of hosting and not a penny more. The intellectual property remains with the creator and they are free to utilise it anywhere else they may wish to host it.
+            </span>
           </p>
         </div>
 
@@ -129,22 +121,30 @@ export default function IntroSection() {
           <MagneticButton
             href="/apply"
             variant="primary"
-            size="sm"
+            size="lg"
             glow={false}
             ripple={false}
-            className="w-[180px]"
+            rainbowBend
+            rainbowBendAmount={14}
+            rainbowBox
+            rainbowBoxDirection="up"
+            className="w-[220px] px-10 py-4 text-[22px] font-bold leading-[1.2]"
           >
-            Become a Contributor
+            contribute
           </MagneticButton>
           
           <MagneticButton
             href="/articles"
             variant="outline"
-            size="sm"
+            size="lg"
             glow={false}
-            className="w-[180px]"
+            rainbowBend
+            rainbowBendAmount={14}
+            rainbowBox
+            rainbowBoxDirection="down"
+            className="w-[220px] px-10 py-4 text-[22px] font-bold leading-[1.2]"
           >
-            Explore Content
+            explore
           </MagneticButton>
         </div>
       </div>

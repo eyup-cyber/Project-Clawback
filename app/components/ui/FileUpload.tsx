@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cn, formatFileSize } from '@/lib/utils';
 
 interface FileUploadProps {
@@ -63,6 +63,15 @@ export function FileUpload({
       return { name: file.name, url: '', type: 'file' as const, size: file.size };
     });
   }, [files, showPreview]);
+
+  // Revoke blob URLs on cleanup to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      previews.forEach((p) => {
+        if (p.url) URL.revokeObjectURL(p.url);
+      });
+    };
+  }, [previews]);
 
   return (
     <div className={cn('space-y-2', className)}>

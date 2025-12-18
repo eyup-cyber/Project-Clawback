@@ -108,7 +108,6 @@ export default function HowItWorksCondensed() {
     <section
       ref={sectionRef}
       className="py-16 px-4 md:px-8"
-      style={{ background: 'var(--background)' }}
     >
       <div className="max-w-5xl mx-auto">
         {/* Section heading */}

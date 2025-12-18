@@ -26,6 +26,7 @@ export default function Nav() {
   const linksRef = useRef<HTMLDivElement>(null);
   const underlineRef = useRef<HTMLSpanElement>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, profile, loading, signOut } = useAuth();
@@ -33,7 +34,10 @@ export default function Nav() {
   // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      const y = globalThis.window?.scrollY ?? 0;
+      const nowScrolled = y > 50;
+      setScrolled(nowScrolled);
+      setCollapsed(y > 120);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -210,7 +214,7 @@ export default function Nav() {
     <>
       <nav
         ref={navRef}
-        className="fixed top-0 left-0 right-0 z-50 px-6 sm:px-8 py-4 flex items-center justify-between transition-all duration-500"
+        className="fixed top-0 left-0 right-0 z-50 px-6 sm:px-8 py-3 flex items-center justify-between transition-all duration-500"
         style={{
           backgroundColor: scrolled ? "var(--surface-elevated)" : "transparent",
           backdropFilter: scrolled ? "blur(12px)" : "none",
@@ -219,83 +223,100 @@ export default function Nav() {
           boxShadow: scrolled ? "0 4px 30px rgba(0, 0, 0, 0.1)" : "none",
         }}
       >
-        {/* Logo with magnetic effect - horizontal layout */}
-        <button
-          ref={logoRef}
-          onClick={() => scrollToSection("hero")}
-          onMouseMove={handleLogoMouseMove}
-          onMouseLeave={handleLogoMouseLeave}
-          className="relative group flex items-baseline"
-          style={{ 
-            willChange: "transform",
-            gap: "0.3em", // Slightly more space between scroungers and multimedia
+        {/* Left cluster (logo + links) with collapse animation */}
+        <div
+          className="flex items-center gap-10 transition-all duration-400"
+          style={{
+            opacity: collapsed ? 0 : 1,
+            transform: collapsed ? "translateY(-24px)" : "translateY(0)",
+            pointerEvents: collapsed ? "none" : "auto",
           }}
         >
-          {/* Glow effect on hover */}
-          <span
-            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"
-            style={{ background: COLORS.glowSecondary }}
-            aria-hidden="true"
-          />
-          {/* scroungers - HelveticaNow */}
-          <span 
-            className="relative z-10 text-lg sm:text-xl lg:text-2xl font-medium lowercase tracking-tight group-hover:text-[var(--secondary)] transition-colors duration-300"
+          {/* Logo with magnetic effect - horizontal layout */}
+          <button
+            ref={logoRef}
+            onClick={() => scrollToSection("hero")}
+            onMouseMove={handleLogoMouseMove}
+            onMouseLeave={handleLogoMouseLeave}
+            className="relative group flex items-baseline"
             style={{ 
-              fontFamily: "var(--font-body)",
-              fontWeight: 500,
-              color: "var(--primary)",
-              textShadow: `0 0 15px ${COLORS.glowPrimary}`,
+              willChange: "transform",
+              gap: "0.35em",
             }}
           >
-            scroungers
-          </span>
-          {/* multimedia - Kindergarten */}
-          <span 
-            className="relative z-10 text-base sm:text-lg lg:text-xl lowercase group-hover:text-[var(--secondary)] transition-colors duration-300"
-            style={{ 
-              fontFamily: "var(--font-kindergarten)",
-              color: COLORS.secondary,
-              textShadow: `0 0 10px ${COLORS.glowSecondary}`,
-            }}
-          >
-            multimedia
-          </span>
-        </button>
-
-        {/* Desktop Navigation Links */}
-        <div 
-          ref={linksRef}
-          className="hidden sm:flex gap-8 relative ml-12"
-          onMouseLeave={handleLinkLeave}
-          style={{ marginLeft: "3rem" }}
-        >
-          {/* Animated underline */}
-          <span
-            ref={underlineRef}
-            className="absolute bottom-0 h-[2px] pointer-events-none"
-            style={{ 
-              background: `linear-gradient(90deg, ${COLORS.secondary}, ${COLORS.primary})`,
-              opacity: 0,
-              width: 0,
-              boxShadow: `0 0 10px ${COLORS.glowSecondary}`,
-            }}
-            aria-hidden="true"
-          />
-
-          {navLinks.map((link, index) => (
-            <NavItem
-              key={link.label}
-              link={link}
-              index={index}
-              isActive={activeIndex === index}
-              onHover={handleLinkHover}
-              onScrollTo={scrollToSection}
+            {/* Glow effect on hover */}
+            <span
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"
+              style={{ background: COLORS.glowSecondary }}
+              aria-hidden="true"
             />
-          ))}
+            {/* scroungers - larger */}
+            <span 
+              className="relative z-10 text-2xl sm:text-3xl lg:text-4xl font-semibold lowercase tracking-tight group-hover:text-[var(--secondary)] transition-colors duration-300"
+              style={{ 
+                fontFamily: "var(--font-body)",
+                fontWeight: 600,
+                color: "var(--primary)",
+                textShadow: `0 0 18px ${COLORS.glowPrimary}`,
+              }}
+            >
+              scroungers
+            </span>
+            {/* multimedia */}
+            <span 
+              className="relative z-10 text-lg sm:text-xl lg:text-2xl lowercase group-hover:text-[var(--secondary)] transition-colors duration-300"
+              style={{ 
+                fontFamily: "var(--font-kindergarten)",
+                color: COLORS.secondary,
+                textShadow: `0 0 12px ${COLORS.glowSecondary}`,
+              }}
+            >
+              multimedia
+            </span>
+          </button>
+
+          {/* Desktop Navigation Links */}
+          <div 
+            ref={linksRef}
+            className="hidden sm:flex gap-7 relative items-center"
+            onMouseLeave={handleLinkLeave}
+            style={{ marginLeft: "1.5rem" }}
+          >
+            {/* Animated underline */}
+            <span
+              ref={underlineRef}
+              className="absolute -bottom-1 h-[2px] pointer-events-none"
+              style={{ 
+                background: `linear-gradient(90deg, ${COLORS.secondary}, ${COLORS.primary})`,
+                opacity: 0,
+                width: 0,
+                boxShadow: `0 0 10px ${COLORS.glowSecondary}`,
+              }}
+              aria-hidden="true"
+            />
+
+            {navLinks.map((link, index) => (
+              <NavItem
+                key={link.label}
+                link={link}
+                index={index}
+                isActive={activeIndex === index}
+                onHover={handleLinkHover}
+                onScrollTo={scrollToSection}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* Auth buttons / User menu */}
-        <div className="hidden sm:flex items-center gap-4">
+        {/* Auth buttons / User menu (pinned, always one line) */}
+        <div
+          className="hidden sm:flex items-center gap-3 whitespace-nowrap"
+          style={{
+            position: "relative",
+            zIndex: 2,
+            color: "var(--foreground)",
+          }}
+        >
           {loading ? (
             <div className="w-8 h-8 rounded-full bg-[var(--surface)] animate-pulse" />
           ) : user ? (
@@ -336,15 +357,15 @@ export default function Nav() {
             <div className="flex items-center gap-3">
               <Link
                 href="/login"
-                className="text-sm font-medium px-4 py-2 rounded-full border transition-all hover:border-[var(--secondary)] hover:text-[var(--secondary)] hover:shadow-[0_0_15px_var(--glow-secondary)]"
-                style={{ borderColor: "var(--border)", color: "var(--foreground)", fontFamily: "var(--font-body)", fontWeight: 500 }}
+                className="text-[13px] font-semibold px-4 py-2 rounded-full border transition-all hover:border-[var(--secondary)] hover:text-[var(--secondary)] hover:shadow-[0_0_12px_var(--glow-secondary)] whitespace-nowrap"
+                style={{ borderColor: "var(--border)", color: "#fff", fontFamily: "var(--font-body)", letterSpacing: "0.02em" }}
               >
                 Sign In
               </Link>
               <Link
                 href="/register"
-                className="text-sm font-medium px-4 py-2 rounded-full transition-all hover:shadow-[0_0_20px_var(--glow-secondary)]"
-                style={{ background: COLORS.secondary, color: "var(--background)", fontFamily: "var(--font-body)", fontWeight: 500 }}
+                className="text-[13px] font-semibold px-4 py-2 rounded-full transition-all hover:shadow-[0_0_16px_var(--glow-secondary)] whitespace-nowrap"
+                style={{ background: "transparent", color: "#fff", border: "1px solid var(--secondary)", fontFamily: "var(--font-body)", letterSpacing: "0.02em" }}
               >
                 Sign Up
               </Link>
@@ -430,7 +451,7 @@ function NavItem({
     }
   };
 
-  const baseClassName = `nav-link relative text-sm uppercase tracking-wide font-medium`;
+  const baseClassName = `nav-link relative text-[13px] uppercase tracking-[0.16em] font-semibold leading-[1.2]`;
 
   if (link.href) {
     return (

@@ -158,6 +158,29 @@ export function useMagneticButton(options: MagneticButtonOptions = {}): {
     }
   }, []);
 
+  const resetPosition = useCallback(() => {
+    isHovering.current = false;
+    
+    if (ref.current) {
+      gsap.to(ref.current, {
+        x: 0,
+        y: 0,
+        scale: 1,
+        duration: duration * 1.5,
+        ease: EASING.elastic,
+      });
+    }
+
+    if (innerRef.current) {
+      gsap.to(innerRef.current, {
+        x: 0,
+        y: 0,
+        duration: duration * 1.5,
+        ease: EASING.elastic,
+      });
+    }
+  }, [duration]);
+
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!ref.current || !boundingRef.current || prefersReducedMotion()) return;
 
