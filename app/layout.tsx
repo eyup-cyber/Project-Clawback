@@ -98,9 +98,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={kindergarten.variable}>
+    <html lang="en" className={kindergarten.variable} data-theme="dark">
       <head />
-      <body>
+      <body style={{ backgroundColor: '#013220', minHeight: '100vh' }}>
         <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
       </body>
     </html>

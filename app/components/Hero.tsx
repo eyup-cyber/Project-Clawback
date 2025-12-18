@@ -1,13 +1,7 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import {
-  EASING,
-  DURATION,
-  COLORS,
-  prefersReducedMotion,
-  getDuration,
-} from '@/lib/animations/gsap-config';
+import { COLORS, prefersReducedMotion } from '@/lib/animations/gsap-config';
 import { FloatingParticles } from './effects/Particles';
 import { GridPattern } from './effects/Noise';
 import { playXylophoneNote, initializeAudio } from '@/lib/audio';
@@ -35,193 +29,181 @@ export default function Hero() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  useEffect(() => {
-    // Skip animation if user prefers reduced motion (already set loaded=true via useState initializer)
+  // Set initial states synchronously before first paint
+  useLayoutEffect(() => {
     if (prefersReducedMotion()) return;
 
-    // Fallback timer: ensure isLoaded becomes true even if animation doesn't complete
-    const fallbackTimer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 5000);
+    const letters = scroungerRef.current?.querySelectorAll('.letter');
+    if (letters) {
+      gsap.set(letters, {
+        y: 60,
+        opacity: 0,
+        rotateX: -30,
+        transformOrigin: 'center bottom',
+      });
+    }
+    if (multimediaRef.current) {
+      gsap.set(multimediaRef.current, { y: 30, opacity: 0 });
+    }
+    if (glowRef.current) {
+      gsap.set(glowRef.current, { scale: 0.8, opacity: 0 });
+    }
+  }, []);
+
+  // Main animation with GSAP context for proper cleanup
+  useEffect(() => {
+    // Skip animation if user prefers reduced motion
+    if (prefersReducedMotion()) return;
 
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        defaults: { ease: EASING.dramatic },
-        onComplete: () => {
-          clearTimeout(fallbackTimer);
-          setIsLoaded(true);
-        },
-      });
-
-      // Get all letter spans
       const letters = scroungerRef.current?.querySelectorAll('.letter');
-      if (!letters || letters.length === 0) {
-        clearTimeout(fallbackTimer);
+      const multimedia = multimediaRef.current;
+      const glow = glowRef.current;
+      const scrounger = scroungerRef.current;
+
+      if (!letters || letters.length === 0 || !multimedia || !glow || !scrounger) {
         setIsLoaded(true);
         return;
       }
 
-      // Check all refs exist before animating
-      if (!multimediaRef.current || !glowRef.current || !scroungerRef.current) {
-        clearTimeout(fallbackTimer);
-        setIsLoaded(true);
-        return;
-      }
-
-      // Initial states
-      gsap.set(letters, { y: 120, opacity: 0, rotateX: -90 });
-      gsap.set(multimediaRef.current, {
-        y: 10,
-        opacity: 0,
-        letterSpacing: '0.15em',
+      // Main animation timeline
+      const tl = gsap.timeline({
+        onComplete: () => setIsLoaded(true),
       });
-      gsap.set(glowRef.current, { scale: 0.5, opacity: 0 });
 
-      // T+0.2s - Ambient glow starts
+      // Glow fades in first
       tl.to(
-        glowRef.current,
+        glow,
         {
           scale: 1,
-          opacity: 0.4,
-          duration: getDuration(1.2),
-          ease: EASING.smooth,
+          opacity: 0.5,
+          duration: 1,
+          ease: 'power2.out',
         },
-        0.2
+        0
       );
 
-      // T+0.4s - Letters flip and drop in
+      // Letters animate in from center outward
       tl.to(
         letters,
         {
           y: 0,
           opacity: 1,
           rotateX: 0,
-          duration: getDuration(DURATION.slow),
-          stagger: {
-            each: 0.06,
-            from: 'center',
-          },
-          ease: EASING.bounce,
+          duration: 0.6,
+          stagger: { each: 0.03, from: 'center' },
+          ease: 'back.out(1.4)',
         },
-        0.4
+        0.2
       );
 
-      // T+1.0s - Logo pulse effect
+      // Multimedia slides up and fades in
       tl.to(
-        scroungerRef.current,
+        multimedia,
         {
-          scale: 1.03,
-          textShadow: `0 0 40px ${COLORS.glowPrimary}, 0 0 80px ${COLORS.glowPrimary}`,
-          duration: getDuration(0.2),
-          ease: EASING.smooth,
+          y: 0,
+          opacity: 1,
+          duration: 0.5,
+          ease: 'power2.out',
+        },
+        0.7
+      );
+
+      // Subtle pulse on scroungers
+      tl.to(
+        scrounger,
+        {
+          scale: 1.02,
+          duration: 0.15,
+          ease: 'power2.inOut',
         },
         1.0
       );
 
       tl.to(
-        scroungerRef.current,
+        scrounger,
         {
           scale: 1,
-          textShadow: `0 0 20px ${COLORS.glowPrimary}, 0 0 40px rgba(50, 205, 50, 0.2)`,
-          duration: getDuration(0.3),
-          ease: EASING.elastic,
+          duration: 0.25,
+          ease: 'elastic.out(1, 0.5)',
         },
-        1.2
+        1.15
       );
 
-      // T+1.2s - MULTIMEDIA slides up with letter spacing animation
-      tl.to(
-        multimediaRef.current,
-        {
-          y: 0,
-          opacity: 1,
-          letterSpacing: '0.05em',
-          duration: getDuration(DURATION.slow),
-          ease: EASING.expo,
-        },
-        1.2
-      );
-
-      // T+1.8s - Glow expands and pulses
-      tl.to(
-        glowRef.current,
-        {
-          scale: 1.5,
-          opacity: 0.3,
-          duration: getDuration(1.5),
-          ease: EASING.smooth,
-        },
-        1.8
-      );
-
-      // Continuous subtle glow pulsing
-      if (glowRef.current) {
-        gsap.to(glowRef.current, {
-          opacity: 0.2,
-          scale: 1.6,
-          duration: 3,
-          repeat: -1,
-          yoyo: true,
-          ease: EASING.smoothInOut,
-          delay: 3,
-        });
-      }
+      // Continuous glow animation (starts after intro)
+      gsap.to(glow, {
+        opacity: 0.3,
+        scale: 1.3,
+        duration: 3,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: 1.5,
+      });
     }, containerRef);
 
+    // Fallback to ensure isLoaded becomes true
+    const fallback = setTimeout(() => setIsLoaded(true), 3000);
+
     return () => {
-      clearTimeout(fallbackTimer);
-      ctx.revert();
+      clearTimeout(fallback);
+      ctx.revert(); // Clean revert of all animations
     };
   }, []);
 
-  // Letter hover interactions with xylophone sounds
+  // Letter hover interactions with xylophone sounds (debounced)
   useEffect(() => {
     if (prefersReducedMotion() || !isLoaded) return;
 
     const letters = scroungerRef.current?.querySelectorAll('.letter');
     if (!letters || letters.length === 0) return;
 
-    const cleanupFunctions: Array<() => void> = [];
+    const handlers: Array<{ el: HTMLElement; enter: () => void; leave: () => void }> = [];
+    const HOVER_DEBOUNCE = 50; // ms
+    const lastHoverTimes = new Map<HTMLElement, number>();
 
     letters.forEach((letter, index) => {
-      const handleMouseEnter = () => {
-        // Play xylophone note for this letter
-        playXylophoneNote(index);
+      const el = letter as HTMLElement;
+      lastHoverTimes.set(el, 0);
 
-        gsap.to(letter, {
-          color: '#FFD700', // Yellow/Gold
+      const enter = () => {
+        const now = Date.now();
+        const lastTime = lastHoverTimes.get(el) || 0;
+        if (now - lastTime < HOVER_DEBOUNCE) return;
+        lastHoverTimes.set(el, now);
+
+        playXylophoneNote(index);
+        gsap.to(el, {
+          color: '#FFD700',
           scale: 1.15,
-          y: -8, // More pronounced upward pop
-          rotation: 0, // No rotation
-          textShadow: '0 0 20px #FFD700, 0 0 40px rgba(255, 215, 0, 0.2)',
-          duration: 0.3,
-          ease: 'power3.out', // Graceful motion
+          y: -10,
+          duration: 0.2,
+          ease: 'power2.out',
+          overwrite: 'auto',
         });
       };
 
-      const handleMouseLeave = () => {
-        gsap.to(letter, {
-          color: 'var(--primary)', // Back to lime green
+      const leave = () => {
+        gsap.to(el, {
+          color: '#32CD32',
           scale: 1,
           y: 0,
-          rotation: 0,
-          textShadow: 'none',
-          duration: 0.4,
-          ease: EASING.elastic,
+          duration: 0.35,
+          ease: 'power2.out',
+          overwrite: 'auto',
         });
       };
 
-      letter.addEventListener('mouseenter', handleMouseEnter);
-      letter.addEventListener('mouseleave', handleMouseLeave);
-
-      cleanupFunctions.push(() => {
-        letter.removeEventListener('mouseenter', handleMouseEnter);
-        letter.removeEventListener('mouseleave', handleMouseLeave);
-      });
+      el.addEventListener('mouseenter', enter);
+      el.addEventListener('mouseleave', leave);
+      handlers.push({ el, enter, leave });
     });
 
     return () => {
-      cleanupFunctions.forEach((cleanup) => cleanup());
+      handlers.forEach(({ el, enter, leave }) => {
+        el.removeEventListener('mouseenter', enter);
+        el.removeEventListener('mouseleave', leave);
+      });
     };
   }, [isLoaded]);
 
@@ -298,6 +280,7 @@ export default function Hero() {
               style={{
                 transformStyle: 'preserve-3d',
                 willChange: 'transform, opacity, color',
+                transform: 'translateZ(0)', // Force GPU layer
                 color: 'var(--primary)',
                 display: 'inline-block',
               }}
@@ -310,13 +293,16 @@ export default function Hero() {
         {/* MULTIMEDIA - Kindergarten font */}
         <span
           ref={multimediaRef}
-          className="logo-multimedia block text-lg sm:text-xl md:text-2xl -mt-5 lowercase"
+          className="logo-multimedia block text-xl sm:text-2xl md:text-3xl mt-8 sm:mt-10 md:mt-12 lowercase"
           style={{
             fontFamily: 'var(--font-kindergarten)',
             color: COLORS.secondary,
             textShadow: `0 0 20px ${COLORS.glowSecondary}`,
-            willChange: 'transform, opacity, letter-spacing',
-            letterSpacing: '0.05em',
+            willChange: 'transform, opacity',
+            transform: 'translateZ(0)', // Force GPU layer
+            letterSpacing: '0.15em',
+            position: 'relative',
+            zIndex: 10,
           }}
         >
           multimedia

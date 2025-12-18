@@ -1,8 +1,8 @@
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 // Register GSAP plugins
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
@@ -11,48 +11,48 @@ if (typeof window !== "undefined") {
 // ============================================
 export const EASING = {
   // Smooth, natural movements
-  smooth: "power2.out",
-  smoothIn: "power2.in",
-  smoothInOut: "power2.inOut",
+  smooth: 'power2.out',
+  smoothIn: 'power2.in',
+  smoothInOut: 'power2.inOut',
 
   // Snappy, responsive movements
-  snappy: "power3.out",
-  snappyIn: "power3.in",
-  snappyInOut: "power3.inOut",
+  snappy: 'power3.out',
+  snappyIn: 'power3.in',
+  snappyInOut: 'power3.inOut',
 
   // Dramatic, expressive movements
-  dramatic: "power4.out",
-  dramaticIn: "power4.in",
-  dramaticInOut: "power4.inOut",
+  dramatic: 'power4.out',
+  dramaticIn: 'power4.in',
+  dramaticInOut: 'power4.inOut',
 
   // Bouncy, playful movements
-  bounce: "back.out(1.7)",
-  bounceIn: "back.in(1.7)",
-  bounceInOut: "back.inOut(1.7)",
+  bounce: 'back.out(1.7)',
+  bounceIn: 'back.in(1.7)',
+  bounceInOut: 'back.inOut(1.7)',
 
   // Elastic, springy movements
-  elastic: "elastic.out(1, 0.3)",
-  elasticIn: "elastic.in(1, 0.3)",
-  elasticInOut: "elastic.inOut(1, 0.3)",
+  elastic: 'elastic.out(1, 0.3)',
+  elasticIn: 'elastic.in(1, 0.3)',
+  elasticInOut: 'elastic.inOut(1, 0.3)',
 
   // Linear for scrub animations
-  linear: "none",
+  linear: 'none',
 
   // Expo for dramatic reveals
-  expo: "expo.out",
-  expoIn: "expo.in",
-  expoInOut: "expo.inOut",
+  expo: 'expo.out',
+  expoIn: 'expo.in',
+  expoInOut: 'expo.inOut',
 
   // Circ for subtle curves
-  circ: "circ.out",
-  circIn: "circ.in",
-  circInOut: "circ.inOut",
+  circ: 'circ.out',
+  circIn: 'circ.in',
+  circInOut: 'circ.inOut',
 
   // Custom easing for unique movements
-  liquid: "power1.inOut", // Smooth, fluid motion
-  magnetic: "power2.inOut", // Magnetic pull effect
-  morph: "sine.inOut", // Morphing shapes
-  trail: "power1.out", // Particle trails
+  liquid: 'power1.inOut', // Smooth, fluid motion
+  magnetic: 'power2.inOut', // Magnetic pull effect
+  morph: 'sine.inOut', // Morphing shapes
+  trail: 'power1.out', // Particle trails
 } as const;
 
 // ============================================
@@ -89,30 +89,30 @@ export const STAGGER = {
 export const SCROLL_TRIGGER = {
   // Start positions
   start: {
-    top: "top top",
-    center: "top center",
-    bottom: "top bottom",
-    nearTop: "top 20%",
-    nearCenter: "top 50%",
-    nearBottom: "top 80%",
-    belowFold: "top 90%",
+    top: 'top top',
+    center: 'top center',
+    bottom: 'top bottom',
+    nearTop: 'top 20%',
+    nearCenter: 'top 50%',
+    nearBottom: 'top 80%',
+    belowFold: 'top 90%',
   },
   // End positions
   end: {
-    top: "bottom top",
-    center: "bottom center",
-    bottom: "bottom bottom",
-    nearTop: "bottom 20%",
-    nearCenter: "bottom 50%",
-    nearBottom: "bottom 80%",
+    top: 'bottom top',
+    center: 'bottom center',
+    bottom: 'bottom bottom',
+    nearTop: 'bottom 20%',
+    nearCenter: 'bottom 50%',
+    nearBottom: 'bottom 80%',
   },
   // Toggle actions
   actions: {
-    playOnce: "play none none none",
-    playReverse: "play none none reverse",
-    playReset: "play none none reset",
-    restart: "restart none none reverse",
-    toggle: "play reverse play reverse",
+    playOnce: 'play none none none',
+    playReverse: 'play none none reverse',
+    playReset: 'play none none reset',
+    restart: 'restart none none reverse',
+    toggle: 'play reverse play reverse',
   },
 } as const;
 
@@ -154,19 +154,19 @@ export const ANIMATION = {
     to: { opacity: 1, scale: 1, duration: DURATION.quick, ease: EASING.smooth },
   },
   slideInUp: {
-    from: { y: "100%" },
+    from: { y: '100%' },
     to: { y: 0, duration: DURATION.slow, ease: EASING.expo },
   },
   slideInDown: {
-    from: { y: "-100%" },
+    from: { y: '-100%' },
     to: { y: 0, duration: DURATION.slow, ease: EASING.expo },
   },
   slideInLeft: {
-    from: { x: "-100%" },
+    from: { x: '-100%' },
     to: { x: 0, duration: DURATION.slow, ease: EASING.expo },
   },
   slideInRight: {
-    from: { x: "100%" },
+    from: { x: '100%' },
     to: { x: 0, duration: DURATION.slow, ease: EASING.expo },
   },
   rotateIn: {
@@ -188,62 +188,62 @@ export const ANIMATION = {
     },
   },
   blurIn: {
-    from: { opacity: 0, filter: "blur(10px)" },
+    from: { opacity: 0, filter: 'blur(10px)' },
     to: {
       opacity: 1,
-      filter: "blur(0px)",
+      filter: 'blur(0px)',
       duration: DURATION.medium,
       ease: EASING.smooth,
     },
   },
   clipReveal: {
-    from: { clipPath: "inset(0 100% 0 0)" },
+    from: { clipPath: 'inset(0 100% 0 0)' },
     to: {
-      clipPath: "inset(0 0% 0 0)",
+      clipPath: 'inset(0 0% 0 0)',
       duration: DURATION.slow,
       ease: EASING.expo,
     },
   },
   clipRevealUp: {
-    from: { clipPath: "inset(100% 0 0 0)" },
+    from: { clipPath: 'inset(100% 0 0 0)' },
     to: {
-      clipPath: "inset(0% 0 0 0)",
+      clipPath: 'inset(0% 0 0 0)',
       duration: DURATION.slow,
       ease: EASING.expo,
     },
   },
   clipRevealCenter: {
-    from: { clipPath: "inset(50% 50% 50% 50%)" },
+    from: { clipPath: 'inset(50% 50% 50% 50%)' },
     to: {
-      clipPath: "inset(0% 0% 0% 0%)",
+      clipPath: 'inset(0% 0% 0% 0%)',
       duration: DURATION.slow,
       ease: EASING.expo,
     },
   },
   // Text morphing/glitch effects
   textGlitch: {
-    from: { 
+    from: {
       opacity: 0,
-      filter: "blur(10px) hue-rotate(0deg)",
-      textShadow: "0 0 0 transparent",
+      filter: 'blur(10px) hue-rotate(0deg)',
+      textShadow: '0 0 0 transparent',
     },
     to: {
       opacity: 1,
-      filter: "blur(0px) hue-rotate(0deg)",
-      textShadow: "0 0 20px var(--glow-primary)",
+      filter: 'blur(0px) hue-rotate(0deg)',
+      textShadow: '0 0 20px var(--glow-primary)',
       duration: DURATION.slow,
       ease: EASING.expo,
     },
   },
   // Liquid/morphing shapes
   liquidMorph: {
-    from: { 
-      borderRadius: "50%",
+    from: {
+      borderRadius: '50%',
       scale: 0.8,
       rotation: 0,
     },
     to: {
-      borderRadius: "20%",
+      borderRadius: '20%',
       scale: 1,
       rotation: 360,
       duration: DURATION.reveal,
@@ -261,8 +261,8 @@ export const ANIMATION = {
     to: {
       opacity: 1,
       scale: 1,
-      x: "random(-50, 50)",
-      y: "random(-50, 50)",
+      x: 'random(-50, 50)',
+      y: 'random(-50, 50)',
       duration: DURATION.medium,
       ease: EASING.trail,
     },
@@ -275,8 +275,8 @@ export const ANIMATION = {
       scale: 1,
     },
     to: {
-      x: "+=20",
-      y: "+=20",
+      x: '+=20',
+      y: '+=20',
       scale: 1.1,
       duration: DURATION.quick,
       ease: EASING.magnetic,
@@ -289,7 +289,7 @@ export const ANIMATION = {
       opacity: 0.5,
     },
     to: {
-      y: "-=100",
+      y: '-=100',
       opacity: 1,
       duration: DURATION.slow,
       ease: EASING.smooth,
@@ -301,14 +301,14 @@ export const ANIMATION = {
 // BRAND COLORS FOR ANIMATIONS
 // ============================================
 export const COLORS = {
-  background: "#013220",
-  foreground: "#E0E0E0",
-  primary: "#32CD32",
-  secondary: "#FFD700",
-  accent: "#FF00FF",
-  glowPrimary: "rgba(50, 205, 50, 0.4)",
-  glowSecondary: "rgba(255, 215, 0, 0.3)",
-  glowAccent: "rgba(255, 0, 255, 0.2)",
+  background: '#013220',
+  foreground: '#E0E0E0',
+  primary: '#32CD32',
+  secondary: '#FFD700',
+  accent: '#FF00FF',
+  glowPrimary: 'rgba(50, 205, 50, 0.4)',
+  glowSecondary: 'rgba(255, 215, 0, 0.3)',
+  glowAccent: 'rgba(255, 0, 255, 0.2)',
 } as const;
 
 // ============================================
@@ -317,9 +317,70 @@ export const COLORS = {
 
 // Check for reduced motion preference
 export const prefersReducedMotion = (): boolean => {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 };
+
+// ============================================
+// REACTIVE MOTION PREFERENCE OBSERVER
+// ============================================
+
+/**
+ * Reactive motion preference observer
+ *
+ * Listens for changes to the user's motion preference and dispatches
+ * a custom event that animation systems can subscribe to.
+ *
+ * Usage:
+ *   motionPreference.init();
+ *
+ *   window.addEventListener('motionPreferenceChange', (e) => {
+ *     const { reduced } = (e as CustomEvent).detail;
+ *     // Handle preference change
+ *   });
+ */
+export const motionPreference = {
+  reduced: false,
+  initialized: false,
+
+  init(): void {
+    if (typeof window === 'undefined' || this.initialized) return;
+
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    this.reduced = mq.matches;
+    this.initialized = true;
+
+    mq.addEventListener('change', (e) => {
+      this.reduced = e.matches;
+      // Notify all animation systems
+      window.dispatchEvent(
+        new CustomEvent('motionPreferenceChange', {
+          detail: { reduced: e.matches },
+        })
+      );
+    });
+  },
+
+  /**
+   * Subscribe to motion preference changes
+   * @param callback Function to call when preference changes
+   * @returns Cleanup function to unsubscribe
+   */
+  subscribe(callback: (reduced: boolean) => void): () => void {
+    const handler = (e: Event) => {
+      const { reduced } = (e as CustomEvent).detail;
+      callback(reduced);
+    };
+
+    window.addEventListener('motionPreferenceChange', handler);
+    return () => window.removeEventListener('motionPreferenceChange', handler);
+  },
+};
+
+// Auto-initialize on client
+if (typeof window !== 'undefined') {
+  motionPreference.init();
+}
 
 // Get duration respecting reduced motion
 export const getDuration = (duration: number): number => {
@@ -338,7 +399,7 @@ export const killAnimations = (element: gsap.TweenTarget): void => {
 
 // Reset element to initial state
 export const resetElement = (element: gsap.TweenTarget): void => {
-  gsap.set(element, { clearProps: "all" });
+  gsap.set(element, { clearProps: 'all' });
 };
 
 // Create context for cleanup
@@ -363,11 +424,11 @@ export const createSequenceTimeline = (
   defaults?: gsap.TimelineVars
 ): gsap.core.Timeline => {
   const tl = gsap.timeline(defaults);
-  
+
   elements.forEach(({ target, props, position }) => {
     tl.to(target, props, position);
   });
-  
+
   return tl;
 };
 
@@ -404,7 +465,7 @@ gsap.defaults({
 });
 
 // Configure ScrollTrigger defaults
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   ScrollTrigger.defaults({
     toggleActions: SCROLL_TRIGGER.actions.playReverse,
     start: SCROLL_TRIGGER.start.nearBottom,

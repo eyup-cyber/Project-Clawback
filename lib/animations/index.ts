@@ -1,5 +1,8 @@
 import gsap from 'gsap';
 
+// Export frame loop manager
+export { frameLoop } from './frame-loop';
+
 // Check for reduced motion preference
 export const prefersReducedMotion = (): boolean => {
   if (typeof window === 'undefined') return false;
@@ -119,7 +122,7 @@ export const textReveal = (element: string | HTMLElement, delay = 0) => {
 
   tl.fromTo(
     element,
-    { 
+    {
       clipPath: 'inset(0 100% 0 0)',
       opacity: 0,
     },
@@ -187,12 +190,3 @@ export const magneticEffect = (element: HTMLElement, strength = 0.3) => {
     gsap.to(element, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.3)' });
   });
 };
-
-
-
-
-
-
-
-
-

@@ -123,6 +123,9 @@
 }
 
 :root {
+  /* DARK THEME ONLY - No light mode */
+  color-scheme: dark only;
+  
   /* Core */
   --background: #013220;      /* Deep Forest Green */
   --foreground: #E0E0E0;      /* Off-White */
@@ -148,28 +151,17 @@
   --font-body: 'HelveticaNow', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-:root[data-theme='light'] {
-  --background: #f6f7f5;
-  --foreground: #0f172a;
-  --primary: #32cd32;
-  --secondary: #d4a300;
-  --accent: #c026d3;
-  --border: rgba(15, 23, 42, 0.12);
-  --border-hover: rgba(15, 23, 42, 0.25);
-  --surface: #ffffff;
-  --surface-elevated: #f1f5f9;
-  --glow-primary: rgba(50, 205, 50, 0.25);
-  --glow-secondary: rgba(212, 163, 0, 0.25);
-  --glow-accent: rgba(192, 38, 211, 0.2);
-  color-scheme: light;
-}
-
-:root[data-theme='dark'] {
-  color-scheme: dark;
-}
-
 * {
   box-sizing: border-box;
+}
+
+/* CRITICAL: Force dark background on all elements */
+html,
+body,
+#__next,
+main,
+section {
+  background-color: #013220 !important;
 }
 
 html {
@@ -179,7 +171,7 @@ html {
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  background: #013220 !important; /* LOCKED: Deep Forest Green - never white */
   font-family: var(--font-body);
   font-weight: 500; /* Minimum font weight - Medium */
   line-height: 1.5;
@@ -513,8 +505,10 @@ button {
 
 @media print {
   body {
-    background: white;
-    color: black;
+    background: #013220 !important;
+    color: var(--foreground);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
   nav,

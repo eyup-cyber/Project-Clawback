@@ -3,20 +3,18 @@
 import dynamic from 'next/dynamic';
 
 /**
- * Client-side wrapper for SpaceDust
+ * Client-side wrapper for high-performance particle system
  *
  * Uses dynamic import with ssr: false to completely skip server-side rendering.
- * This prevents hooks from being called during Next.js 16's aggressive prerendering.
+ * The WebGLParticles component uses Canvas 2D for GPU-accelerated rendering
+ * of 10,000+ particles at 60fps.
  */
-const SpaceDust = dynamic(
-  () => import('./effects/Particles').then((mod) => ({ default: mod.SpaceDust })),
-  { ssr: false }
-);
+const WebGLParticles = dynamic(() => import('./effects/WebGLParticles'), { ssr: false });
 
 interface ClientSpaceDustProps {
   count?: number;
 }
 
-export default function ClientSpaceDust({ count = 22000 }: ClientSpaceDustProps) {
-  return <SpaceDust count={count} />;
+export default function ClientSpaceDust({ count = 12000 }: ClientSpaceDustProps) {
+  return <WebGLParticles count={count} />;
 }
