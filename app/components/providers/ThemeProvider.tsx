@@ -13,10 +13,9 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 const STORAGE_KEY = 'scroungers-theme';
 
-function getSystemTheme(): Theme {
-  const w = globalThis.window;
-  if (w === undefined) return 'dark';
-  return w.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+function getDefaultTheme(): Theme {
+  // Default to dark theme - this is the brand identity
+  return 'dark';
 }
 
 type ThemeAction = { type: 'set'; theme: Theme };
@@ -31,7 +30,7 @@ export function ThemeProvider({ children }: Readonly<{ children: React.ReactNode
     const w = globalThis.window;
     if (w === undefined) return 'dark';
     const stored = w.localStorage?.getItem(STORAGE_KEY) as Theme | null;
-    return stored ?? getSystemTheme();
+    return stored ?? getDefaultTheme();
   });
 
   // Apply theme to document and persist

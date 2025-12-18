@@ -70,20 +70,45 @@ if (!process.env.DEBUG) {
 }
 
 // Mock Next.js
-jest.mock('next/server', () => ({
-  NextRequest: jest.fn(),
-  NextResponse: {
-    json: jest.fn((data: unknown, init?: { status?: number; headers?: HeadersInit }) => ({
-      json: async () => data,
-      status: init?.status || 200,
-      headers: new Headers(init?.headers),
-    })),
-    redirect: jest.fn((url: string) => ({
+jest.mock('next/server', () => {
+  // NextResponse mock that works as both constructor and static methods
+  class MockNextResponse {
+    body: unknown;
+    status: number;
+    headers: Headers;
+
+    constructor(body: unknown, init?: { status?: number; headers?: HeadersInit }) {
+      this.body = body;
+      this.status = init?.status || 200;
+      this.headers = new Headers(init?.headers);
+    }
+
+    async json() {
+      return this.body;
+    }
+
+    static json(data: unknown, init?: { status?: number; headers?: HeadersInit }) {
+      const response = new MockNextResponse(data, init);
+      return response;
+    }
+
+    static redirect(url: string, status = 302) {
+      const response = new MockNextResponse(null, { status });
+      response.headers.set('Location', url);
+      return response;
+    }
+  }
+
+  return {
+    NextRequest: jest.fn().mockImplementation((url: string, init?: RequestInit) => ({
       url,
-      status: 302,
+      method: init?.method || 'GET',
+      headers: new Headers(init?.headers),
+      json: jest.fn().mockResolvedValue(init?.body ? JSON.parse(init.body as string) : {}),
     })),
-  },
-}));
+    NextResponse: MockNextResponse,
+  };
+});
 
 // Global test utilities
 (

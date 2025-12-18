@@ -2,7 +2,7 @@
 
 # Run type checking and tests before pushing
 echo "Running type check..."
-npm run typecheck -- --pretty false
+npm run typecheck
 
 echo "Running tests..."
 npm test -- --passWithNoTests
