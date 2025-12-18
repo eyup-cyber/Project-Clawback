@@ -274,11 +274,11 @@ describe('Admin API Integration', () => {
         }),
       });
 
-      const { PUT } = await import('@/app/api/admin/posts/[id]/moderate/route');
+      const { POST } = await import('@/app/api/admin/posts/[id]/moderate/route');
       const request = new NextRequest(
         `http://localhost:3000/api/admin/posts/${mockPost.id}/moderate`,
         {
-          method: 'PUT',
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -288,7 +288,7 @@ describe('Admin API Integration', () => {
         }
       );
 
-      const response = await PUT(request, {
+      const response = await POST(request, {
         params: Promise.resolve({ id: mockPost.id }),
       });
       expect(response.status).toBe(403);
@@ -338,11 +338,11 @@ describe('Admin API Integration', () => {
         }),
       });
 
-      const { PUT } = await import('@/app/api/admin/posts/[id]/moderate/route');
+      const { POST } = await import('@/app/api/admin/posts/[id]/moderate/route');
       const request = new NextRequest(
         `http://localhost:3000/api/admin/posts/${mockPost.id}/moderate`,
         {
-          method: 'PUT',
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -352,7 +352,7 @@ describe('Admin API Integration', () => {
         }
       );
 
-      const response = await PUT(request, {
+      const response = await POST(request, {
         params: Promise.resolve({ id: mockPost.id }),
       });
       // Will succeed or fail based on implementation

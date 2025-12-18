@@ -2,7 +2,13 @@
 
 import { useRef, type ReactNode, useEffect, useState } from 'react';
 import gsap from 'gsap';
-import { EASING, COLORS, prefersReducedMotion, getDuration, DURATION } from '@/lib/animations/gsap-config';
+import {
+  EASING,
+  COLORS,
+  prefersReducedMotion,
+  getDuration,
+  DURATION,
+} from '@/lib/animations/gsap-config';
 
 interface AnimatedCardProps {
   children: ReactNode;
@@ -174,7 +180,7 @@ export default function AnimatedCard({
       card.removeEventListener('mouseenter', handleMouseEnter);
       card.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [tilt, lift, glow, parallaxImage, maxTilt, liftHeight, disabled]);
+  }, [tilt, lift, glow, parallaxImage, maxTilt, liftHeight, disabled, depth]);
 
   // Shimmer loading effect
   useEffect(() => {
@@ -200,7 +206,10 @@ export default function AnimatedCard({
     const card = cardRef.current;
     const initialStates: Record<string, gsap.TweenVars> = {
       clip: { clipPath: 'inset(0 100% 0 0)' },
-      mask: { maskImage: 'linear-gradient(to right, black 0%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black 0%, transparent 100%)' },
+      mask: {
+        maskImage: 'linear-gradient(to right, black 0%, transparent 100%)',
+        WebkitMaskImage: 'linear-gradient(to right, black 0%, transparent 100%)',
+      },
       fade: { opacity: 0 },
       scale: { opacity: 0, scale: 0.8 },
     };
@@ -208,8 +217,17 @@ export default function AnimatedCard({
     gsap.set(card, initialStates[revealAnimation] || {});
 
     const animations: Record<string, gsap.TweenVars> = {
-      clip: { clipPath: 'inset(0 0% 0 0)', duration: getDuration(DURATION.slow), ease: EASING.expo },
-      mask: { maskImage: 'linear-gradient(to right, black 100%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black 100%, transparent 100%)', duration: getDuration(DURATION.slow), ease: EASING.expo },
+      clip: {
+        clipPath: 'inset(0 0% 0 0)',
+        duration: getDuration(DURATION.slow),
+        ease: EASING.expo,
+      },
+      mask: {
+        maskImage: 'linear-gradient(to right, black 100%, transparent 100%)',
+        WebkitMaskImage: 'linear-gradient(to right, black 100%, transparent 100%)',
+        duration: getDuration(DURATION.slow),
+        ease: EASING.expo,
+      },
       fade: { opacity: 1, duration: getDuration(DURATION.medium), ease: EASING.smooth },
       scale: { opacity: 1, scale: 1, duration: getDuration(DURATION.medium), ease: EASING.bounce },
     };
@@ -229,11 +247,11 @@ export default function AnimatedCard({
     observer.observe(card);
 
     return () => observer.disconnect();
-  }, []);
+  }, [revealAnimation]);
 
   const handleClick = () => {
     if (disabled) return;
-    
+
     if (href) {
       window.location.href = href;
     } else {
@@ -287,7 +305,8 @@ export default function AnimatedCard({
           ref={shimmerRef}
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)',
+            background:
+              'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)',
             transform: 'translateX(-100%)',
             zIndex: 15,
           }}
@@ -296,11 +315,7 @@ export default function AnimatedCard({
       )}
 
       {/* Content wrapper */}
-      <div
-        ref={contentRef}
-        className="relative z-5"
-        style={{ willChange: 'transform' }}
-      >
+      <div ref={contentRef} className="relative z-5" style={{ willChange: 'transform' }}>
         {children}
       </div>
 
@@ -328,8 +343,8 @@ interface SkeletonCardProps {
   lines?: number;
 }
 
-export function SkeletonCard({ 
-  className = '', 
+export function SkeletonCard({
+  className = '',
   aspectRatio = '16/9',
   lines = 3,
 }: SkeletonCardProps) {
@@ -363,7 +378,7 @@ export function SkeletonCard({
           <div
             key={i}
             className="h-4 rounded bg-[var(--background)]"
-            style={{ 
+            style={{
               width: i === 0 ? '80%' : i === lines - 1 ? '40%' : '100%',
             }}
           />
@@ -375,7 +390,8 @@ export function SkeletonCard({
         ref={shimmerRef}
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%)',
+          background:
+            'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%)',
           transform: 'translateX(-100%)',
         }}
         aria-hidden="true"
@@ -433,6 +449,3 @@ export function RevealCard({ children, className = '', delay = 0 }: RevealCardPr
     </div>
   );
 }
-
-
-

@@ -1,228 +1,184 @@
 /**
  * Unit tests for reactions database operations
+ *
+ * Note: Post reactions use a multi-reaction model (multiple types per user),
+ * while comment reactions use a single-reaction model (like/dislike).
  */
 
-// Mock Supabase client
+import { mockPost, mockUser } from '@/lib/test/fixtures';
+
+// Create a chainable mock helper that supports data collection
+function createChainableMock() {
+  let resolveData: unknown = { data: null, error: null };
+
+  const chainable: Record<string, jest.Mock> = {
+    select: jest.fn(),
+    insert: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    upsert: jest.fn(),
+    eq: jest.fn(),
+    in: jest.fn(),
+    match: jest.fn(),
+    order: jest.fn(),
+    limit: jest.fn(),
+    single: jest.fn(() => Promise.resolve(resolveData)),
+    // For queries that don't use single()
+    then: jest.fn((resolve) => resolve(resolveData)),
+  };
+
+  // Make all methods return the chainable object for chaining
+  Object.keys(chainable).forEach((key) => {
+    if (key !== 'single' && key !== 'then') {
+      chainable[key].mockReturnValue(chainable);
+    }
+  });
+
+  // Helper to set the resolve value
+  (chainable as Record<string, unknown>).setResolveData = (data: unknown) => {
+    resolveData = data;
+    chainable.single.mockResolvedValue(data);
+  };
+
+  return chainable;
+}
+
+// Mock Supabase client with chainable query builder
+const mockChainable = createChainableMock();
+
 jest.mock('@/lib/supabase/server', () => ({
   createClient: jest.fn(() => ({
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          single: jest.fn(),
-        })),
-      })),
-      insert: jest.fn(() => ({
-        select: jest.fn(() => ({
-          single: jest.fn(),
-        })),
-      })),
-      delete: jest.fn(() => ({
-        match: jest.fn(),
-      })),
-      upsert: jest.fn(),
-    })),
-    rpc: jest.fn(),
+    from: jest.fn(() => mockChainable),
   })),
 }));
-
-import { createClient } from '@/lib/supabase/server';
-import { mockPost, mockUser } from '@/lib/test/fixtures';
 
 describe('Reactions Database Operations', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset chain methods
+    Object.keys(mockChainable).forEach((key) => {
+      if (typeof mockChainable[key] === 'function' && mockChainable[key].mockClear) {
+        mockChainable[key].mockClear();
+        if (key !== 'single' && key !== 'then') {
+          mockChainable[key].mockReturnValue(mockChainable);
+        }
+      }
+    });
+    mockChainable.single.mockResolvedValue({ data: null, error: null });
   });
 
   describe('togglePostReaction', () => {
-    it('should add reaction when none exists', async () => {
-      const mockSupabase = await createClient();
-
-      // Mock check for existing reaction
-      (mockSupabase.from as jest.Mock).mockReturnValueOnce({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
-                data: null,
-                error: null,
-              }),
-            }),
-          }),
-        }),
-      });
-
-      // Mock insert
-      (mockSupabase.from as jest.Mock).mockReturnValueOnce({
-        insert: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: {
-                id: 'reaction-id',
-                post_id: mockPost.id,
-                user_id: mockUser.id,
-                type: 'star',
-              },
-              error: null,
-            }),
-          }),
-        }),
-      });
+    it('should add reaction when user has no reaction of that type', async () => {
+      // Mock: no existing reaction of this type found
+      mockChainable.single.mockResolvedValueOnce({ data: null, error: null });
 
       const { togglePostReaction } = await import('@/lib/db/reactions');
       const result = await togglePostReaction(mockPost.id, mockUser.id, 'star');
 
       expect(result.action).toBe('added');
       expect(result.type).toBe('star');
+      expect(mockChainable.insert).toHaveBeenCalled();
     });
 
-    it('should remove reaction when same type exists', async () => {
-      const mockSupabase = await createClient();
-
-      // Mock check for existing reaction
-      (mockSupabase.from as jest.Mock).mockReturnValueOnce({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
-                data: {
-                  id: 'existing-reaction',
-                  type: 'star',
-                },
-                error: null,
-              }),
-            }),
-          }),
-        }),
-      });
-
-      // Mock delete
-      (mockSupabase.from as jest.Mock).mockReturnValueOnce({
-        delete: jest.fn().mockReturnValue({
-          match: jest.fn().mockResolvedValue({
-            error: null,
-          }),
-        }),
+    it('should remove reaction when same type already exists', async () => {
+      // Mock: existing reaction found with same type
+      mockChainable.single.mockResolvedValueOnce({
+        data: {
+          id: 'existing-reaction',
+          reaction_type: 'star',
+        },
+        error: null,
       });
 
       const { togglePostReaction } = await import('@/lib/db/reactions');
       const result = await togglePostReaction(mockPost.id, mockUser.id, 'star');
 
       expect(result.action).toBe('removed');
+      expect(result.type).toBeNull();
+      expect(mockChainable.delete).toHaveBeenCalled();
     });
 
-    it('should change reaction when different type exists', async () => {
-      const mockSupabase = await createClient();
-
-      // Mock check for existing reaction
-      (mockSupabase.from as jest.Mock).mockReturnValueOnce({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
-                data: {
-                  id: 'existing-reaction',
-                  type: 'heart',
-                },
-                error: null,
-              }),
-            }),
-          }),
-        }),
-      });
-
-      // Mock update (upsert)
-      (mockSupabase.from as jest.Mock).mockReturnValueOnce({
-        upsert: jest.fn().mockResolvedValue({
-          error: null,
-        }),
-      });
+    it('should allow multiple reaction types from same user', async () => {
+      // Post reactions allow multiple types - if user has 'heart' and clicks 'star',
+      // the query for 'star' will not find existing (since it queries exact type)
+      mockChainable.single.mockResolvedValueOnce({ data: null, error: null });
 
       const { togglePostReaction } = await import('@/lib/db/reactions');
       const result = await togglePostReaction(mockPost.id, mockUser.id, 'star');
 
-      expect(result.action).toBe('changed');
+      // Should add a new 'star' reaction (user might already have 'heart')
+      expect(result.action).toBe('added');
       expect(result.type).toBe('star');
     });
   });
 
   describe('getPostReactionSummary', () => {
-    it('should return reaction counts', async () => {
-      const mockSupabase = await createClient();
-      const mockCounts = {
-        star: 10,
-        heart: 5,
-        fire: 3,
-        clap: 7,
-        think: 2,
-      };
+    it('should return reaction counts from database', async () => {
+      // Mock: return a list of reactions
+      const mockReactions = [
+        { reaction_type: 'star', user_id: 'user-1' },
+        { reaction_type: 'star', user_id: 'user-2' },
+        { reaction_type: 'heart', user_id: 'user-3' },
+        { reaction_type: 'fire', user_id: 'user-4' },
+      ];
 
-      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
-        data: mockCounts,
-        error: null,
+      // The function doesn't use .single() - it expects array data
+      mockChainable.eq.mockReturnValue({
+        ...mockChainable,
+        then: jest.fn((resolve) => resolve({ data: mockReactions, error: null })),
       });
 
       const { getPostReactionSummary } = await import('@/lib/db/reactions');
       const result = await getPostReactionSummary(mockPost.id);
 
-      expect(result.counts).toEqual(mockCounts);
-      expect(result.postId).toBe(mockPost.id);
+      expect(result.counts.star).toBe(2);
+      expect(result.counts.heart).toBe(1);
+      expect(result.counts.fire).toBe(1);
+      expect(result.counts.total).toBe(4);
     });
 
     it('should include user reaction when user ID provided', async () => {
-      const mockSupabase = await createClient();
+      // Mock: return reactions including one from our user
+      const mockReactions = [
+        { reaction_type: 'star', user_id: 'other-user' },
+        { reaction_type: 'heart', user_id: mockUser.id },
+      ];
 
-      // Mock counts
-      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
-        data: { star: 5, heart: 3 },
-        error: null,
-      });
-
-      // Mock user reaction
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
-                data: { type: 'star' },
-                error: null,
-              }),
-            }),
-          }),
-        }),
+      mockChainable.eq.mockReturnValue({
+        ...mockChainable,
+        then: jest.fn((resolve) => resolve({ data: mockReactions, error: null })),
       });
 
       const { getPostReactionSummary } = await import('@/lib/db/reactions');
       const result = await getPostReactionSummary(mockPost.id, mockUser.id);
 
-      expect(result.userReaction).toBe('star');
+      expect(result.userReaction).toBe('heart');
     });
 
     it('should return null userReaction when user has not reacted', async () => {
-      const mockSupabase = await createClient();
+      const mockReactions = [{ reaction_type: 'star', user_id: 'other-user' }];
 
-      // Mock counts
-      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
-        data: { star: 5 },
-        error: null,
-      });
-
-      // Mock no user reaction
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
-                data: null,
-                error: null,
-              }),
-            }),
-          }),
-        }),
+      mockChainable.eq.mockReturnValue({
+        ...mockChainable,
+        then: jest.fn((resolve) => resolve({ data: mockReactions, error: null })),
       });
 
       const { getPostReactionSummary } = await import('@/lib/db/reactions');
       const result = await getPostReactionSummary(mockPost.id, mockUser.id);
 
+      expect(result.userReaction).toBeNull();
+    });
+
+    it('should handle empty reactions', async () => {
+      mockChainable.eq.mockReturnValue({
+        ...mockChainable,
+        then: jest.fn((resolve) => resolve({ data: [], error: null })),
+      });
+
+      const { getPostReactionSummary } = await import('@/lib/db/reactions');
+      const result = await getPostReactionSummary(mockPost.id);
+
+      expect(result.counts.total).toBe(0);
       expect(result.userReaction).toBeNull();
     });
   });

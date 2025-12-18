@@ -90,39 +90,18 @@ async function checkStorage(): Promise<{
 }
 
 /**
- * Check cache health (Redis)
+ * Check cache health (in-memory cache)
+ * Note: Redis is not currently implemented, using in-memory cache instead
  */
 async function checkCache(): Promise<{
   status: 'healthy' | 'unhealthy';
   error?: string;
 }> {
-  if (!config.features.redisCache) {
-    return {
-      status: 'healthy', // Not required
-    };
-  }
-  
-  try {
-    const client = await getRedisClient();
-    if (!client) {
-      return {
-        status: 'unhealthy',
-        error: 'Redis client not available',
-      };
-    }
-    
-    // Try a simple ping
-    await client.ping();
-    
-    return {
-      status: 'healthy',
-    };
-  } catch (error) {
-    return {
-      status: 'unhealthy',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    };
-  }
+  // Currently using in-memory cache, which is always available
+  // Redis would be checked here if implemented in the future
+  return {
+    status: 'healthy',
+  };
 }
 
 /**

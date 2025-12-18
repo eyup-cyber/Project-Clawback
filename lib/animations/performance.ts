@@ -15,7 +15,7 @@ export const useWillChange = (
 
     const element = ref.current;
     const originalWillChange = element.style.willChange;
-    
+
     element.style.willChange = properties.join(', ');
 
     return () => {
@@ -78,7 +78,7 @@ export interface IntersectionObserverOptions {
 }
 
 export const useIntersectionObserver = (
-  ref: RefObject<HTMLElement>,
+  ref: RefObject<HTMLElement | null>,
   callback: (isIntersecting: boolean) => void,
   options: IntersectionObserverOptions = {}
 ) => {
@@ -182,7 +182,7 @@ export const measureAnimationPerformance = (
 
 export const batchDOMUpdates = (updates: Array<() => void>) => {
   requestAnimationFrame(() => {
-    updates.forEach(update => update());
+    updates.forEach((update) => update());
   });
 };
 
@@ -193,7 +193,7 @@ export const batchDOMUpdates = (updates: Array<() => void>) => {
 export const cleanupAnimations = (targets: gsap.TweenTarget | gsap.TweenTarget[]) => {
   gsap.killTweensOf(targets);
   if (Array.isArray(targets)) {
-    targets.forEach(target => {
+    targets.forEach((target) => {
       if (target instanceof HTMLElement) {
         gsap.set(target, { clearProps: 'all' });
       }
@@ -202,7 +202,3 @@ export const cleanupAnimations = (targets: gsap.TweenTarget | gsap.TweenTarget[]
     gsap.set(targets, { clearProps: 'all' });
   }
 };
-
-
-
-

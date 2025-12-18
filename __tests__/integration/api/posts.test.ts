@@ -48,7 +48,7 @@ describe('Posts API Integration', () => {
 
       const { GET } = await import('@/app/api/posts/route');
       const request = new NextRequest('http://localhost:3000/api/posts?page=1&limit=10');
-      
+
       const response = await GET(request);
       const json = await response.json();
 
@@ -83,7 +83,7 @@ describe('Posts API Integration', () => {
       const request = new NextRequest(
         'http://localhost:3000/api/posts?category_id=' + mockPost.category_id
       );
-      
+
       const response = await GET(request);
       expect(response.status).toBe(200);
     });
@@ -108,7 +108,7 @@ describe('Posts API Integration', () => {
 
       const { GET } = await import('@/app/api/posts/route');
       const request = new NextRequest('http://localhost:3000/api/posts');
-      
+
       const response = await GET(request);
       expect(response.status).toBeGreaterThanOrEqual(400);
     });
@@ -136,7 +136,7 @@ describe('Posts API Integration', () => {
           category_id: mockPost.category_id,
         }),
       });
-      
+
       const response = await POST(request);
       expect(response.status).toBe(401);
     });
@@ -168,7 +168,7 @@ describe('Posts API Integration', () => {
             insert: jest.fn().mockReturnValue({
               select: jest.fn().mockReturnValue({
                 single: jest.fn().mockResolvedValue({
-                  data: { id: 'new-post-id', ...mockPost },
+                  data: { ...mockPost, id: 'new-post-id' },
                   error: null,
                 }),
               }),
@@ -190,7 +190,7 @@ describe('Posts API Integration', () => {
           category_id: mockPost.category_id,
         }),
       });
-      
+
       const response = await POST(request);
       // Will likely be 401 or 403 due to CSRF validation in tests
       // In real integration test, CSRF would be properly validated
@@ -229,7 +229,7 @@ describe('Posts API Integration', () => {
           // Missing required fields
         }),
       });
-      
+
       const response = await POST(request);
       expect(response.status).toBeGreaterThanOrEqual(400);
     });
@@ -254,7 +254,7 @@ describe('Posts API Integration', () => {
 
       const { GET } = await import('@/app/api/posts/[id]/route');
       const request = new NextRequest(`http://localhost:3000/api/posts/${mockPost.id}`);
-      
+
       const response = await GET(request, { params: Promise.resolve({ id: mockPost.id }) });
       const json = await response.json();
 
@@ -280,10 +280,9 @@ describe('Posts API Integration', () => {
 
       const { GET } = await import('@/app/api/posts/[id]/route');
       const request = new NextRequest('http://localhost:3000/api/posts/non-existent');
-      
+
       const response = await GET(request, { params: Promise.resolve({ id: 'non-existent' }) });
       expect(response.status).toBe(404);
     });
   });
 });
-

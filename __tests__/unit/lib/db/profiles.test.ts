@@ -170,7 +170,7 @@ describe('Profiles Database Operations', () => {
     });
   });
 
-  describe('checkUsernameAvailable', () => {
+  describe('isUsernameAvailable', () => {
     it('should return true for available username', async () => {
       const mockSupabase = await createClient();
 
@@ -185,8 +185,8 @@ describe('Profiles Database Operations', () => {
         }),
       });
 
-      const { checkUsernameAvailable } = await import('@/lib/db/profiles');
-      const result = await checkUsernameAvailable('newusername');
+      const { isUsernameAvailable } = await import('@/lib/db/profiles');
+      const result = await isUsernameAvailable('newusername');
 
       expect(result).toBe(true);
     });
@@ -205,8 +205,8 @@ describe('Profiles Database Operations', () => {
         }),
       });
 
-      const { checkUsernameAvailable } = await import('@/lib/db/profiles');
-      const result = await checkUsernameAvailable('existinguser');
+      const { isUsernameAvailable } = await import('@/lib/db/profiles');
+      const result = await isUsernameAvailable('existinguser');
 
       expect(result).toBe(false);
     });

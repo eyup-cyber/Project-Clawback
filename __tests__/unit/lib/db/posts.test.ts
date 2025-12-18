@@ -12,7 +12,6 @@ jest.mock('@/lib/supabase/server', () => ({
   createClient: jest.fn(() => mockSupabaseClient),
 }));
 
-import { createClient } from '@/lib/supabase/server';
 import { mockPost } from '@/lib/test/fixtures';
 
 describe('Posts Database Operations', () => {

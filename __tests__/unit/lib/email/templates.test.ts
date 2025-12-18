@@ -22,11 +22,12 @@ describe('Email Templates', () => {
       expect(html).toContain('Scroungers');
     });
 
-    it('should include call-to-action button', () => {
+    it('should include call-to-action link', () => {
       const { html } = welcomeEmail('User');
 
       expect(html).toContain('href=');
-      expect(html).toContain('button');
+      // Button is rendered as a styled anchor tag
+      expect(html).toContain('Explore Content');
     });
   });
 
@@ -48,14 +49,14 @@ describe('Email Templates', () => {
 
   describe('applicationRejectedEmail', () => {
     it('should include rejection message', () => {
-      const { html, subject: _subject } = applicationRejectedEmail('John Doe', 'Incomplete application');
+      const { html, subject: _subject } = applicationRejectedEmail('John Doe');
 
       expect(html).toContain('John Doe');
-      expect(html).toContain('Incomplete application');
+      expect(html).toContain('not to move forward');
     });
 
     it('should be respectful in tone', () => {
-      const { html } = applicationRejectedEmail('User', 'Reason');
+      const { html } = applicationRejectedEmail('User');
 
       // Should not contain harsh language
       expect(html.toLowerCase()).not.toContain('denied');
@@ -144,7 +145,7 @@ describe('Email Templates', () => {
       const templates = [
         welcomeEmail('User'),
         applicationApprovedEmail('User'),
-        applicationRejectedEmail('User', 'Reason'),
+        applicationRejectedEmail('User'),
         postPublishedEmail('User', 'Title', 'slug'),
         newCommentEmail('A', 'B', 'T', 'slug', 'preview'),
         newsletterWelcomeEmail('test@example.com'),

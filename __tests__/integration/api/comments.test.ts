@@ -56,10 +56,8 @@ describe('Comments API Integration', () => {
       });
 
       const { GET } = await import('@/app/api/comments/route');
-      const request = new NextRequest(
-        `http://localhost:3000/api/comments?post_id=${mockPost.id}`
-      );
-      
+      const request = new NextRequest(`http://localhost:3000/api/comments?post_id=${mockPost.id}`);
+
       const response = await GET(request);
       const json = await response.json();
 
@@ -99,7 +97,7 @@ describe('Comments API Integration', () => {
       const request = new NextRequest(
         `http://localhost:3000/api/comments?post_id=${mockPost.id}&with_replies=true`
       );
-      
+
       const response = await GET(request);
       expect(response.status).toBe(200);
     });
@@ -107,7 +105,7 @@ describe('Comments API Integration', () => {
     it('should require post_id parameter', async () => {
       const { GET } = await import('@/app/api/comments/route');
       const request = new NextRequest('http://localhost:3000/api/comments');
-      
+
       const response = await GET(request);
       expect(response.status).toBe(400);
     });
@@ -137,7 +135,7 @@ describe('Comments API Integration', () => {
           content: 'Test comment',
         }),
       });
-      
+
       const response = await POST(request);
       expect(response.status).toBe(401);
     });
@@ -169,7 +167,7 @@ describe('Comments API Integration', () => {
             insert: jest.fn().mockReturnValue({
               select: jest.fn().mockReturnValue({
                 single: jest.fn().mockResolvedValue({
-                  data: { id: 'new-comment-id', ...mockComment },
+                  data: { ...mockComment, id: 'new-comment-id' },
                   error: null,
                 }),
               }),
@@ -190,7 +188,7 @@ describe('Comments API Integration', () => {
           content: 'Test comment',
         }),
       });
-      
+
       const response = await POST(request);
       // Response may be 401/403 due to CSRF validation in test env
       expect(response.status).toBeDefined();
@@ -229,7 +227,7 @@ describe('Comments API Integration', () => {
           content: '', // Empty content
         }),
       });
-      
+
       const response = await POST(request);
       expect(response.status).toBeGreaterThanOrEqual(400);
     });
@@ -273,19 +271,16 @@ describe('Comments API Integration', () => {
       });
 
       const { PUT } = await import('@/app/api/comments/[id]/route');
-      const request = new NextRequest(
-        `http://localhost:3000/api/comments/${mockComment.id}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            content: 'Updated content',
-          }),
-        }
-      );
-      
+      const request = new NextRequest(`http://localhost:3000/api/comments/${mockComment.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: 'Updated content',
+        }),
+      });
+
       const response = await PUT(request, {
         params: Promise.resolve({ id: mockComment.id }),
       });
@@ -339,16 +334,13 @@ describe('Comments API Integration', () => {
       });
 
       const { DELETE } = await import('@/app/api/comments/[id]/route');
-      const request = new NextRequest(
-        `http://localhost:3000/api/comments/${mockComment.id}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'X-CSRF-Token': 'valid-token',
-          },
-        }
-      );
-      
+      const request = new NextRequest(`http://localhost:3000/api/comments/${mockComment.id}`, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-Token': 'valid-token',
+        },
+      });
+
       const response = await DELETE(request, {
         params: Promise.resolve({ id: mockComment.id }),
       });
@@ -357,4 +349,3 @@ describe('Comments API Integration', () => {
     });
   });
 });
-

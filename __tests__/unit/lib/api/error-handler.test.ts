@@ -9,14 +9,14 @@ import { ApiError } from '@/lib/api/response';
 describe('API Error Handler', () => {
   describe('handleApiError', () => {
     it('should handle ApiError instances', async () => {
-      const error = new ApiError('Custom error', 'CUSTOM_ERROR', { detail: 'extra' });
+      const error = new ApiError('Custom error', 'BAD_REQUEST', { detail: 'extra' });
       const response = handleApiError(error);
 
       expect(response.status).toBe(400);
       const json = await response.json();
       expect(json.success).toBe(false);
       expect(json.error.message).toBe('Custom error');
-      expect(json.error.code).toBe('CUSTOM_ERROR');
+      expect(json.error.code).toBe('BAD_REQUEST');
     });
 
     it('should handle ZodError for validation failures', async () => {

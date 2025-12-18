@@ -1,6 +1,6 @@
 'use client';
 
-import { type ReactNode, type JSX, forwardRef, useRef, useEffect } from 'react';
+import React, { type ReactNode, forwardRef, useRef, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -14,25 +14,46 @@ interface TypographyProps {
   children: ReactNode;
   className?: string;
   variant?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'body' | 'caption' | 'label';
-  animate?: 'none' | 'fadeIn' | 'slideUp' | 'slideDown' | 'slideLeft' | 'slideRight' | 'scale' | 'reveal';
+  animate?:
+    | 'none'
+    | 'fadeIn'
+    | 'slideUp'
+    | 'slideDown'
+    | 'slideLeft'
+    | 'slideRight'
+    | 'scale'
+    | 'reveal';
   delay?: number;
-  as?: keyof JSX.IntrinsicElements;
+  as?: React.ElementType;
 }
 
 const Typography = forwardRef<HTMLElement, TypographyProps>(
   ({ children, className, variant = 'body', animate = 'none', delay = 0, as, ...props }, ref) => {
-    const elementRef = useRef<HTMLElement>(null);
-    const actualRef = (ref as React.RefObject<HTMLElement>) || elementRef;
+    const internalRef = useRef<HTMLElement | null>(null);
+
+    // Merge refs using callback pattern
+    const setRef = useCallback(
+      (node: HTMLElement | null) => {
+        internalRef.current = node;
+        if (typeof ref === 'function') {
+          ref(node);
+        } else if (ref) {
+          (ref as React.MutableRefObject<HTMLElement | null>).current = node;
+        }
+      },
+      [ref]
+    );
 
     useEffect(() => {
+      const element = internalRef.current;
+
       if (animate === 'none' || prefersReducedMotion()) {
-        if (actualRef.current) {
-          gsap.set(actualRef.current, { opacity: 1, clearProps: 'all' });
+        if (element) {
+          gsap.set(element, { opacity: 1, clearProps: 'all' });
         }
         return;
       }
 
-      const element = actualRef.current;
       if (!element) return;
 
       // Set initial state based on animation type
@@ -51,12 +72,47 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
       // Animate on scroll
       const animationProps: Record<string, gsap.TweenVars> = {
         fadeIn: { opacity: 1, duration: getDuration(DURATION.medium), ease: EASING.smooth, delay },
-        slideUp: { opacity: 1, y: 0, duration: getDuration(DURATION.medium), ease: EASING.snappy, delay },
-        slideDown: { opacity: 1, y: 0, duration: getDuration(DURATION.medium), ease: EASING.snappy, delay },
-        slideLeft: { opacity: 1, x: 0, duration: getDuration(DURATION.medium), ease: EASING.snappy, delay },
-        slideRight: { opacity: 1, x: 0, duration: getDuration(DURATION.medium), ease: EASING.snappy, delay },
-        scale: { opacity: 1, scale: 1, duration: getDuration(DURATION.medium), ease: EASING.bounce, delay },
-        reveal: { clipPath: 'inset(0 0% 0 0)', duration: getDuration(DURATION.slow), ease: EASING.expo, delay },
+        slideUp: {
+          opacity: 1,
+          y: 0,
+          duration: getDuration(DURATION.medium),
+          ease: EASING.snappy,
+          delay,
+        },
+        slideDown: {
+          opacity: 1,
+          y: 0,
+          duration: getDuration(DURATION.medium),
+          ease: EASING.snappy,
+          delay,
+        },
+        slideLeft: {
+          opacity: 1,
+          x: 0,
+          duration: getDuration(DURATION.medium),
+          ease: EASING.snappy,
+          delay,
+        },
+        slideRight: {
+          opacity: 1,
+          x: 0,
+          duration: getDuration(DURATION.medium),
+          ease: EASING.snappy,
+          delay,
+        },
+        scale: {
+          opacity: 1,
+          scale: 1,
+          duration: getDuration(DURATION.medium),
+          ease: EASING.bounce,
+          delay,
+        },
+        reveal: {
+          clipPath: 'inset(0 0% 0 0)',
+          duration: getDuration(DURATION.slow),
+          ease: EASING.expo,
+          delay,
+        },
       };
 
       gsap.to(element, {
@@ -71,7 +127,7 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
       return () => {
         gsap.killTweensOf(element);
       };
-    }, [animate, delay, actualRef]);
+    }, [animate, delay]);
 
     const variantStyles = {
       h1: 'text-4xl sm:text-5xl md:text-6xl font-bold',
@@ -109,17 +165,19 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
       label: 'label',
     };
 
-    const Component = (as || defaultElements[variant]) as keyof JSX.IntrinsicElements;
+    // Dynamic element rendering using createElement to avoid TypeScript JSX issues
+    const Tag = as || defaultElements[variant];
 
-    return (
-      <Component
-        ref={actualRef as any}
-        className={cn(variantStyles[variant], className)}
-        style={{ fontFamily: fontFamilies[variant] }}
-        {...props}
-      >
-        {children}
-      </Component>
+    return React.createElement(
+      Tag,
+      // eslint-disable-next-line react-hooks/refs -- Callback ref is valid for forwardRef components
+      {
+        ref: setRef,
+        className: cn(variantStyles[variant], className),
+        style: { fontFamily: fontFamilies[variant] },
+        ...props,
+      },
+      children
     );
   }
 );
@@ -158,7 +216,3 @@ export const Label = forwardRef<HTMLLabelElement, Omit<TypographyProps, 'variant
   (props, ref) => <Typography ref={ref} variant="label" {...props} />
 );
 Label.displayName = 'Label';
-
-
-
-
