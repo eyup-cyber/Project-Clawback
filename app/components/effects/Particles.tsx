@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import type * as THREE from 'three';
 import { prefersReducedMotion } from '@/lib/animations/gsap-config';
@@ -350,5 +350,78 @@ export function Sparkle({
   );
 }
 
+// SpaceDust: slow, downward drifting particles (space-like)
+interface SpaceDustProps {
+  count?: number;
+}
 
+export function SpaceDust({ count = 2200 }: SpaceDustProps) {
+  const mounted = useIsMounted();
 
+  // 80% lime green, 20% gold
+  const getColor = (seed: number) => {
+    return seed > 0.8 ? 'var(--secondary)' : 'var(--primary)';
+  };
+
+  const [particles] = useState(() =>
+    Array.from({ length: count }, (_, i) => {
+      const random = createSeededRandom(i * 9999);
+      return {
+        id: i,
+        left: random() * 100,
+        size: 1 + random() * 2, // 1-3px
+        duration: 110 + random() * 210, // 110-320s
+        delay: -random() * 320, // Start mid-cycle
+        opacity: 0.2 + random() * 0.4,
+        blur: random() * 2, // 0-2px blur
+        color: getColor(random()),
+        sway: 10 + random() * 30, // Horizontal sway amount
+      };
+    })
+  );
+
+  if (prefersReducedMotion() || !mounted) {
+    return null;
+  }
+
+  return (
+    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+      {particles.map((p) => (
+        <div
+          key={p.id}
+          className="absolute rounded-full animate-spacedust"
+          style={{
+            left: `${p.left}%`,
+            top: '-10px', // Start slightly above
+            width: p.size,
+            height: p.size,
+            backgroundColor: p.color,
+            opacity: p.opacity,
+            filter: `blur(${p.blur}px)`,
+            animationDuration: `${p.duration}s`,
+            animationDelay: `${p.delay}s`,
+            // Custom property for horizontal sway
+            ['--sway' as any]: `${p.sway}px`,
+          }}
+        />
+      ))}
+
+      <style jsx>{`
+        @keyframes spacedust {
+          0% {
+            transform: translateY(0) translateX(calc(var(--sway) * -1));
+          }
+          50% {
+             transform: translateY(55vh) translateX(var(--sway));
+          }
+          100% {
+            transform: translateY(110vh) translateX(calc(var(--sway) * -1));
+          }
+        }
+        .animate-spacedust {
+          animation: spacedust linear infinite;
+        }
+      `}</style>
+    </div>
+  );
+}

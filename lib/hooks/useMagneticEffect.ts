@@ -17,14 +17,14 @@ interface UseMagneticEffectReturn {
 }
 
 export function useMagneticEffect(options: MagneticOptions = {}): UseMagneticEffectReturn {
-  const { 
-    strength = 0.35, 
-    radius = 100, 
+  const {
+    strength = 0.35,
+    radius = 100,
     ease = EASING.smooth,
     duration = 0.4,
     scale = 1.05,
   } = options;
-  
+
   const ref = useRef<HTMLElement>(null);
   const boundingRef = useRef<DOMRect | null>(null);
   const isHovering = useRef(false);
@@ -37,7 +37,7 @@ export function useMagneticEffect(options: MagneticOptions = {}): UseMagneticEff
 
   const resetPosition = useCallback(() => {
     isHovering.current = false;
-    
+
     if (ref.current) {
       gsap.to(ref.current, {
         x: 0,
@@ -47,51 +47,45 @@ export function useMagneticEffect(options: MagneticOptions = {}): UseMagneticEff
         ease: EASING.elastic,
       });
     }
-
-    if (innerRef.current) {
-      gsap.to(innerRef.current, {
-        x: 0,
-        y: 0,
-        duration: duration * 1.5,
-        ease: EASING.elastic,
-      });
-    }
   }, [duration]);
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!ref.current || !boundingRef.current || prefersReducedMotion()) return;
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!ref.current || !boundingRef.current || prefersReducedMotion()) return;
 
-    const rect = boundingRef.current;
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    const distanceX = e.clientX - centerX;
-    const distanceY = e.clientY - centerY;
-    const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+      const rect = boundingRef.current;
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
 
-    if (distance < radius) {
-      isHovering.current = true;
-      const moveX = distanceX * strength;
-      const moveY = distanceY * strength;
+      const distanceX = e.clientX - centerX;
+      const distanceY = e.clientY - centerY;
+      const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 
-      gsap.to(ref.current, {
-        x: moveX,
-        y: moveY,
-        scale,
-        duration,
-        ease,
-      });
-    } else if (isHovering.current) {
-      isHovering.current = false;
-      gsap.to(ref.current, {
-        x: 0,
-        y: 0,
-        scale: 1,
-        duration: duration * 1.5,
-        ease: EASING.elastic,
-      });
-    }
-  }, [strength, radius, ease, duration, scale]);
+      if (distance < radius) {
+        isHovering.current = true;
+        const moveX = distanceX * strength;
+        const moveY = distanceY * strength;
+
+        gsap.to(ref.current, {
+          x: moveX,
+          y: moveY,
+          scale,
+          duration,
+          ease,
+        });
+      } else if (isHovering.current) {
+        isHovering.current = false;
+        gsap.to(ref.current, {
+          x: 0,
+          y: 0,
+          scale: 1,
+          duration: duration * 1.5,
+          ease: EASING.elastic,
+        });
+      }
+    },
+    [strength, radius, ease, duration, scale]
+  );
 
   const handleMouseLeave = useCallback(() => {
     if (!ref.current || prefersReducedMotion()) return;
@@ -111,7 +105,7 @@ export function useMagneticEffect(options: MagneticOptions = {}): UseMagneticEff
     if (!element || prefersReducedMotion()) return;
 
     updateBounding();
-    
+
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('resize', updateBounding);
     window.addEventListener('scroll', updateBounding);
@@ -138,7 +132,7 @@ export function useMagneticButton(options: MagneticButtonOptions = {}): {
   ref: RefObject<HTMLElement | null>;
   innerRef: RefObject<HTMLElement | null>;
 } {
-  const { 
+  const {
     strength = 0.25,
     innerStrength = 0.15,
     radius = 100,
@@ -158,49 +152,74 @@ export function useMagneticButton(options: MagneticButtonOptions = {}): {
     }
   }, []);
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!ref.current || !boundingRef.current || prefersReducedMotion()) return;
-
-    const rect = boundingRef.current;
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
+  const resetPosition = useCallback(() => {
+    isHovering.current = false;
     
-    const distanceX = e.clientX - centerX;
-    const distanceY = e.clientY - centerY;
-    const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-
-    if (distance < radius) {
-      isHovering.current = true;
-      
-      // Move outer element
+    if (ref.current) {
       gsap.to(ref.current, {
-        x: distanceX * strength,
-        y: distanceY * strength,
-        scale,
-        duration,
-        ease,
+        x: 0,
+        y: 0,
+        scale: 1,
+        duration: duration * 1.5,
+        ease: EASING.elastic,
       });
+    }
+    if (innerRef.current) {
+      gsap.to(innerRef.current, {
+        x: 0,
+        y: 0,
+        duration: duration * 1.5,
+        ease: EASING.elastic,
+      });
+    }
+  }, [duration]);
 
-      // Move inner content in same direction but less
-      if (innerRef.current) {
-        gsap.to(innerRef.current, {
-          x: distanceX * innerStrength,
-          y: distanceY * innerStrength,
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!ref.current || !boundingRef.current || prefersReducedMotion()) return;
+
+      const rect = boundingRef.current;
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      const distanceX = e.clientX - centerX;
+      const distanceY = e.clientY - centerY;
+      const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+      if (distance < radius) {
+        isHovering.current = true;
+
+        // Move outer element
+        gsap.to(ref.current, {
+          x: distanceX * strength,
+          y: distanceY * strength,
+          scale,
           duration,
           ease,
         });
+
+        // Move inner content in same direction but less
+        if (innerRef.current) {
+          gsap.to(innerRef.current, {
+            x: distanceX * innerStrength,
+            y: distanceY * innerStrength,
+            duration,
+            ease,
+          });
+        }
+      } else if (isHovering.current) {
+        resetPosition();
       }
-    } else if (isHovering.current) {
-      resetPosition();
-    }
-  }, [strength, innerStrength, radius, ease, duration, scale, resetPosition]);
+    },
+    [strength, innerStrength, radius, ease, duration, scale, resetPosition]
+  );
 
   useEffect(() => {
     const element = ref.current;
     if (!element || prefersReducedMotion()) return;
 
     updateBounding();
-    
+
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('resize', updateBounding);
     window.addEventListener('scroll', updateBounding);
@@ -214,16 +233,10 @@ export function useMagneticButton(options: MagneticButtonOptions = {}): {
     };
   }, [handleMouseMove, resetPosition, updateBounding]);
 
-  return { 
-    ref: ref as RefObject<HTMLElement | null>, 
-    innerRef: innerRef as RefObject<HTMLElement | null> 
+  return {
+    ref: ref as RefObject<HTMLElement | null>,
+    innerRef: innerRef as RefObject<HTMLElement | null>,
   };
 }
 
 export default useMagneticEffect;
-
-
-
-
-
-

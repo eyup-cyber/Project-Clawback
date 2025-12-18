@@ -59,7 +59,7 @@ describe('Admin API Integration', () => {
 
       const { GET } = await import('@/app/api/admin/users/route');
       const request = new NextRequest('http://localhost:3000/api/admin/users');
-      
+
       const response = await GET(request);
       expect(response.status).toBe(403);
     });
@@ -78,7 +78,7 @@ describe('Admin API Integration', () => {
             error: null,
           }),
         },
-        from: jest.fn().mockImplementation((_table) => {
+        from: jest.fn().mockImplementation((table) => {
           if (table === 'profiles') {
             return {
               select: jest.fn().mockImplementation(() => ({
@@ -104,7 +104,7 @@ describe('Admin API Integration', () => {
 
       const { GET } = await import('@/app/api/admin/users/route');
       const request = new NextRequest('http://localhost:3000/api/admin/users');
-      
+
       const response = await GET(request);
       // Should succeed or 403 based on role check
       expect(response.status).toBeDefined();
@@ -136,7 +136,7 @@ describe('Admin API Integration', () => {
 
       const { GET } = await import('@/app/api/admin/stats/route');
       const response = await GET();
-      
+
       expect(response.status).toBe(403);
     });
 
@@ -150,7 +150,7 @@ describe('Admin API Integration', () => {
             error: null,
           }),
         },
-        from: jest.fn().mockImplementation((table) => {
+        from: jest.fn().mockImplementation((_table) => {
           return {
             select: jest.fn().mockImplementation((cols, opts) => {
               if (opts?.count === 'exact' && opts?.head) {
@@ -186,7 +186,7 @@ describe('Admin API Integration', () => {
 
       const { GET } = await import('@/app/api/admin/stats/route');
       const response = await GET();
-      
+
       // Will be 200 or 403 based on role check
       expect(response.status).toBeDefined();
     });
@@ -245,7 +245,7 @@ describe('Admin API Integration', () => {
 
       const { GET } = await import('@/app/api/admin/applications/route');
       const request = new NextRequest('http://localhost:3000/api/admin/applications');
-      
+
       const response = await GET(request);
       expect(response.status).toBeDefined();
     });
@@ -287,7 +287,7 @@ describe('Admin API Integration', () => {
           }),
         }
       );
-      
+
       const response = await PUT(request, {
         params: Promise.resolve({ id: mockPost.id }),
       });
@@ -351,7 +351,7 @@ describe('Admin API Integration', () => {
           }),
         }
       );
-      
+
       const response = await PUT(request, {
         params: Promise.resolve({ id: mockPost.id }),
       });
@@ -360,4 +360,3 @@ describe('Admin API Integration', () => {
     });
   });
 });
-

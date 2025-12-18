@@ -22,13 +22,31 @@ import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
  * Icons (tiny inline SVGs to avoid external deps)
  * -------------------------------------------------------------------------- */
 const CheckIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M20 6L9 17l-5-5" />
   </svg>
 );
 
 const ChevronDownIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M6 9l6 6 6-6" />
   </svg>
 );
@@ -42,9 +60,12 @@ const DotIcon = () => (
 /* -----------------------------------------------------------------------------
  * Shared tokens
  * -------------------------------------------------------------------------- */
-const surfaceBase = 'bg-(--surface) text-(--foreground) border border-(--border) shadow-xl shadow-black/30';
-const popoverMotion = 'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in data-[state=closed]:fade-out data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95';
-const slideMotion = 'data-[state=open]:slide-in-from-bottom-2 data-[state=closed]:slide-out-to-bottom-2';
+const surfaceBase =
+  'bg-(--surface) text-(--foreground) border border-(--border) shadow-xl shadow-black/30';
+const popoverMotion =
+  'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in data-[state=closed]:fade-out data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95';
+const slideMotion =
+  'data-[state=open]:slide-in-from-bottom-2 data-[state=closed]:slide-out-to-bottom-2';
 
 /* -----------------------------------------------------------------------------
  * Select
@@ -214,16 +235,19 @@ export const Slider = forwardRef<
 >(({ className, ...props }, ref) => (
   <SliderPrimitive.Root
     ref={ref}
-    className={cn(
-      'relative flex w-full touch-none select-none items-center',
-      className
-    )}
+    className={cn('relative flex w-full touch-none select-none items-center', className)}
     {...props}
   >
     <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-(--border)">
       <SliderPrimitive.Range className="absolute h-full bg-(--primary)" />
     </SliderPrimitive.Track>
-    <SliderPrimitive.Thumb className="block h-4 w-4 rounded-full border border-(--background) bg-(--foreground) shadow transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 focus-visible:ring-offset-(--background)" />
+    {/* Dynamic thumbs based on value/defaultValue length */}
+    {Array.from({ length: (props.value || props.defaultValue || [0]).length }).map((_, i) => (
+      <SliderPrimitive.Thumb
+        key={i}
+        className="block h-4 w-4 rounded-full border border-(--background) bg-(--foreground) shadow transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 focus-visible:ring-offset-(--background)"
+      />
+    ))}
   </SliderPrimitive.Root>
 ));
 Slider.displayName = SliderPrimitive.Root.displayName;
@@ -324,12 +348,7 @@ export const DropdownMenuContent = forwardRef<
     <DropdownMenuPrimitive.Content
       ref={ref}
       sideOffset={sideOffset}
-      className={cn(
-        'z-9999 min-w-48 rounded-xl p-1',
-        surfaceBase,
-        popoverMotion,
-        className
-      )}
+      className={cn('z-9999 min-w-48 rounded-xl p-1', surfaceBase, popoverMotion, className)}
       {...props}
     />
   </DropdownMenuPrimitive.Portal>
@@ -392,12 +411,7 @@ export const PopoverContent = forwardRef<
     <PopoverPrimitive.Content
       ref={ref}
       sideOffset={sideOffset}
-      className={cn(
-        'z-9999 w-72 rounded-xl p-4',
-        surfaceBase,
-        popoverMotion,
-        className
-      )}
+      className={cn('z-9999 w-72 rounded-xl p-4', surfaceBase, popoverMotion, className)}
       {...props}
     />
   </PopoverPrimitive.Portal>
@@ -688,4 +702,3 @@ export const Primitives = {
   AlertDialogCancel,
   AlertDialogAction,
 };
-

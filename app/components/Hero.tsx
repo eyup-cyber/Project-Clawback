@@ -1,15 +1,15 @@
-"use client";
-import { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
+'use client';
+import { useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
 import {
   EASING,
   DURATION,
   COLORS,
   prefersReducedMotion,
   getDuration,
-} from "@/lib/animations/gsap-config";
-import { FloatingParticles } from "./effects/Particles";
-import { GridPattern } from "./effects/Noise";
+} from '@/lib/animations/gsap-config';
+import { FloatingParticles } from './effects/Particles';
+import { GridPattern } from './effects/Noise';
 
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
@@ -30,8 +30,8 @@ export default function Hero() {
       setMousePosition({ x, y });
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function Hero() {
       });
 
       // Get all letter spans
-      const letters = scroungerRef.current?.querySelectorAll(".letter");
+      const letters = scroungerRef.current?.querySelectorAll('.letter');
       if (!letters || letters.length === 0) {
         setIsLoaded(true);
         return;
@@ -62,7 +62,7 @@ export default function Hero() {
       gsap.set(multimediaRef.current, {
         y: 40,
         opacity: 0,
-        letterSpacing: "0.5em",
+        letterSpacing: '0.5em',
       });
       gsap.set(glowRef.current, { scale: 0.5, opacity: 0 });
 
@@ -88,7 +88,7 @@ export default function Hero() {
           duration: getDuration(DURATION.slow),
           stagger: {
             each: 0.06,
-            from: "center",
+            from: 'center',
           },
           ease: EASING.bounce,
         },
@@ -124,7 +124,7 @@ export default function Hero() {
         {
           y: 0,
           opacity: 1,
-          letterSpacing: "0.3em",
+          letterSpacing: '0.3em',
           duration: getDuration(DURATION.slow),
           ease: EASING.expo,
         },
@@ -164,7 +164,7 @@ export default function Hero() {
   useEffect(() => {
     if (prefersReducedMotion() || !isLoaded) return;
 
-    const letters = scroungerRef.current?.querySelectorAll(".letter");
+    const letters = scroungerRef.current?.querySelectorAll('.letter');
     if (!letters || letters.length === 0) return;
 
     const cleanupFunctions: Array<() => void> = [];
@@ -172,32 +172,34 @@ export default function Hero() {
     letters.forEach((letter) => {
       const handleMouseEnter = () => {
         gsap.to(letter, {
-          color: "#FFD700", // Yellow/Gold
+          color: '#FFD700', // Yellow/Gold
           scale: 1.15,
-          y: -5,
-          rotation: 5,
+          y: -8, // More pronounced upward pop
+          rotation: 0, // No rotation
+          textShadow: '0 0 20px #FFD700, 0 0 40px rgba(255, 215, 0, 0.2)',
           duration: 0.3,
-          ease: EASING.snappy,
+          ease: 'power3.out', // Graceful motion
         });
       };
 
       const handleMouseLeave = () => {
         gsap.to(letter, {
-          color: "var(--primary)", // Back to lime green
+          color: 'var(--primary)', // Back to lime green
           scale: 1,
           y: 0,
           rotation: 0,
+          textShadow: 'none',
           duration: 0.4,
-          ease: EASING.smooth,
+          ease: EASING.elastic,
         });
       };
 
-      letter.addEventListener("mouseenter", handleMouseEnter);
-      letter.addEventListener("mouseleave", handleMouseLeave);
+      letter.addEventListener('mouseenter', handleMouseEnter);
+      letter.addEventListener('mouseleave', handleMouseLeave);
 
       cleanupFunctions.push(() => {
-        letter.removeEventListener("mouseenter", handleMouseEnter);
-        letter.removeEventListener("mouseleave", handleMouseLeave);
+        letter.removeEventListener('mouseenter', handleMouseEnter);
+        letter.removeEventListener('mouseleave', handleMouseLeave);
       });
     });
 
@@ -210,14 +212,12 @@ export default function Hero() {
   const parallaxStyle = (intensity: number) => ({
     transform: prefersReducedMotion()
       ? undefined
-      : `translate(${mousePosition.x * intensity}px, ${
-          mousePosition.y * intensity
-        }px)`,
-    transition: "transform 0.3s ease-out",
+      : `translate(${mousePosition.x * intensity}px, ${mousePosition.y * intensity}px)`,
+    transition: 'transform 0.3s ease-out',
   });
 
   // Split "scroungers" into individual letters
-  const scroungers = "scroungers".split("");
+  const scroungers = 'scroungers'.split('');
 
   return (
     <section
@@ -225,42 +225,32 @@ export default function Hero() {
       className="pt-24 pb-4 flex flex-col items-center justify-start relative overflow-hidden"
       style={{
         background:
-          "radial-gradient(ellipse at center top, rgba(1, 60, 35, 1) 0%, var(--background) 70%)",
+          'radial-gradient(ellipse at center top, rgba(1, 60, 35, 1) 0%, var(--background) 70%)',
       }}
     >
       {/* Animated grid pattern */}
       <GridPattern size={80} opacity={0.02} />
 
       {/* Floating particles */}
-      <FloatingParticles
-        count={30}
-        color="var(--primary)"
-        minSize={1}
-        maxSize={4}
-      />
+      <FloatingParticles count={30} color="var(--primary)" minSize={1} maxSize={4} />
 
       {/* Background glow effect - responds to mouse with parallax */}
       <div
         ref={glowRef}
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: `radial-gradient(ellipse at ${
-            50 + mousePosition.x * 5
-          }% ${
+          background: `radial-gradient(ellipse at ${50 + mousePosition.x * 5}% ${
             50 + mousePosition.y * 5
           }%, rgba(50, 205, 50, 0.2) 0%, transparent 50%)`,
-          willChange: "transform, opacity",
+          willChange: 'transform, opacity',
         }}
       />
-      
 
       {/* Secondary accent glow */}
       <div
         className="absolute inset-0 pointer-events-none opacity-30"
         style={{
-          background: `radial-gradient(ellipse at ${
-            50 - mousePosition.x * 10
-          }% ${
+          background: `radial-gradient(ellipse at ${50 - mousePosition.x * 10}% ${
             50 - mousePosition.y * 10
           }%, rgba(255, 215, 0, 0.1) 0%, transparent 40%)`,
           ...parallaxStyle(-10),
@@ -274,9 +264,9 @@ export default function Hero() {
           ref={scroungerRef}
           className="logo-scroungers text-7xl sm:text-8xl md:text-9xl font-medium leading-none cursor-default select-none lowercase"
           style={{
-            fontFamily: "var(--font-body)",
+            fontFamily: 'var(--font-body)',
             fontWeight: 500,
-            perspective: "1000px",
+            perspective: '1000px',
             textShadow: `0 0 30px ${COLORS.glowPrimary}`,
           }}
         >
@@ -285,13 +275,13 @@ export default function Hero() {
               key={i}
               className="letter inline-block cursor-pointer"
               style={{
-                transformStyle: "preserve-3d",
-                willChange: "transform, opacity, color",
-                color: "var(--primary)",
-                display: "inline-block",
+                transformStyle: 'preserve-3d',
+                willChange: 'transform, opacity, color',
+                color: 'var(--primary)',
+                display: 'inline-block',
               }}
             >
-              {letter === " " ? "\u00A0" : letter}
+              {letter === ' ' ? '\u00A0' : letter}
             </span>
           ))}
         </h1>
@@ -301,16 +291,15 @@ export default function Hero() {
           ref={multimediaRef}
           className="logo-multimedia block text-3xl sm:text-4xl md:text-5xl mt-1 lowercase"
           style={{
-            fontFamily: "var(--font-kindergarten)",
+            fontFamily: 'var(--font-kindergarten)',
             color: COLORS.secondary,
             textShadow: `0 0 20px ${COLORS.glowSecondary}`,
-            willChange: "transform, opacity, letter-spacing",
+            willChange: 'transform, opacity, letter-spacing',
           }}
         >
           multimedia
         </span>
       </div>
-
     </section>
   );
 }

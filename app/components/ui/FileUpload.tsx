@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cn, formatFileSize } from '@/lib/utils';
 
 interface FileUploadProps {
@@ -58,11 +58,24 @@ export function FileUpload({
     if (!showPreview) return [];
     return files.map((file) => {
       if (file.type.startsWith('image/')) {
-        return { name: file.name, url: URL.createObjectURL(file), type: 'image' as const, size: file.size };
+        return {
+          name: file.name,
+          url: URL.createObjectURL(file),
+          type: 'image' as const,
+          size: file.size,
+        };
       }
       return { name: file.name, url: '', type: 'file' as const, size: file.size };
     });
   }, [files, showPreview]);
+
+  useEffect(() => {
+    return () => {
+      previews.forEach((p) => {
+        if (p.url) URL.revokeObjectURL(p.url);
+      });
+    };
+  }, [previews]);
 
   return (
     <div className={cn('space-y-2', className)}>
@@ -126,7 +139,14 @@ export function FileUpload({
                 <img src={item.url} alt={item.name} className="h-12 w-12 rounded-md object-cover" />
               ) : (
                 <div className="flex h-12 w-12 items-center justify-center rounded-md bg-(--surface-elevated)">
-                  <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    fill="none"
+                  >
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                     <path d="M14 2v6h6" />
                   </svg>
@@ -148,4 +168,3 @@ export function FileUpload({
     </div>
   );
 }
-
