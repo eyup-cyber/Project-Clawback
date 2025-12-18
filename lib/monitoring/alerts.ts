@@ -70,7 +70,7 @@ export const emailChannel: AlertChannel = {
   name: 'email',
   send: async (alert) => {
     try {
-      const adminEmail = config.ADMIN_EMAIL;
+      const adminEmail = config.adminEmail;
       if (!adminEmail) {
         logger.warn('No admin email configured for alerts');
         return false;
@@ -403,7 +403,7 @@ export function initializeAlerts(): void {
   registerCondition(highLatencyCondition);
 
   // Register email channel if configured
-  if (config.RESEND_API_KEY && config.ADMIN_EMAIL) {
+  if (config.resendApiKey && config.adminEmail) {
     registerChannel(emailChannel);
   }
 

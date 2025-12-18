@@ -34,11 +34,14 @@ export function mapErrorToDetails(err: unknown, _requestId?: string): ErrorDetai
   // Handle Zod validation errors
   if (isZodError(err)) {
     const zodErr = err as ZodError;
-    const details = zodErr.errors.reduce((acc, e) => {
-      const path = e.path.join('.');
-      acc[path] = e.message;
-      return acc;
-    }, {} as Record<string, string>);
+    const details = zodErr.issues.reduce(
+      (acc: Record<string, string>, e) => {
+        const path = e.path.join('.');
+        acc[path] = e.message;
+        return acc;
+      },
+      {} as Record<string, string>
+    );
 
     return {
       code: 'VALIDATION_ERROR',
@@ -135,10 +138,7 @@ function getStatusCode(code: ErrorCode): number {
 /**
  * Handle API error and return appropriate response
  */
-export function handleApiError(
-  err: unknown,
-  requestId?: string
-): NextResponse {
+export function handleApiError(err: unknown, requestId?: string): NextResponse {
   const errorDetails = mapErrorToDetails(err, requestId);
 
   // Log error
@@ -224,7 +224,3 @@ export function withErrorHandling<T extends unknown[]>(
     }
   };
 }
-
-
-
-

@@ -196,7 +196,6 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               aria-describedby={error ? `${textareaId}-error` : hint ? `${textareaId}-hint` : undefined}
               maxLength={maxLength}
               onChange={(e) => {
-                setHasValue(!!e.target.value);
                 props.onChange?.(e);
               }}
               {...props}

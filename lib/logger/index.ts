@@ -68,9 +68,9 @@ class Logger {
       level,
       message,
       timestamp: new Date().toISOString(),
-      ...(requestId && { requestId }),
-      ...(context && Object.keys(context).length > 0 && { context }),
-      ...(error && { error: this.formatError(error) }),
+      ...(requestId ? { requestId } : {}),
+      ...(context && Object.keys(context).length > 0 ? { context } : {}),
+      ...(error ? { error: this.formatError(error) } : {}),
     };
 
     // Add request context if available

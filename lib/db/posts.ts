@@ -114,9 +114,7 @@ export async function createPost(input: CreatePostInput): Promise<PostWithDetail
 
   // Calculate reading time for written content
   const reading_time =
-    input.content_type === 'written' && input.content
-      ? calculateReadingTime(input.content)
-      : null;
+    input.content_type === 'written' && input.content ? calculateReadingTime(input.content) : null;
 
   const { data, error } = await supabase
     .from('posts')
@@ -154,7 +152,8 @@ export async function getPostById(id: string): Promise<PostWithDetails> {
 
   const { data, error } = await supabase
     .from('posts')
-    .select(`
+    .select(
+      `
       *,
       author:profiles!posts_author_id_fkey (
         id,
@@ -169,7 +168,8 @@ export async function getPostById(id: string): Promise<PostWithDetails> {
         slug,
         color
       )
-    `)
+    `
+    )
     .eq('id', id)
     .single();
 
@@ -188,7 +188,8 @@ export async function getPostBySlug(slug: string): Promise<PostWithDetails> {
 
   const { data, error } = await supabase
     .from('posts')
-    .select(`
+    .select(
+      `
       *,
       author:profiles!posts_author_id_fkey (
         id,
@@ -203,7 +204,8 @@ export async function getPostBySlug(slug: string): Promise<PostWithDetails> {
         slug,
         color
       )
-    `)
+    `
+    )
     .eq('slug', slug)
     .single();
 
@@ -227,10 +229,8 @@ export async function listPosts(options: {
   const { filters, sort, page = 1, limit = 20 } = options;
 
   // Build query
-  let query = supabase
-    .from('posts')
-    .select(
-      `
+  let query = supabase.from('posts').select(
+    `
       *,
       author:profiles!posts_author_id_fkey (
         id,
@@ -246,8 +246,8 @@ export async function listPosts(options: {
         color
       )
     `,
-      { count: 'exact' }
-    );
+    { count: 'exact' }
+  );
 
   // Apply filters
   if (filters?.status) {
@@ -266,9 +266,7 @@ export async function listPosts(options: {
     query = query.eq('is_featured', filters.featured);
   }
   if (filters?.search) {
-    query = query.or(
-      `title.ilike.%${filters.search}%,excerpt.ilike.%${filters.search}%`
-    );
+    query = query.or(`title.ilike.%${filters.search}%,excerpt.ilike.%${filters.search}%`);
   }
 
   // Apply sorting
@@ -284,7 +282,7 @@ export async function listPosts(options: {
   const { data, error, count } = await query;
 
   if (error) {
-    logger.error('[listPosts] Error', error, { filters, pagination, sort });
+    logger.error('[listPosts] Error', error, { filters, pagination: { page, limit }, sort });
     throw ApiError.badRequest('Failed to fetch posts');
   }
 
@@ -297,10 +295,7 @@ export async function listPosts(options: {
 /**
  * Update a post
  */
-export async function updatePost(
-  id: string,
-  input: UpdatePostInput
-): Promise<PostWithDetails> {
+export async function updatePost(id: string, input: UpdatePostInput): Promise<PostWithDetails> {
   const supabase = await createClient();
 
   // If title is being updated, update the slug too
@@ -332,15 +327,10 @@ export async function updatePost(
 
   // Recalculate reading time if content changed
   if (input.content !== undefined && input.content_type === 'written') {
-    updates.reading_time = input.content
-      ? calculateReadingTime(input.content)
-      : null;
+    updates.reading_time = input.content ? calculateReadingTime(input.content) : null;
   }
 
-  const { error } = await supabase
-    .from('posts')
-    .update(updates)
-    .eq('id', id);
+  const { error } = await supabase.from('posts').update(updates).eq('id', id);
 
   if (error) {
     logger.error('[updatePost] Error', error, { postId: id });
@@ -372,10 +362,7 @@ export async function updatePostStatus(
     updates.scheduled_for = options.scheduled_for;
   }
 
-  const { error } = await supabase
-    .from('posts')
-    .update(updates)
-    .eq('id', id);
+  const { error } = await supabase.from('posts').update(updates).eq('id', id);
 
   if (error) {
     logger.error('[updatePostStatus] Error', error, { postId: id, status });
@@ -391,10 +378,7 @@ export async function updatePostStatus(
 export async function deletePost(id: string): Promise<void> {
   const supabase = await createClient();
 
-  const { error } = await supabase
-    .from('posts')
-    .update({ status: 'archived' })
-    .eq('id', id);
+  const { error } = await supabase.from('posts').update({ status: 'archived' }).eq('id', id);
 
   if (error) {
     logger.error('[deletePost] Error', error, { postId: id });
@@ -423,11 +407,7 @@ export async function toggleFeatured(id: string): Promise<PostWithDetails> {
   const supabase = await createClient();
 
   // Get current featured status
-  const { data: post } = await supabase
-    .from('posts')
-    .select('is_featured')
-    .eq('id', id)
-    .single();
+  const { data: post } = await supabase.from('posts').select('is_featured').eq('id', id).single();
 
   if (!post) {
     throw ApiError.notFound('Post');
@@ -456,7 +436,8 @@ export async function getTrendingPosts(limit: number = 10): Promise<PostWithDeta
   // Views require type regeneration after migration
   const { data, error } = await supabase
     .from('posts')
-    .select(`
+    .select(
+      `
       *,
       author:profiles!posts_author_id_fkey (
         id,
@@ -471,7 +452,8 @@ export async function getTrendingPosts(limit: number = 10): Promise<PostWithDeta
         slug,
         color
       )
-    `)
+    `
+    )
     .eq('status', 'published')
     .order('view_count', { ascending: false })
     .order('reaction_count', { ascending: false })
@@ -548,4 +530,3 @@ export async function incrementViewCount(
     logger.error('[incrementViewCount] Error', error, { postId, viewerId: userId, ip: ipAddress });
   }
 }
-

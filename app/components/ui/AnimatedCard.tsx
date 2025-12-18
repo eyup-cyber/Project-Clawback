@@ -36,6 +36,8 @@ export default function AnimatedCard({
   maxTilt = 10,
   liftHeight = 10,
   disabled = false,
+  revealAnimation = 'none',
+  depth = 0.5,
 }: AnimatedCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
