@@ -283,7 +283,6 @@ export default function FeaturedContributors() {
     <section
       ref={sectionRef}
       className="py-24 px-4 md:px-8 overflow-hidden"
-      style={{ background: 'var(--background)' }}
     >
       <div className="max-w-7xl mx-auto">
         {/* Header */}

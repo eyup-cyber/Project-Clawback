@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useRef, useEffect, type ReactNode } from 'react';
+import { forwardRef, useRef, useEffect, useCallback, type ReactNode } from 'react';
 import gsap from 'gsap';
 import { EASING, COLORS, prefersReducedMotion } from '@/lib/animations/gsap-config';
 
@@ -14,6 +14,14 @@ interface MagneticButtonProps {
   ripple?: boolean;
   particleTrail?: boolean;
   liquidMorph?: boolean;
+  /** If true and children is a string, animate letters into an arc ("rainbow") on hover */
+  rainbowBend?: boolean;
+  /** Arc height in px (higher = more bend) */
+  rainbowBendAmount?: number;
+  /** If true, bend the box shape slightly on hover and add inner shadow */
+  rainbowBox?: boolean;
+  /** Direction of box bend when rainbowBox is enabled */
+  rainbowBoxDirection?: 'up' | 'down';
   variant?: 'primary' | 'secondary' | 'ghost' | 'outline' | 'glassmorphism' | 'neon' | 'gradient';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
@@ -34,6 +42,10 @@ const MagneticButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Magneti
       ripple: _ripple = true,
       particleTrail = false,
       liquidMorph = false,
+      rainbowBend = false,
+      rainbowBendAmount = 12,
+      rainbowBox = false,
+      rainbowBoxDirection = 'up',
       variant = 'primary',
       size = 'md',
       disabled = false,
@@ -45,6 +57,8 @@ const MagneticButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Magneti
   ) => {
     const buttonRef = useRef<HTMLButtonElement | HTMLAnchorElement>(null);
     const contentRef = useRef<HTMLSpanElement>(null);
+    const overlayRef = useRef<HTMLSpanElement>(null);
+    const letterRefs = useRef<HTMLSpanElement[]>([]);
     const glowRef = useRef<HTMLSpanElement>(null);
     const _rippleRef = useRef<HTMLSpanElement>(null);
     const particleContainerRef = useRef<HTMLDivElement>(null);
@@ -109,6 +123,31 @@ const MagneticButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Magneti
     };
 
     const styles = variantStyles[variant];
+
+    const animateRainbow = useCallback(
+      (isEntering: boolean) => {
+        if (!rainbowBend || prefersReducedMotion()) return;
+        const letters = letterRefs.current.filter(Boolean);
+        if (letters.length === 0) return;
+
+        const mid = (letters.length - 1) / 2;
+        const amp = Math.max(6, rainbowBendAmount);
+        const rotMax = 6; // degrees
+
+        letters.forEach((el, i) => {
+          const t = mid === 0 ? 0 : (i - mid) / mid; // -1..1
+          const y = isEntering ? -amp * (1 - t * t) : 0; // parabola arc
+          const r = isEntering ? t * rotMax : 0;
+          gsap.to(el, {
+            y,
+            rotateZ: r,
+            duration: isEntering ? 0.35 : 0.4,
+            ease: isEntering ? 'power3.out' : 'power3.out',
+          });
+        });
+      },
+      [rainbowBend, rainbowBendAmount]
+    );
 
     useEffect(() => {
       const element = ref.current || buttonRef.current;
@@ -338,6 +377,97 @@ const MagneticButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Magneti
 
     const Component = href ? 'a' : 'button';
 
+    const handleEnter = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+      if (disabled) return;
+      // Existing hover color changes for primary/outline
+      if (variant === 'primary' || variant === 'outline') {
+        const target = e.currentTarget as HTMLElement;
+        target.style.background = COLORS.secondary;
+        target.style.color = '#000';
+        if (variant === 'outline') {
+          target.style.borderColor = COLORS.secondary;
+        }
+      }
+      animateRainbow(true);
+      if (contentRef.current && rainbowBend) {
+        gsap.to(contentRef.current, {
+          letterSpacing: '0.08em',
+          duration: 0.35,
+          ease: 'power3.out',
+        });
+      }
+      if (rainbowBox && ref.current) {
+        const bendTop = rainbowBoxDirection === 'up';
+        const bendRadius = bendTop ? '18px 18px 12px 12px' : '12px 12px 18px 18px';
+        gsap.to(ref.current, {
+          borderRadius: bendRadius,
+          boxShadow: 'inset 0 0 16px rgba(255,255,255,0.18)',
+          duration: 0.35,
+          ease: 'power3.out',
+        });
+      }
+      if (rainbowBox && overlayRef.current) {
+        gsap.to(overlayRef.current, {
+          opacity: 0.4,
+          duration: 0.3,
+          ease: 'power3.out',
+        });
+      }
+    };
+
+    const handleLeave = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+      if (disabled) return;
+      if (variant === 'primary' || variant === 'outline') {
+        const target = e.currentTarget as HTMLElement;
+        target.style.background = styles.bg;
+        target.style.color = styles.text;
+        if (variant === 'outline') {
+          target.style.borderColor = COLORS.primary;
+        }
+      }
+      animateRainbow(false);
+      if (contentRef.current && rainbowBend) {
+        gsap.to(contentRef.current, {
+          letterSpacing: 'normal',
+          duration: 0.35,
+          ease: 'power3.out',
+        });
+      }
+      if (rainbowBox && ref.current) {
+        gsap.to(ref.current, {
+          borderRadius: '12px',
+          boxShadow: 'inset 0 0 10px rgba(255,255,255,0.12)',
+          duration: 0.35,
+          ease: 'power3.out',
+        });
+      }
+      if (rainbowBox && overlayRef.current) {
+        gsap.to(overlayRef.current, {
+          opacity: 0,
+          duration: 0.3,
+          ease: 'power3.out',
+        });
+      }
+    };
+
+    // Render per-letter spans for rainbow bend (only when children is a plain string)
+    const renderedChildren =
+      rainbowBend && typeof children === 'string'
+        ? children.split('').map((ch, idx) => (
+            <span
+              // eslint-disable-next-line react/no-array-index-key
+              key={`${ch}-${idx}`}
+              ref={(el) => {
+                if (el) letterRefs.current[idx] = el;
+              }}
+              className="inline-block"
+              style={{ willChange: 'transform' }}
+            >
+              {ch === ' ' ? '\u00A0' : ch}
+            </span>
+          ))
+        : children;
+
     return (
       <Component
         ref={ref as React.Ref<HTMLButtonElement & HTMLAnchorElement>}
@@ -347,28 +477,12 @@ const MagneticButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Magneti
           color: styles.text,
           borderColor: variant === 'outline' || variant === 'neon' ? COLORS.primary : undefined,
           willChange: 'transform',
-          transition: 'background-color 0.3s ease, color 0.3s ease',
+          transition: 'background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease',
+          boxShadow: rainbowBox ? 'inset 0 0 10px rgba(255,255,255,0.12)' : undefined,
+          borderRadius: rainbowBox ? '12px' : undefined,
         }}
-        onMouseEnter={(e) => {
-          if (!disabled && (variant === 'primary' || variant === 'outline')) {
-            const target = e.currentTarget as HTMLElement;
-            target.style.background = COLORS.secondary;
-            target.style.color = '#000';
-            if (variant === 'outline') {
-              target.style.borderColor = COLORS.secondary;
-            }
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!disabled && (variant === 'primary' || variant === 'outline')) {
-            const target = e.currentTarget as HTMLElement;
-            target.style.background = styles.bg;
-            target.style.color = styles.text;
-            if (variant === 'outline') {
-              target.style.borderColor = COLORS.primary;
-            }
-          }
-        }}
+        onMouseEnter={handleEnter}
+        onMouseLeave={handleLeave}
         onClick={handleClick}
         href={href}
         type={href ? undefined : type}
@@ -402,6 +516,21 @@ const MagneticButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Magneti
           />
         )}
 
+        {/* Rainbow overlay for box bend */}
+        {rainbowBox && (
+          <span
+            ref={overlayRef}
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(135deg, rgba(50,205,50,0.45), rgba(255,215,0,0.45))',
+              opacity: 0,
+              mixBlendMode: 'screen',
+              transition: 'opacity 0.3s ease',
+            }}
+            aria-hidden="true"
+          />
+        )}
+
         {/* Particle container */}
         {particleTrail && (
           <div
@@ -419,7 +548,7 @@ const MagneticButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Magneti
           className="relative z-10 flex items-center justify-center"
           style={{ willChange: 'transform' }}
         >
-          {children}
+          {renderedChildren}
         </span>
       </Component>
     );

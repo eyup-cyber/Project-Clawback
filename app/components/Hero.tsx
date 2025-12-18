@@ -23,15 +23,17 @@ export default function Hero() {
   // Track mouse for parallax effect
   useEffect(() => {
     if (prefersReducedMotion()) return;
+    const w = globalThis.window;
+    if (w === undefined) return;
 
     const handleMouseMove = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 2;
-      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      const x = (e.clientX / w.innerWidth - 0.5) * 2;
+      const y = (e.clientY / w.innerHeight - 0.5) * 2;
       setMousePosition({ x, y });
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    w.addEventListener("mousemove", handleMouseMove);
+    return () => w.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
   useEffect(() => {
@@ -95,7 +97,7 @@ export default function Hero() {
         0.4
       );
 
-      // T+1.0s - Logo pulse effect
+      // T+1s - Logo pulse effect
       tl.to(
         scroungerRef.current,
         {
@@ -104,7 +106,7 @@ export default function Hero() {
           duration: getDuration(0.2),
           ease: EASING.smooth,
         },
-        1.0
+        1
       );
 
       tl.to(
@@ -173,11 +175,12 @@ export default function Hero() {
       const handleMouseEnter = () => {
         gsap.to(letter, {
           color: "#FFD700", // Yellow/Gold
-          scale: 1.15,
-          y: -5,
-          rotation: 5,
-          duration: 0.3,
-          ease: EASING.snappy,
+          scale: 1.12,
+          y: -14,
+          rotation: 0,
+          textShadow: `0 0 18px ${COLORS.glowSecondary}, 0 2px 8px rgba(0,0,0,0.45)`,
+          duration: 0.38,
+          ease: "power3.out",
         });
       };
 
@@ -187,8 +190,9 @@ export default function Hero() {
           scale: 1,
           y: 0,
           rotation: 0,
-          duration: 0.4,
-          ease: EASING.smooth,
+          textShadow: "none",
+          duration: 0.45,
+          ease: "power3.out",
         });
       };
 
@@ -223,20 +227,22 @@ export default function Hero() {
     <section
       ref={containerRef}
       className="pt-24 pb-4 flex flex-col items-center justify-start relative overflow-hidden"
-      style={{
-        background:
-          "radial-gradient(ellipse at center top, rgba(1, 60, 35, 1) 0%, var(--background) 70%)",
-      }}
     >
       {/* Animated grid pattern */}
       <GridPattern size={80} opacity={0.02} />
 
-      {/* Floating particles */}
+      {/* Floating particles - enhanced for Hero */}
       <FloatingParticles
-        count={30}
+        count={60}
         color="var(--primary)"
         minSize={1}
-        maxSize={4}
+        maxSize={5}
+      />
+      <FloatingParticles
+        count={30}
+        color="var(--secondary)"
+        minSize={1}
+        maxSize={3}
       />
 
       {/* Background glow effect - responds to mouse with parallax */}
@@ -282,7 +288,7 @@ export default function Hero() {
         >
           {scroungers.map((letter, i) => (
             <span
-              key={i}
+              key={`${letter}-${i}`}
               className="letter inline-block cursor-pointer"
               style={{
                 transformStyle: "preserve-3d",

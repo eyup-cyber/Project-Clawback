@@ -1,6 +1,7 @@
-import { setTimeout as delay } from 'timers/promises';
-
 const DEFAULT_TIMEOUT_MS = Number(process.env.SUPABASE_FETCH_TIMEOUT_MS || 10_000);
+
+// Edge-compatible delay function
+const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 const MAX_RETRIES = Number(process.env.SUPABASE_FETCH_MAX_RETRIES || 2);
 
 function createAbortSignal(timeoutMs: number) {

@@ -5,7 +5,6 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Link from 'next/link';
 import { formatRelativeTime, getContentTypeIcon } from '@/lib/utils';
-import BackgroundEffects from '@/app/components/effects/BackgroundEffects';
 import { FloatingParticles } from '@/app/components/effects/Particles';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -84,10 +83,10 @@ function getInitials(name: string): string {
   return name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 }
 
-interface PostCardProps {
+type PostCardProps = Readonly<{
   post: typeof mockPosts[0];
   featured?: boolean;
-}
+}>;
 
 function PostCard({ post, featured = false }: PostCardProps) {
   const cardRef = useRef<HTMLAnchorElement>(null);
@@ -139,7 +138,7 @@ function PostCard({ post, featured = false }: PostCardProps) {
           <img
             src={post.featured_image_url}
             alt={post.title}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute w-full h-full object-cover"
             style={{ zIndex: 1 }}
           />
         )}
@@ -174,7 +173,7 @@ function PostCard({ post, featured = false }: PostCardProps) {
         </span>
 
         {/* Duration/Reading time badge */}
-        {'reading_time' in post && post.reading_time && (
+        {'reading_time' in post && Boolean(post.reading_time) && (
           <span
             className="absolute bottom-3 right-3 px-2 py-1 rounded text-xs font-medium"
             style={{ background: 'rgba(0,0,0,0.7)', color: 'var(--foreground)' }}
@@ -182,7 +181,7 @@ function PostCard({ post, featured = false }: PostCardProps) {
             {post.reading_time} min read
           </span>
         )}
-        {'media_duration' in post && post.media_duration && (
+        {'media_duration' in post && Boolean(post.media_duration) && (
           <span
             className="absolute bottom-3 right-3 px-2 py-1 rounded text-xs font-medium"
             style={{ background: 'rgba(0,0,0,0.7)', color: 'var(--foreground)' }}
@@ -359,10 +358,7 @@ export default function Newsfeed() {
     <section
       ref={sectionRef}
       className="py-6 px-4 md:px-8 relative overflow-hidden"
-      style={{ background: 'var(--background)' }}
     >
-      {/* Background Effects */}
-      <BackgroundEffects variant="all" intensity={1.2} />
       <FloatingParticles count={60} color="var(--primary)" minSize={1} maxSize={4} />
       
       <div className="max-w-7xl mx-auto relative z-10">

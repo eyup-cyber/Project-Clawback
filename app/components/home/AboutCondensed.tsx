@@ -104,7 +104,6 @@ export default function AboutCondensed() {
     <section
       ref={sectionRef}
       className="py-16 px-4 md:px-8"
-      style={{ background: 'var(--surface)' }}
     >
       <div className="max-w-6xl mx-auto">
         {/* Section heading */}

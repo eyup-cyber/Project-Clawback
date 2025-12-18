@@ -123,48 +123,35 @@
 }
 
 :root {
-  /* Core */
-  --background: #013220;      /* Deep Forest Green */
-  --foreground: #E0E0E0;      /* Off-White */
+  /* Core - Single Uniform Deep Forest Green */
+  --background: #013220;          /* Deep forest green - THE color */
+  --foreground: #FFFFFF;          /* Pure white for readability */
   
   /* Brand */
-  --primary: #32CD32;         /* Lime Green - "scroungers" text */
-  --secondary: #FFD700;       /* Gold - "MULTIMEDIA" text */
-  --accent: #FF00FF;          /* Hot Pink - SPARSE micro-accents only */
+  --primary: #32CD32;             /* Lime Green - "scroungers" text */
+  --secondary: #FFD700;           /* Gold - "MULTIMEDIA" text & emphasis */
+  --accent: #FF00FF;              /* Hot Pink - SPARSE micro-accents only */
   
-  /* UI */
-  --border: rgba(224, 224, 224, 0.15);
-  --border-hover: rgba(224, 224, 224, 0.3);
-  --surface: rgba(1, 50, 32, 0.8);
-  --surface-elevated: rgba(1, 50, 32, 0.95);
+  /* Text colors */
+  --text-primary: #FFFFFF;        /* White - main text */
+  --text-emphasis: #FFD700;       /* Gold/Yellow - emphasized text */
+  --text-muted: rgba(255, 255, 255, 0.7);
+  
+  /* UI - slightly transparent versions of the same green */
+  --border: rgba(255, 255, 255, 0.12);
+  --border-hover: rgba(255, 255, 255, 0.25);
+  --surface: rgba(1, 50, 32, 0.6);
+  --surface-elevated: rgba(0, 40, 24, 0.8);
   
   /* Glows */
-  --glow-primary: rgba(50, 205, 50, 0.4);
-  --glow-secondary: rgba(255, 215, 0, 0.3);
+  --glow-primary: rgba(50, 205, 50, 0.5);
+  --glow-secondary: rgba(255, 215, 0, 0.4);
   --glow-accent: rgba(255, 0, 255, 0.2);
   
   /* Typography */
   --font-display: 'Kindergarten', cursive;
   --font-body: 'HelveticaNow', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-
-:root[data-theme='light'] {
-  --background: #f6f7f5;
-  --foreground: #0f172a;
-  --primary: #32cd32;
-  --secondary: #d4a300;
-  --accent: #c026d3;
-  --border: rgba(15, 23, 42, 0.12);
-  --border-hover: rgba(15, 23, 42, 0.25);
-  --surface: #ffffff;
-  --surface-elevated: #f1f5f9;
-  --glow-primary: rgba(50, 205, 50, 0.25);
-  --glow-secondary: rgba(212, 163, 0, 0.25);
-  --glow-accent: rgba(192, 38, 211, 0.2);
-  color-scheme: light;
-}
-
-:root[data-theme='dark'] {
+  
   color-scheme: dark;
 }
 
@@ -179,13 +166,14 @@ html {
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  background-color: var(--background);
   font-family: var(--font-body);
-  font-weight: 500; /* Minimum font weight - Medium */
+  font-weight: 600; /* Semi-bold for better readability on dark backgrounds */
   line-height: 1.5;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
 }
 
 /* Selection - Hot Pink is appropriate here */
@@ -290,7 +278,7 @@ h6 {
 /* Body text - HelveticaNow with minimum Medium weight */
 p, span, div, li, td, th {
   font-family: var(--font-body);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* Paragraphs - tighter line spacing */
@@ -472,10 +460,28 @@ button {
 
 /* Glass morphism */
 .glass {
-  background: rgba(1, 50, 32, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(1, 50, 32, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border);
+}
+
+/* Text color utilities - Scroungers brand protocol */
+/* White and Yellow text should have equal visual weight */
+.text-white {
+  color: #FFFFFF !important;
+  font-weight: 600;
+}
+
+.text-emphasis,
+.text-yellow {
+  color: #FFD700 !important;
+  font-weight: 600;
+}
+
+.text-muted {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-weight: 500;
 }
 
 /* Glow effects */

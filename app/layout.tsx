@@ -6,6 +6,7 @@ import ScrollAnimations from "./components/ScrollAnimations";
 import ScrollProgress from "./components/ScrollProgress";
 import { Providers } from "./components/providers/Providers";
 import SkipLink from "./components/ui/SkipLink";
+import { FallingDebris } from "./components/effects/Particles";
 
 const kindergarten = localFont({
   src: "./fonts/kindergarten.ttf",
@@ -130,6 +131,8 @@ export default function RootLayout({
       </head>
       <body>
         <SkipLink />
+        {/* Global space dust - appears on all pages */}
+        <FallingDebris count={2200} />
         <Providers>
           <ScrollProgress />
           <ScrollAnimations>
