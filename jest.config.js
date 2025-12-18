@@ -5,6 +5,7 @@ const config = {
   roots: ['<rootDir>'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/?(*.)+(spec|test).ts'],
   maxWorkers: 2, // Limit workers to prevent heap exhaustion
+  workerIdleMemoryLimit: '512MB', // Force worker restart when memory exceeds limit
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
   },
@@ -17,6 +18,7 @@ const config = {
           esModuleInterop: true,
           allowSyntheticDefaultImports: true,
         },
+        isolatedModules: true, // Faster compilation, less memory
       },
     ],
   },
@@ -40,6 +42,11 @@ const config = {
   setupFilesAfterEnv: ['<rootDir>/lib/test/setup.ts'],
   testTimeout: 10000,
   extensionsToTreatAsEsm: ['.ts'],
+  // Memory optimization
+  clearMocks: true,
+  resetMocks: true,
+  restoreMocks: true,
+  forceExit: true, // Force exit after tests complete
 };
 
 module.exports = config;

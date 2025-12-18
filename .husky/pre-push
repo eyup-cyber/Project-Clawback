@@ -5,5 +5,6 @@ echo "Running type check..."
 npm run typecheck
 
 echo "Running tests..."
-npm test -- --passWithNoTests
+# Run tests with increased heap memory and in serial to prevent OOM
+NODE_OPTIONS="--max-old-space-size=4096" npm test -- --runInBand --passWithNoTests
 
