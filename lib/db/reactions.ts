@@ -67,10 +67,7 @@ export async function togglePostReaction(
 
   if (existing) {
     // Same type - remove the reaction
-    const { error } = await supabase
-      .from('reactions')
-      .delete()
-      .eq('id', existing.id);
+    const { error } = await supabase.from('reactions').delete().eq('id', existing.id);
 
     if (error) {
       logger.error('[togglePostReaction] Delete error', error, { postId, userId });
@@ -142,12 +139,23 @@ export async function getPostReactors(
   postId: string,
   reactionType?: ReactionType,
   limit: number = 10
-): Promise<Array<{ user: { id: string; username: string | null; display_name: string | null; avatar_url: string | null }; reaction_type: ReactionType }>> {
+): Promise<
+  Array<{
+    user: {
+      id: string;
+      username: string | null;
+      display_name: string | null;
+      avatar_url: string | null;
+    };
+    reaction_type: ReactionType;
+  }>
+> {
   const supabase = await createClient();
 
   let query = supabase
     .from('reactions')
-    .select(`
+    .select(
+      `
       reaction_type,
       user:profiles!reactions_user_id_fkey (
         id,
@@ -155,7 +163,8 @@ export async function getPostReactors(
         display_name,
         avatar_url
       )
-    `)
+    `
+    )
     .eq('post_id', postId)
     .order('created_at', { ascending: false })
     .limit(limit);
@@ -171,7 +180,15 @@ export async function getPostReactors(
     return [];
   }
 
-  return (data || []) as Array<{ user: { id: string; username: string | null; display_name: string | null; avatar_url: string | null }; reaction_type: ReactionType }>;
+  return (data || []) as unknown as Array<{
+    user: {
+      id: string;
+      username: string | null;
+      display_name: string | null;
+      avatar_url: string | null;
+    };
+    reaction_type: ReactionType;
+  }>;
 }
 
 // ============================================================================
@@ -199,10 +216,7 @@ export async function toggleCommentReaction(
   if (existing) {
     if (existing.reaction_type === reactionType) {
       // Same type - remove the reaction
-      const { error } = await supabase
-        .from('comment_reactions')
-        .delete()
-        .eq('id', existing.id);
+      const { error } = await supabase.from('comment_reactions').delete().eq('id', existing.id);
 
       if (error) {
         logger.error('[toggleCommentReaction] Delete error', error, { commentId, userId });
@@ -345,10 +359,7 @@ export async function getPostsReactionSummaries(
 /**
  * Check if user has reacted to a post (returns first reaction type found)
  */
-export async function hasUserReacted(
-  postId: string,
-  userId: string
-): Promise<ReactionType | null> {
+export async function hasUserReacted(postId: string, userId: string): Promise<ReactionType | null> {
   const supabase = await createClient();
 
   const { data } = await supabase
@@ -361,4 +372,3 @@ export async function hasUserReacted(
 
   return (data?.reaction_type as ReactionType) ?? null;
 }
-

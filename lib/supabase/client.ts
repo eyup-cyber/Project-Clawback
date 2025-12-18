@@ -14,5 +14,5 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 // Note: Using untyped client due to @supabase/ssr v0.8 type inference issues
 // Types are validated at runtime through Supabase RLS and schema constraints
 export function createClient() {
-  return createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  return createBrowserClient(SUPABASE_URL!, SUPABASE_ANON_KEY!);
 }

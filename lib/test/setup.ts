@@ -92,7 +92,7 @@ jest.mock('next/server', () => {
       return response;
     }
 
-    static redirect(url: string, status = 302) {
+    static redirect(url: string, status = 307) {
       const response = new MockNextResponse(null, { status });
       response.headers.set('Location', url);
       return response;
