@@ -17,22 +17,24 @@ interface CategoryPost {
   author: { display_name: string } | null;
 }
 
-export async function generateMetadata({ params }: { params: { category: string } }) {
-  const categoryName = params.category.replace(/-/g, ' ');
+export async function generateMetadata({ params }: { params: Promise<{ category: string }> }) {
+  const { category } = await params;
+  const categoryName = category.replace(/-/g, ' ');
   return {
     title: `${categoryName.charAt(0).toUpperCase() + categoryName.slice(1)} | Categories`,
     description: `Browse all posts in the ${categoryName} category on Scroungers Multimedia.`,
   };
 }
 
-export default async function CategoryPage({ params }: { params: { category: string } }) {
+export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
+  const { category: categorySlug } = await params;
   const supabase = await createClient();
 
   // Get category
   const { data: category } = await supabase
     .from('categories')
     .select('*')
-    .eq('slug', params.category)
+    .eq('slug', categorySlug)
     .single();
 
   if (!category) {
@@ -54,9 +56,7 @@ export default async function CategoryPage({ params }: { params: { category: str
         <div className="max-w-6xl mx-auto">
           {/* Category header */}
           <div className="text-center mb-12">
-            <span className="text-6xl mb-4 block">
-              {getCategoryIcon(category.slug)}
-            </span>
+            <span className="text-6xl mb-4 block">{getCategoryIcon(category.slug)}</span>
             <h1
               className="text-5xl font-bold mb-4"
               style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--primary)' }}
@@ -108,7 +108,10 @@ export default async function CategoryPage({ params }: { params: { category: str
 
                   {/* Content */}
                   <div className="p-6">
-                    <div className="flex items-center gap-2 mb-3 text-sm" style={{ color: 'var(--foreground)', opacity: 0.5 }}>
+                    <div
+                      className="flex items-center gap-2 mb-3 text-sm"
+                      style={{ color: 'var(--foreground)', opacity: 0.5 }}
+                    >
                       <span>{getContentTypeIcon(post.content_type)}</span>
                       <span>{post.reading_time || 5} min</span>
                     </div>
@@ -121,7 +124,11 @@ export default async function CategoryPage({ params }: { params: { category: str
                     {post.excerpt && (
                       <p
                         className="line-clamp-2 mb-4"
-                        style={{ color: 'var(--foreground)', opacity: 0.7, fontFamily: 'var(--font-body)' }}
+                        style={{
+                          color: 'var(--foreground)',
+                          opacity: 0.7,
+                          fontFamily: 'var(--font-body)',
+                        }}
                       >
                         {post.excerpt}
                       </p>
@@ -182,19 +189,18 @@ export default async function CategoryPage({ params }: { params: { category: str
 
 function getCategoryIcon(slug: string): string {
   const icons: Record<string, string> = {
-    'housing': '🏠',
-    'benefits': '📋',
-    'healthcare': '🏥',
-    'labour': '👷',
+    housing: '🏠',
+    benefits: '📋',
+    healthcare: '🏥',
+    labour: '👷',
     'economic-justice': '💰',
     'disability-rights': '♿',
-    'immigration': '🌍',
-    'education': '📚',
-    'environment': '🌱',
+    immigration: '🌍',
+    education: '📚',
+    environment: '🌱',
     'criminal-justice': '⚖️',
     'media-criticism': '📺',
     'local-politics': '🏛️',
   };
   return icons[slug] || '📝';
 }
-

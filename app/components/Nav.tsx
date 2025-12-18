@@ -231,7 +231,7 @@ export default function Nav() {
           onClick={() => scrollToSection('hero')}
           onMouseMove={handleLogoMouseMove}
           onMouseLeave={handleLogoMouseLeave}
-          className="relative group flex items-baseline"
+          className="relative group flex items-baseline flex-shrink-0"
           style={{
             willChange: 'transform',
             gap: '0.4em', // Space between scroungers and multimedia
@@ -271,9 +271,8 @@ export default function Nav() {
         {/* Desktop Navigation Links */}
         <div
           ref={linksRef}
-          className="hidden sm:flex gap-8 relative ml-16"
+          className="hidden sm:flex items-center gap-6 lg:gap-8 relative ml-8 lg:ml-16"
           onMouseLeave={handleLinkLeave}
-          style={{ marginLeft: '4rem' }}
         >
           {/* Animated underline */}
           <span

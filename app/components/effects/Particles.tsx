@@ -10,8 +10,8 @@ const emptySubscribe = () => () => {};
 function useIsMounted() {
   return useSyncExternalStore(
     emptySubscribe,
-    () => true,  // Client: mounted
-    () => false  // Server: not mounted
+    () => true, // Client: mounted
+    () => false // Server: not mounted
   );
 }
 
@@ -152,13 +152,13 @@ function ParticleField({
 
       // Wrap around edges
       if (Math.abs(positions[i3]) > spread / 2) {
-        positions[i3] = -Math.sign(positions[i3]) * spread / 2;
+        positions[i3] = (-Math.sign(positions[i3]) * spread) / 2;
       }
       if (Math.abs(positions[i3 + 1]) > spread / 2) {
-        positions[i3 + 1] = -Math.sign(positions[i3 + 1]) * spread / 2;
+        positions[i3 + 1] = (-Math.sign(positions[i3 + 1]) * spread) / 2;
       }
       if (Math.abs(positions[i3 + 2]) > spread / 2) {
-        positions[i3 + 2] = -Math.sign(positions[i3 + 2]) * spread / 2;
+        positions[i3 + 2] = (-Math.sign(positions[i3 + 2]) * spread) / 2;
       }
 
       // Interactive - push particles away from mouse
@@ -182,13 +182,7 @@ function ParticleField({
   return (
     <points ref={pointsRef}>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={count}
-          array={particles.positions}
-          itemSize={3}
-          args={[particles.positions, 3]}
-        />
+        <bufferAttribute attach="attributes-position" args={[particles.positions, 3]} />
       </bufferGeometry>
       <pointsMaterial
         size={size}
@@ -260,7 +254,8 @@ export function FloatingParticles({
 
       <style jsx>{`
         @keyframes float {
-          0%, 100% {
+          0%,
+          100% {
             transform: translateY(0) translateX(0);
             opacity: 0;
           }
@@ -289,11 +284,7 @@ interface SparkleProps {
   className?: string;
 }
 
-export function Sparkle({
-  color = 'var(--secondary)',
-  count = 3,
-  className = '',
-}: SparkleProps) {
+export function Sparkle({ color = 'var(--secondary)', count = 3, className = '' }: SparkleProps) {
   const [sparkles] = useState(() => {
     const random = createSeededRandom(123);
     return Array.from({ length: count }, (_, i) => ({
@@ -316,6 +307,7 @@ export function Sparkle({
         <svg
           key={s.id}
           className="absolute animate-sparkle"
+          aria-hidden="true"
           style={{
             left: `${s.x}%`,
             top: `${s.y}%`,
@@ -327,13 +319,15 @@ export function Sparkle({
           viewBox="0 0 24 24"
           fill={color}
         >
+          <title>Sparkle</title>
           <path d="M12 0L14 10L24 12L14 14L12 24L10 14L0 12L10 10L12 0Z" />
         </svg>
       ))}
 
       <style jsx>{`
         @keyframes sparkle {
-          0%, 100% {
+          0%,
+          100% {
             transform: scale(0) rotate(0deg);
             opacity: 0;
           }
@@ -369,11 +363,11 @@ export function SpaceDust({ count = 2200 }: SpaceDustProps) {
       return {
         id: i,
         left: random() * 100,
-        size: 1 + random() * 2, // 1-3px
+        size: 1 + random() * 3, // 1-4px for more depth variation
         duration: 110 + random() * 210, // 110-320s
         delay: -random() * 320, // Start mid-cycle
-        opacity: 0.2 + random() * 0.4,
-        blur: random() * 2, // 0-2px blur
+        opacity: 0.3 + random() * 0.3, // 0.3-0.6 for better visibility
+        blur: random() * 1.5, // 0-1.5px blur (slightly less for clarity)
         color: getColor(random()),
         sway: 10 + random() * 30, // Horizontal sway amount
       };
@@ -390,19 +384,21 @@ export function SpaceDust({ count = 2200 }: SpaceDustProps) {
         <div
           key={p.id}
           className="absolute rounded-full animate-spacedust"
-          style={{
-            left: `${p.left}%`,
-            top: '-10px', // Start slightly above
-            width: p.size,
-            height: p.size,
-            backgroundColor: p.color,
-            opacity: p.opacity,
-            filter: `blur(${p.blur}px)`,
-            animationDuration: `${p.duration}s`,
-            animationDelay: `${p.delay}s`,
-            // Custom property for horizontal sway
-            ['--sway' as any]: `${p.sway}px`,
-          }}
+          style={
+            {
+              left: `${p.left}%`,
+              top: '-10px', // Start slightly above
+              width: p.size,
+              height: p.size,
+              backgroundColor: p.color,
+              opacity: p.opacity,
+              filter: `blur(${p.blur}px)`,
+              animationDuration: `${p.duration}s`,
+              animationDelay: `${p.delay}s`,
+              // Custom property for horizontal sway
+              '--sway': `${p.sway}px`,
+            } as React.CSSProperties
+          }
         />
       ))}
 
@@ -412,7 +408,7 @@ export function SpaceDust({ count = 2200 }: SpaceDustProps) {
             transform: translateY(0) translateX(calc(var(--sway) * -1));
           }
           50% {
-             transform: translateY(55vh) translateX(var(--sway));
+            transform: translateY(55vh) translateX(var(--sway));
           }
           100% {
             transform: translateY(110vh) translateX(calc(var(--sway) * -1));

@@ -22,23 +22,21 @@ interface TagPost {
   category: { name: string; slug: string } | null;
 }
 
-export async function generateMetadata({ params }: { params: { tag: string } }) {
-  const tagName = params.tag.replace(/-/g, ' ');
+export async function generateMetadata({ params }: { params: Promise<{ tag: string }> }) {
+  const { tag } = await params;
+  const tagName = tag.replace(/-/g, ' ');
   return {
     title: `#${tagName} | Tags`,
     description: `Browse all posts tagged with #${tagName} on Scroungers Multimedia.`,
   };
 }
 
-export default async function TagPage({ params }: { params: { tag: string } }) {
+export default async function TagPage({ params }: { params: Promise<{ tag: string }> }) {
+  const { tag: tagSlug } = await params;
   const supabase = await createClient();
 
   // Get tag
-  const { data: tag } = await supabase
-    .from('tags')
-    .select('*')
-    .eq('slug', params.tag)
-    .single();
+  const { data: tag } = await supabase.from('tags').select('*').eq('slug', tagSlug).single();
 
   if (!tag) {
     notFound();
@@ -52,14 +50,17 @@ export default async function TagPage({ params }: { params: { tag: string } }) {
 
   const postIds = postTags?.map((pt: PostTag) => pt.post_id) || [];
 
-  const { data: posts } = postIds.length > 0
-    ? await supabase
-        .from('posts')
-        .select('*, author:profiles(display_name, username, avatar_url), category:categories(name, slug)')
-        .in('id', postIds)
-        .eq('status', 'published')
-        .order('published_at', { ascending: false })
-    : { data: [] };
+  const { data: posts } =
+    postIds.length > 0
+      ? await supabase
+          .from('posts')
+          .select(
+            '*, author:profiles(display_name, username, avatar_url), category:categories(name, slug)'
+          )
+          .in('id', postIds)
+          .eq('status', 'published')
+          .order('published_at', { ascending: false })
+      : { data: [] };
 
   return (
     <>
@@ -129,7 +130,10 @@ export default async function TagPage({ params }: { params: { tag: string } }) {
 
                       <h2
                         className="text-2xl font-bold mb-2 group-hover:text-[var(--primary)] transition-colors"
-                        style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--foreground)' }}
+                        style={{
+                          fontFamily: 'var(--font-kindergarten)',
+                          color: 'var(--foreground)',
+                        }}
                       >
                         {post.title}
                       </h2>
@@ -137,18 +141,27 @@ export default async function TagPage({ params }: { params: { tag: string } }) {
                       {post.excerpt && (
                         <p
                           className="line-clamp-2 mb-4"
-                          style={{ color: 'var(--foreground)', opacity: 0.7, fontFamily: 'var(--font-body)' }}
+                          style={{
+                            color: 'var(--foreground)',
+                            opacity: 0.7,
+                            fontFamily: 'var(--font-body)',
+                          }}
                         >
                           {post.excerpt}
                         </p>
                       )}
 
-                      <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--foreground)', opacity: 0.5 }}>
+                      <div
+                        className="flex items-center gap-4 text-sm"
+                        style={{ color: 'var(--foreground)', opacity: 0.5 }}
+                      >
                         <span>{post.author?.display_name || 'Anonymous'}</span>
                         <span>•</span>
                         <span>{post.reading_time || 5} min read</span>
                         <span>•</span>
-                        <span>{post.published_at ? formatRelativeTime(post.published_at) : 'Recently'}</span>
+                        <span>
+                          {post.published_at ? formatRelativeTime(post.published_at) : 'Recently'}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -189,4 +202,3 @@ export default async function TagPage({ params }: { params: { tag: string } }) {
     </>
   );
 }
-

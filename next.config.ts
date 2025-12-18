@@ -1,20 +1,23 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // Docker standalone output for containerized deployments
+  output: 'standalone',
+
   // Image optimization
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "images.unsplash.com",
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
       },
       {
-        protocol: "https",
-        hostname: "*.r2.cloudflarestorage.com",
+        protocol: 'https',
+        hostname: '*.r2.cloudflarestorage.com',
       },
       {
-        protocol: "https",
-        hostname: "*.public.blob.vercel-storage.com",
+        protocol: 'https',
+        hostname: '*.public.blob.vercel-storage.com',
       },
     ],
     formats: ['image/avif', 'image/webp'],

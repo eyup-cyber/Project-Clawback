@@ -1,0 +1,20 @@
+{
+  "snapshot": "POPULATED_FROM_SETTINGS",
+  "install": "npm install",
+  "start": "sudo service docker start",
+  "terminals": [
+    {
+      "name": "Next.js Dev",
+      "command": "npm run dev"
+    },
+    {
+      "name": "Type Check",
+      "command": "npm run type-check -- --watch"
+    }
+  ],
+  "dockerfile": "../Dockerfile",
+  "build": {
+    "context": "..",
+    "dockerfile": "Dockerfile"
+  }
+}

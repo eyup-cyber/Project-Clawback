@@ -39,21 +39,31 @@ export default function Hero() {
     // Skip animation if user prefers reduced motion (already set loaded=true via useState initializer)
     if (prefersReducedMotion()) return;
 
+    // Fallback timer: ensure isLoaded becomes true even if animation doesn't complete
+    const fallbackTimer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 5000);
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         defaults: { ease: EASING.dramatic },
-        onComplete: () => setIsLoaded(true),
+        onComplete: () => {
+          clearTimeout(fallbackTimer);
+          setIsLoaded(true);
+        },
       });
 
       // Get all letter spans
       const letters = scroungerRef.current?.querySelectorAll('.letter');
       if (!letters || letters.length === 0) {
+        clearTimeout(fallbackTimer);
         setIsLoaded(true);
         return;
       }
 
       // Check all refs exist before animating
       if (!multimediaRef.current || !glowRef.current || !scroungerRef.current) {
+        clearTimeout(fallbackTimer);
         setIsLoaded(true);
         return;
       }
@@ -61,9 +71,9 @@ export default function Hero() {
       // Initial states
       gsap.set(letters, { y: 120, opacity: 0, rotateX: -90 });
       gsap.set(multimediaRef.current, {
-        y: 40,
+        y: 10,
         opacity: 0,
-        letterSpacing: '0.5em',
+        letterSpacing: '0.15em',
       });
       gsap.set(glowRef.current, { scale: 0.5, opacity: 0 });
 
@@ -125,7 +135,7 @@ export default function Hero() {
         {
           y: 0,
           opacity: 1,
-          letterSpacing: '0.3em',
+          letterSpacing: '0.05em',
           duration: getDuration(DURATION.slow),
           ease: EASING.expo,
         },
@@ -158,7 +168,10 @@ export default function Hero() {
       }
     }, containerRef);
 
-    return () => ctx.revert();
+    return () => {
+      clearTimeout(fallbackTimer);
+      ctx.revert();
+    };
   }, []);
 
   // Letter hover interactions with xylophone sounds
@@ -297,12 +310,13 @@ export default function Hero() {
         {/* MULTIMEDIA - Kindergarten font */}
         <span
           ref={multimediaRef}
-          className="logo-multimedia block text-3xl sm:text-4xl md:text-5xl mt-1 lowercase"
+          className="logo-multimedia block text-lg sm:text-xl md:text-2xl -mt-5 lowercase"
           style={{
             fontFamily: 'var(--font-kindergarten)',
             color: COLORS.secondary,
             textShadow: `0 0 20px ${COLORS.glowSecondary}`,
             willChange: 'transform, opacity, letter-spacing',
+            letterSpacing: '0.05em',
           }}
         >
           multimedia

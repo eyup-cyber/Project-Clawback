@@ -17,29 +17,36 @@ interface ContributorPost {
   reaction_count: number;
 }
 
-export async function generateMetadata({ params }: { params: { username: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
+  const { username } = await params;
   const supabase = await createClient();
   const { data: contributor } = await supabase
     .from('profiles')
     .select('display_name, bio')
-    .eq('username', params.username)
+    .eq('username', username)
     .single();
 
   if (!contributor) return {};
 
   return {
     title: contributor.display_name,
-    description: contributor.bio || `Articles by ${contributor.display_name} on Scroungers Multimedia`,
+    description:
+      contributor.bio || `Articles by ${contributor.display_name} on Scroungers Multimedia`,
   };
 }
 
-export default async function ContributorProfilePage({ params }: { params: { username: string } }) {
+export default async function ContributorProfilePage({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}) {
+  const { username } = await params;
   const supabase = await createClient();
 
   const { data: contributor } = await supabase
     .from('profiles')
     .select('*')
-    .eq('username', params.username)
+    .eq('username', username)
     .single();
 
   if (!contributor) {
@@ -63,7 +70,11 @@ export default async function ContributorProfilePage({ params }: { params: { use
             {/* Avatar */}
             <div
               className="w-32 h-32 rounded-full mx-auto mb-6 flex items-center justify-center text-4xl font-bold overflow-hidden"
-              style={{ background: 'var(--primary)', color: 'var(--background)', border: '4px solid var(--secondary)' }}
+              style={{
+                background: 'var(--primary)',
+                color: 'var(--background)',
+                border: '4px solid var(--secondary)',
+              }}
             >
               {contributor.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -104,19 +115,25 @@ export default async function ContributorProfilePage({ params }: { params: { use
                 <p className="text-3xl font-bold" style={{ color: 'var(--primary)' }}>
                   {contributor.article_count || 0}
                 </p>
-                <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.6 }}>Posts</p>
+                <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.6 }}>
+                  Posts
+                </p>
               </div>
               <div className="text-center">
                 <p className="text-3xl font-bold" style={{ color: 'var(--secondary)' }}>
                   {contributor.total_views || 0}
                 </p>
-                <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.6 }}>Views</p>
+                <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.6 }}>
+                  Views
+                </p>
               </div>
               <div className="text-center">
                 <p className="text-3xl font-bold" style={{ color: 'var(--accent)' }}>
                   {contributor.total_reactions || 0}
                 </p>
-                <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.6 }}>Stars</p>
+                <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.6 }}>
+                  Stars
+                </p>
               </div>
             </div>
 
@@ -189,14 +206,21 @@ export default async function ContributorProfilePage({ params }: { params: { use
                       <div className="flex-1 min-w-0">
                         <h3
                           className="text-xl font-bold group-hover:text-[var(--primary)] transition-colors"
-                          style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--foreground)' }}
+                          style={{
+                            fontFamily: 'var(--font-kindergarten)',
+                            color: 'var(--foreground)',
+                          }}
                         >
                           {post.title}
                         </h3>
                         {post.excerpt && (
                           <p
                             className="mt-2 line-clamp-2"
-                            style={{ color: 'var(--foreground)', opacity: 0.7, fontFamily: 'var(--font-body)' }}
+                            style={{
+                              color: 'var(--foreground)',
+                              opacity: 0.7,
+                              fontFamily: 'var(--font-body)',
+                            }}
                           >
                             {post.excerpt}
                           </p>
@@ -205,7 +229,9 @@ export default async function ContributorProfilePage({ params }: { params: { use
                           className="flex items-center gap-4 mt-3 text-sm"
                           style={{ color: 'var(--foreground)', opacity: 0.5 }}
                         >
-                          <span>{post.published_at ? formatRelativeTime(post.published_at) : 'Recently'}</span>
+                          <span>
+                            {post.published_at ? formatRelativeTime(post.published_at) : 'Recently'}
+                          </span>
                           <span>•</span>
                           <span>{post.reading_time || 5} min read</span>
                           <span>•</span>
@@ -245,4 +271,3 @@ export default async function ContributorProfilePage({ params }: { params: { use
     </>
   );
 }
-

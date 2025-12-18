@@ -1,12 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
-import SmoothScroll from './components/SmoothScroll';
-import ScrollAnimations from './components/ScrollAnimations';
-import ScrollProgress from './components/ScrollProgress';
-import { Providers } from './components/providers/Providers';
-import SkipLink from './components/ui/SkipLink';
-import { SpaceDust } from './components/effects/Particles';
+import ClientLayoutWrapper from './components/ClientLayoutWrapper';
 
 const kindergarten = localFont({
   src: './fonts/kindergarten.ttf',
@@ -97,23 +92,6 @@ export const metadata: Metadata = {
   manifest: '/site.webmanifest',
 };
 
-// Structured data for organization
-const organizationSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'Scroungers Multimedia',
-  url: 'https://scroungers.media',
-  logo: 'https://scroungers.media/logo.png',
-  description:
-    'Political journalism from the people who live it. No credentials required. 100% your revenue. Your voice, amplified.',
-  sameAs: ['https://twitter.com/scroungersmedia'],
-  contactPoint: {
-    '@type': 'ContactPoint',
-    contactType: 'customer support',
-    url: 'https://scroungers.media/contact',
-  },
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -121,23 +99,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={kindergarten.variable}>
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-        />
-      </head>
+      <head />
       <body>
-        <SpaceDust count={22000} />
-        <SkipLink />
-        <Providers>
-          <ScrollProgress />
-          <ScrollAnimations>
-            <SmoothScroll>
-              <main id="main-content">{children}</main>
-            </SmoothScroll>
-          </ScrollAnimations>
-        </Providers>
+        <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
       </body>
     </html>
   );
