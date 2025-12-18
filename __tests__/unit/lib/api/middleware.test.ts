@@ -2,24 +2,17 @@
  * Unit tests for API middleware
  */
 
-// Mock Supabase client
+import { createMockSupabaseClient, createChainableMock } from '@/lib/test/mocks';
+
+// Create a persistent mock instance
+const mockSupabaseClient = createMockSupabaseClient();
+
+// Mock Supabase client to return our mock asynchronously
 jest.mock('@/lib/supabase/server', () => ({
-  createClient: jest.fn(() => ({
-    auth: {
-      getUser: jest.fn(),
-    },
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          single: jest.fn(),
-        })),
-      })),
-    })),
-  })),
+  createClient: jest.fn().mockResolvedValue(mockSupabaseClient),
 }));
 
 import { getAuthUser, requireAuth, requireRole, requireMinRole } from '@/lib/api/middleware';
-import { createClient } from '@/lib/supabase/server';
 
 describe('API Middleware', () => {
   beforeEach(() => {
@@ -28,8 +21,7 @@ describe('API Middleware', () => {
 
   describe('getAuthUser', () => {
     it('should return null when no user is authenticated', async () => {
-      const mockSupabase = await createClient();
-      (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({
+      (mockSupabaseClient.auth.getUser as jest.Mock).mockResolvedValue({
         data: { user: null },
         error: null,
       });
@@ -47,22 +39,14 @@ describe('API Middleware', () => {
         display_name: 'Test User',
       };
 
-      const mockSupabase = await createClient();
-      (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({
+      (mockSupabaseClient.auth.getUser as jest.Mock).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: mockProfile,
-              error: null,
-            }),
-          }),
-        }),
-      });
+      const query = createChainableMock();
+      query.single.mockResolvedValue({ data: mockProfile, error: null });
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       const result = await getAuthUser();
       expect(result.user).toBeDefined();
@@ -72,8 +56,7 @@ describe('API Middleware', () => {
 
   describe('requireAuth', () => {
     it('should throw unauthorized error when not authenticated', async () => {
-      const mockSupabase = await createClient();
-      (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({
+      (mockSupabaseClient.auth.getUser as jest.Mock).mockResolvedValue({
         data: { user: null },
         error: null,
       });
@@ -91,22 +74,14 @@ describe('API Middleware', () => {
         username: 'admin',
       };
 
-      const mockSupabase = await createClient();
-      (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({
+      (mockSupabaseClient.auth.getUser as jest.Mock).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: mockProfile,
-              error: null,
-            }),
-          }),
-        }),
-      });
+      const query = createChainableMock();
+      query.single.mockResolvedValue({ data: mockProfile, error: null });
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       const result = await requireRole('admin');
       expect(result.user.id).toBe('user-123');
@@ -122,22 +97,14 @@ describe('API Middleware', () => {
         username: 'admin',
       };
 
-      const mockSupabase = await createClient();
-      (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({
+      (mockSupabaseClient.auth.getUser as jest.Mock).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: mockProfile,
-              error: null,
-            }),
-          }),
-        }),
-      });
+      const query = createChainableMock();
+      query.single.mockResolvedValue({ data: mockProfile, error: null });
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       const result = await requireMinRole('contributor');
       expect(result.user.role).toBe('admin');

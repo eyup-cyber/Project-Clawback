@@ -3,58 +3,71 @@
  * Provides reusable mock implementations for tests
  */
 
+// Chain methods that return the mock itself for unlimited chaining
+const CHAIN_METHODS = [
+  'select',
+  'insert',
+  'update',
+  'delete',
+  'upsert',
+  'eq',
+  'neq',
+  'gt',
+  'gte',
+  'lt',
+  'lte',
+  'like',
+  'ilike',
+  'is',
+  'in',
+  'contains',
+  'containedBy',
+  'rangeLt',
+  'rangeGt',
+  'rangeGte',
+  'rangeLte',
+  'rangeAdjacent',
+  'overlaps',
+  'textSearch',
+  'match',
+  'not',
+  'or',
+  'filter',
+  'order',
+  'limit',
+  'range',
+];
+
 /**
  * Creates a chainable mock query builder
  * All chain methods return the mock itself for unlimited chaining
+ * Terminal methods (single, maybeSingle, then) return promises
  */
-export function createChainableMock() {
+export function createChainableMock(
+  defaultResult: {
+    data?: unknown;
+    error?: unknown;
+    count?: number | null;
+  } = {}
+) {
   const mock: Record<string, jest.Mock> = {};
 
-  // Chain methods that return the mock itself
-  const chainMethods = [
-    'select',
-    'insert',
-    'update',
-    'delete',
-    'upsert',
-    'eq',
-    'neq',
-    'gt',
-    'gte',
-    'lt',
-    'lte',
-    'like',
-    'ilike',
-    'is',
-    'in',
-    'contains',
-    'containedBy',
-    'rangeLt',
-    'rangeGt',
-    'rangeGte',
-    'rangeLte',
-    'rangeAdjacent',
-    'overlaps',
-    'textSearch',
-    'match',
-    'not',
-    'or',
-    'filter',
-    'order',
-    'limit',
-    'range',
-  ];
+  const result = {
+    data: defaultResult.data ?? null,
+    error: defaultResult.error ?? null,
+    count: defaultResult.count ?? null,
+  };
 
-  chainMethods.forEach((method) => {
+  CHAIN_METHODS.forEach((method) => {
     mock[method] = jest.fn().mockReturnValue(mock);
   });
 
   // Terminal methods that return promises
-  mock.single = jest.fn().mockResolvedValue({ data: null, error: null });
-  mock.maybeSingle = jest.fn().mockResolvedValue({ data: null, error: null });
+  mock.single = jest.fn().mockResolvedValue({ data: result.data, error: result.error });
+  mock.maybeSingle = jest.fn().mockResolvedValue({ data: result.data, error: result.error });
 
-  // Make the mock thenable so it can be awaited directly
-  mock.then = jest.fn((resolve) => resolve({ data: null, error: null, count: null }));
+  // Make the mock thenable so it can be awaited directly (for queries without .single())
+  mock.then = jest.fn((resolve) => resolve(result));
 
   return mock;
 }
@@ -62,6 +75,12 @@ export function createChainableMock() {
 /**
  * Creates a mock Supabase client with chainable query builder
  * Returns a client that can be customized per test
+ *
+ * Usage in tests:
+ *   const mockClient = createMockSupabaseClient();
+ *   // Configure terminal method results:
+ *   mockClient._query.single.mockResolvedValue({ data: myData, error: null });
+ *   mockClient._query.then.mockImplementation((resolve) => resolve({ data: myData, error: null, count: 10 }));
  */
 export function createMockSupabaseClient() {
   const mockQuery = createChainableMock();
@@ -82,3 +101,8 @@ export function createMockSupabaseClient() {
  * Type for mock Supabase client
  */
 export type MockSupabaseClient = ReturnType<typeof createMockSupabaseClient>;
+
+/**
+ * Type for chainable mock query
+ */
+export type ChainableMock = ReturnType<typeof createChainableMock>;

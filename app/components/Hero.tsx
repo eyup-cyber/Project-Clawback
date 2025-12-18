@@ -10,6 +10,7 @@ import {
 } from '@/lib/animations/gsap-config';
 import { FloatingParticles } from './effects/Particles';
 import { GridPattern } from './effects/Noise';
+import { playXylophoneNote, initializeAudio } from '@/lib/audio';
 
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
@@ -160,7 +161,7 @@ export default function Hero() {
     return () => ctx.revert();
   }, []);
 
-  // Letter hover interactions
+  // Letter hover interactions with xylophone sounds
   useEffect(() => {
     if (prefersReducedMotion() || !isLoaded) return;
 
@@ -169,8 +170,11 @@ export default function Hero() {
 
     const cleanupFunctions: Array<() => void> = [];
 
-    letters.forEach((letter) => {
+    letters.forEach((letter, index) => {
       const handleMouseEnter = () => {
+        // Play xylophone note for this letter
+        playXylophoneNote(index);
+
         gsap.to(letter, {
           color: '#FFD700', // Yellow/Gold
           scale: 1.15,
@@ -258,7 +262,11 @@ export default function Hero() {
       />
 
       {/* Logo container with parallax */}
-      <div className="relative z-10 text-center" style={parallaxStyle(5)}>
+      <div
+        className="relative z-10 text-center"
+        style={parallaxStyle(5)}
+        onMouseEnter={initializeAudio}
+      >
         {/* scroungers - letter by letter - HelveticaNow font */}
         <h1
           ref={scroungerRef}

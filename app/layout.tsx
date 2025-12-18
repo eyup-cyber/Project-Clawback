@@ -128,7 +128,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <SpaceDust count={2200} />
+        <SpaceDust count={22000} />
         <SkipLink />
         <Providers>
           <ScrollProgress />

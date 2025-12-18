@@ -2,7 +2,7 @@
  * Unit tests for profiles database operations
  */
 
-import { createMockSupabaseClient } from '@/lib/test/mocks';
+import { createMockSupabaseClient, createChainableMock } from '@/lib/test/mocks';
 import { mockUser } from '@/lib/test/fixtures';
 
 // Create a persistent mock instance
@@ -29,16 +29,9 @@ describe('Profiles Database Operations', () => {
         bio: 'Test bio',
       };
 
-      (mockSupabaseClient.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: mockProfile,
-              error: null,
-            }),
-          }),
-        }),
-      });
+      const query = createChainableMock();
+      query.single.mockResolvedValue({ data: mockProfile, error: null });
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       const { getProfileById } = await import('@/lib/db/profiles');
       const result = await getProfileById(mockUser.id);
@@ -48,16 +41,9 @@ describe('Profiles Database Operations', () => {
     });
 
     it('should throw not found for non-existent profile', async () => {
-      (mockSupabaseClient.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: null,
-              error: { code: 'PGRST116' },
-            }),
-          }),
-        }),
-      });
+      const query = createChainableMock();
+      query.single.mockResolvedValue({ data: null, error: { code: 'PGRST116' } });
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       const { getProfileById } = await import('@/lib/db/profiles');
       await expect(getProfileById('non-existent')).rejects.toThrow();
@@ -73,16 +59,9 @@ describe('Profiles Database Operations', () => {
         role: mockUser.role,
       };
 
-      (mockSupabaseClient.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: mockProfile,
-              error: null,
-            }),
-          }),
-        }),
-      });
+      const query = createChainableMock();
+      query.single.mockResolvedValue({ data: mockProfile, error: null });
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       const { getProfileByUsername } = await import('@/lib/db/profiles');
       const result = await getProfileByUsername(mockUser.profile.username);
@@ -98,25 +77,20 @@ describe('Profiles Database Operations', () => {
         bio: 'Updated bio',
       };
 
-      (mockSupabaseClient.from as jest.Mock).mockReturnValueOnce({
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({
-            error: null,
-          }),
-        }),
+      // Mock update query (returns the chainable with thenable for the update)
+      const updateQuery = createChainableMock();
+      updateQuery.then.mockImplementation((resolve) => resolve({ error: null }));
+
+      // Mock select query for refetch
+      const selectQuery = createChainableMock();
+      selectQuery.single.mockResolvedValue({
+        data: { ...mockUser.profile, ...updates },
+        error: null,
       });
 
-      // Mock refetch
-      (mockSupabaseClient.from as jest.Mock).mockReturnValueOnce({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: { ...mockUser.profile, ...updates },
-              error: null,
-            }),
-          }),
-        }),
-      });
+      (mockSupabaseClient.from as jest.Mock)
+        .mockReturnValueOnce(updateQuery)
+        .mockReturnValueOnce(selectQuery);
 
       const { updateProfile } = await import('@/lib/db/profiles');
       const result = await updateProfile(mockUser.id, updates);
@@ -132,18 +106,9 @@ describe('Profiles Database Operations', () => {
         { id: '2', username: 'contributor2', display_name: 'Contributor 2' },
       ];
 
-      (mockSupabaseClient.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          in: jest.fn().mockReturnValue({
-            order: jest.fn().mockReturnValue({
-              limit: jest.fn().mockResolvedValue({
-                data: mockContributors,
-                error: null,
-              }),
-            }),
-          }),
-        }),
-      });
+      const query = createChainableMock();
+      query.limit.mockResolvedValue({ data: mockContributors, error: null });
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       const { getFeaturedContributors } = await import('@/lib/db/profiles');
       const result = await getFeaturedContributors(5);
@@ -154,16 +119,9 @@ describe('Profiles Database Operations', () => {
 
   describe('isUsernameAvailable', () => {
     it('should return true for available username', async () => {
-      (mockSupabaseClient.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: null,
-              error: null,
-            }),
-          }),
-        }),
-      });
+      const query = createChainableMock();
+      query.single.mockResolvedValue({ data: null, error: null });
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       const { isUsernameAvailable } = await import('@/lib/db/profiles');
       const result = await isUsernameAvailable('newusername');
@@ -172,16 +130,9 @@ describe('Profiles Database Operations', () => {
     });
 
     it('should return false for taken username', async () => {
-      (mockSupabaseClient.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: { id: 'existing-user' },
-              error: null,
-            }),
-          }),
-        }),
-      });
+      const query = createChainableMock();
+      query.single.mockResolvedValue({ data: { id: 'existing-user' }, error: null });
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       const { isUsernameAvailable } = await import('@/lib/db/profiles');
       const result = await isUsernameAvailable('existinguser');

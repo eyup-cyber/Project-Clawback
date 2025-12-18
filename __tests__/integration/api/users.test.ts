@@ -4,6 +4,7 @@
 
 import { NextRequest } from 'next/server';
 import { mockUser } from '@/lib/test/fixtures';
+import { createChainableMock } from '@/lib/test/mocks';
 
 // Mock dependencies
 jest.mock('@/lib/supabase/server', () => ({
@@ -39,24 +40,18 @@ describe('Users API Integration', () => {
         created_at: new Date().toISOString(),
       };
 
+      const query = createChainableMock();
+      query.single.mockResolvedValue({ data: mockProfile, error: null });
+
       (createClient as jest.Mock).mockResolvedValue({
-        from: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
-                data: mockProfile,
-                error: null,
-              }),
-            }),
-          }),
-        }),
+        from: jest.fn().mockReturnValue(query),
       });
 
       const { GET } = await import('@/app/api/users/[username]/route');
       const request = new NextRequest(
         `http://localhost:3000/api/users/${mockUser.profile.username}`
       );
-      
+
       const response = await GET(request, {
         params: Promise.resolve({ username: mockUser.profile.username }),
       });
@@ -69,22 +64,16 @@ describe('Users API Integration', () => {
     it('should return 404 for non-existent user', async () => {
       const { createClient } = await import('@/lib/supabase/server');
 
+      const query = createChainableMock();
+      query.single.mockResolvedValue({ data: null, error: { code: 'PGRST116' } });
+
       (createClient as jest.Mock).mockResolvedValue({
-        from: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
-                data: null,
-                error: { code: 'PGRST116' },
-              }),
-            }),
-          }),
-        }),
+        from: jest.fn().mockReturnValue(query),
       });
 
       const { GET } = await import('@/app/api/users/[username]/route');
       const request = new NextRequest('http://localhost:3000/api/users/nonexistent');
-      
+
       const response = await GET(request, {
         params: Promise.resolve({ username: 'nonexistent' }),
       });
@@ -107,13 +96,23 @@ describe('Users API Integration', () => {
 
       const { GET } = await import('@/app/api/users/me/route');
       const request = new NextRequest('http://localhost:3000/api/users/me');
-      
+
       const response = await GET(request);
       expect(response.status).toBe(401);
     });
 
     it('should return authenticated user profile', async () => {
       const { createClient } = await import('@/lib/supabase/server');
+
+      const query = createChainableMock();
+      query.single.mockResolvedValue({
+        data: {
+          ...mockUser.profile,
+          id: mockUser.id,
+          role: mockUser.role,
+        },
+        error: null,
+      });
 
       (createClient as jest.Mock).mockResolvedValue({
         auth: {
@@ -122,25 +121,12 @@ describe('Users API Integration', () => {
             error: null,
           }),
         },
-        from: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
-                data: {
-                  ...mockUser.profile,
-                  id: mockUser.id,
-                  role: mockUser.role,
-                },
-                error: null,
-              }),
-            }),
-          }),
-        }),
+        from: jest.fn().mockReturnValue(query),
       });
 
       const { GET } = await import('@/app/api/users/me/route');
       const request = new NextRequest('http://localhost:3000/api/users/me');
-      
+
       const response = await GET(request);
       const json = await response.json();
 
@@ -153,6 +139,19 @@ describe('Users API Integration', () => {
     it('should update authenticated user profile', async () => {
       const { createClient } = await import('@/lib/supabase/server');
 
+      const selectQuery = createChainableMock();
+      selectQuery.single.mockResolvedValue({
+        data: {
+          ...mockUser.profile,
+          id: mockUser.id,
+          role: mockUser.role,
+        },
+        error: null,
+      });
+
+      const updateQuery = createChainableMock();
+      updateQuery.then.mockImplementation((resolve) => resolve({ error: null }));
+
       (createClient as jest.Mock).mockResolvedValue({
         auth: {
           getUser: jest.fn().mockResolvedValue({
@@ -162,27 +161,9 @@ describe('Users API Integration', () => {
         },
         from: jest.fn().mockImplementation((table) => {
           if (table === 'profiles') {
-            return {
-              select: jest.fn().mockReturnValue({
-                eq: jest.fn().mockReturnValue({
-                  single: jest.fn().mockResolvedValue({
-                    data: {
-                      ...mockUser.profile,
-                      id: mockUser.id,
-                      role: mockUser.role,
-                    },
-                    error: null,
-                  }),
-                }),
-              }),
-              update: jest.fn().mockReturnValue({
-                eq: jest.fn().mockResolvedValue({
-                  error: null,
-                }),
-              }),
-            };
+            return selectQuery;
           }
-          return {};
+          return updateQuery;
         }),
       });
 
@@ -197,7 +178,7 @@ describe('Users API Integration', () => {
           bio: 'Updated bio',
         }),
       });
-      
+
       const response = await PUT(request);
       expect(response.status).toBeDefined();
     });
@@ -207,24 +188,18 @@ describe('Users API Integration', () => {
     it('should return available=true for unused username', async () => {
       const { createClient } = await import('@/lib/supabase/server');
 
+      const query = createChainableMock();
+      query.single.mockResolvedValue({ data: null, error: null });
+
       (createClient as jest.Mock).mockResolvedValue({
-        from: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
-                data: null,
-                error: null,
-              }),
-            }),
-          }),
-        }),
+        from: jest.fn().mockReturnValue(query),
       });
 
       const { GET } = await import('@/app/api/users/check-username/route');
       const request = new NextRequest(
         'http://localhost:3000/api/users/check-username?username=newuser'
       );
-      
+
       const response = await GET(request);
       const json = await response.json();
 
@@ -235,24 +210,18 @@ describe('Users API Integration', () => {
     it('should return available=false for taken username', async () => {
       const { createClient } = await import('@/lib/supabase/server');
 
+      const query = createChainableMock();
+      query.single.mockResolvedValue({ data: { id: 'existing-user' }, error: null });
+
       (createClient as jest.Mock).mockResolvedValue({
-        from: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
-                data: { id: 'existing-user' },
-                error: null,
-              }),
-            }),
-          }),
-        }),
+        from: jest.fn().mockReturnValue(query),
       });
 
       const { GET } = await import('@/app/api/users/check-username/route');
       const request = new NextRequest(
         `http://localhost:3000/api/users/check-username?username=${mockUser.profile.username}`
       );
-      
+
       const response = await GET(request);
       const json = await response.json();
 
@@ -261,4 +230,3 @@ describe('Users API Integration', () => {
     });
   });
 });
-

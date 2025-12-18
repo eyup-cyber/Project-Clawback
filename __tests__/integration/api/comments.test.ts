@@ -4,6 +4,7 @@
 
 import { NextRequest } from 'next/server';
 import { mockComment, mockPost, mockUser } from '@/lib/test/fixtures';
+import { createChainableMock } from '@/lib/test/mocks';
 
 // Mock dependencies
 jest.mock('@/lib/supabase/server', () => ({
@@ -37,22 +38,11 @@ describe('Comments API Integration', () => {
       const { createClient } = await import('@/lib/supabase/server');
       const mockComments = [mockComment, { ...mockComment, id: 'comment-2' }];
 
+      const query = createChainableMock();
+      query.range.mockResolvedValue({ data: mockComments, error: null, count: 2 });
+
       (createClient as jest.Mock).mockResolvedValue({
-        from: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              is: jest.fn().mockReturnValue({
-                order: jest.fn().mockReturnValue({
-                  range: jest.fn().mockResolvedValue({
-                    data: mockComments,
-                    error: null,
-                    count: 2,
-                  }),
-                }),
-              }),
-            }),
-          }),
-        }),
+        from: jest.fn().mockReturnValue(query),
       });
 
       const { GET } = await import('@/app/api/comments/route');
@@ -75,22 +65,15 @@ describe('Comments API Integration', () => {
         parent_id: mockComment.id,
       };
 
+      const query = createChainableMock();
+      query.range.mockResolvedValue({
+        data: [{ ...parentComment, replies: [replyComment] }],
+        error: null,
+        count: 1,
+      });
+
       (createClient as jest.Mock).mockResolvedValue({
-        from: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              is: jest.fn().mockReturnValue({
-                order: jest.fn().mockReturnValue({
-                  range: jest.fn().mockResolvedValue({
-                    data: [{ ...parentComment, replies: [replyComment] }],
-                    error: null,
-                    count: 1,
-                  }),
-                }),
-              }),
-            }),
-          }),
-        }),
+        from: jest.fn().mockReturnValue(query),
       });
 
       const { GET } = await import('@/app/api/comments/route');
@@ -115,6 +98,8 @@ describe('Comments API Integration', () => {
     it('should require authentication', async () => {
       const { createClient } = await import('@/lib/supabase/server');
 
+      const query = createChainableMock();
+
       (createClient as jest.Mock).mockResolvedValue({
         auth: {
           getUser: jest.fn().mockResolvedValue({
@@ -122,6 +107,7 @@ describe('Comments API Integration', () => {
             error: null,
           }),
         },
+        from: jest.fn().mockReturnValue(query),
       });
 
       const { POST } = await import('@/app/api/comments/route');
@@ -143,6 +129,18 @@ describe('Comments API Integration', () => {
     it('should create comment for authenticated user', async () => {
       const { createClient } = await import('@/lib/supabase/server');
 
+      const profileQuery = createChainableMock();
+      profileQuery.single.mockResolvedValue({
+        data: { ...mockUser.profile, role: 'reader' },
+        error: null,
+      });
+
+      const insertQuery = createChainableMock();
+      insertQuery.single.mockResolvedValue({
+        data: { ...mockComment, id: 'new-comment-id' },
+        error: null,
+      });
+
       (createClient as jest.Mock).mockResolvedValue({
         auth: {
           getUser: jest.fn().mockResolvedValue({
@@ -152,27 +150,9 @@ describe('Comments API Integration', () => {
         },
         from: jest.fn().mockImplementation((table) => {
           if (table === 'profiles') {
-            return {
-              select: jest.fn().mockReturnValue({
-                eq: jest.fn().mockReturnValue({
-                  single: jest.fn().mockResolvedValue({
-                    data: { ...mockUser.profile, role: 'reader' },
-                    error: null,
-                  }),
-                }),
-              }),
-            };
+            return profileQuery;
           }
-          return {
-            insert: jest.fn().mockReturnValue({
-              select: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
-                  data: { ...mockComment, id: 'new-comment-id' },
-                  error: null,
-                }),
-              }),
-            }),
-          };
+          return insertQuery;
         }),
       });
 
@@ -197,6 +177,12 @@ describe('Comments API Integration', () => {
     it('should validate comment content', async () => {
       const { createClient } = await import('@/lib/supabase/server');
 
+      const profileQuery = createChainableMock();
+      profileQuery.single.mockResolvedValue({
+        data: { ...mockUser.profile, role: 'reader' },
+        error: null,
+      });
+
       (createClient as jest.Mock).mockResolvedValue({
         auth: {
           getUser: jest.fn().mockResolvedValue({
@@ -204,16 +190,7 @@ describe('Comments API Integration', () => {
             error: null,
           }),
         },
-        from: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
-                data: { ...mockUser.profile, role: 'reader' },
-                error: null,
-              }),
-            }),
-          }),
-        }),
+        from: jest.fn().mockReturnValue(profileQuery),
       });
 
       const { POST } = await import('@/app/api/comments/route');
@@ -237,6 +214,18 @@ describe('Comments API Integration', () => {
     it('should require comment ownership', async () => {
       const { createClient } = await import('@/lib/supabase/server');
 
+      const profileQuery = createChainableMock();
+      profileQuery.single.mockResolvedValue({
+        data: { role: 'reader' },
+        error: null,
+      });
+
+      const commentQuery = createChainableMock();
+      commentQuery.single.mockResolvedValue({
+        data: mockComment, // Author is mockUser.id
+        error: null,
+      });
+
       (createClient as jest.Mock).mockResolvedValue({
         auth: {
           getUser: jest.fn().mockResolvedValue({
@@ -246,27 +235,9 @@ describe('Comments API Integration', () => {
         },
         from: jest.fn().mockImplementation((table) => {
           if (table === 'profiles') {
-            return {
-              select: jest.fn().mockReturnValue({
-                eq: jest.fn().mockReturnValue({
-                  single: jest.fn().mockResolvedValue({
-                    data: { role: 'reader' },
-                    error: null,
-                  }),
-                }),
-              }),
-            };
+            return profileQuery;
           }
-          return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
-                  data: mockComment, // Author is mockUser.id
-                  error: null,
-                }),
-              }),
-            }),
-          };
+          return commentQuery;
         }),
       });
 
@@ -292,6 +263,18 @@ describe('Comments API Integration', () => {
     it('should soft delete comment', async () => {
       const { createClient } = await import('@/lib/supabase/server');
 
+      const profileQuery = createChainableMock();
+      profileQuery.single.mockResolvedValue({
+        data: { ...mockUser.profile, role: 'reader' },
+        error: null,
+      });
+
+      const commentQuery = createChainableMock();
+      commentQuery.single.mockResolvedValue({ data: mockComment, error: null });
+
+      const updateQuery = createChainableMock();
+      updateQuery.then.mockImplementation((resolve) => resolve({ error: null }));
+
       (createClient as jest.Mock).mockResolvedValue({
         auth: {
           getUser: jest.fn().mockResolvedValue({
@@ -301,35 +284,13 @@ describe('Comments API Integration', () => {
         },
         from: jest.fn().mockImplementation((table) => {
           if (table === 'profiles') {
-            return {
-              select: jest.fn().mockReturnValue({
-                eq: jest.fn().mockReturnValue({
-                  single: jest.fn().mockResolvedValue({
-                    data: { ...mockUser.profile, role: 'reader' },
-                    error: null,
-                  }),
-                }),
-              }),
-            };
+            return profileQuery;
           }
           if (table === 'comments') {
-            return {
-              select: jest.fn().mockReturnValue({
-                eq: jest.fn().mockReturnValue({
-                  single: jest.fn().mockResolvedValue({
-                    data: mockComment,
-                    error: null,
-                  }),
-                }),
-              }),
-              update: jest.fn().mockReturnValue({
-                eq: jest.fn().mockResolvedValue({
-                  error: null,
-                }),
-              }),
-            };
+            // Return different queries based on operation (select vs update)
+            return commentQuery;
           }
-          return {};
+          return updateQuery;
         }),
       });
 
