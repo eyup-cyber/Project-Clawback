@@ -7,65 +7,33 @@
 
 import { mockPost, mockUser } from '@/lib/test/fixtures';
 
-// Create a chainable mock helper that supports data collection
-function createChainableMock() {
-  let resolveData: unknown = { data: null, error: null };
+// Use the global mock from setup.ts
+const mockSupabaseClient = globalThis.__mockSupabaseClient;
+const mockChainable = globalThis.__mockSupabaseQuery;
 
-  const chainable: Record<string, jest.Mock> = {
-    select: jest.fn(),
-    insert: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-    upsert: jest.fn(),
-    eq: jest.fn(),
-    in: jest.fn(),
-    match: jest.fn(),
-    order: jest.fn(),
-    limit: jest.fn(),
-    single: jest.fn(() => Promise.resolve(resolveData)),
-    // For queries that don't use single()
-    then: jest.fn((resolve) => resolve(resolveData)),
-  };
+// Helper to reset all chainable mock methods
+function resetMockChainable() {
+  // Reset the client's from method
+  (mockSupabaseClient.from as jest.Mock).mockClear();
+  (mockSupabaseClient.from as jest.Mock).mockReturnValue(mockChainable);
 
-  // Make all methods return the chainable object for chaining
-  Object.keys(chainable).forEach((key) => {
-    if (key !== 'single' && key !== 'then') {
-      chainable[key].mockReturnValue(chainable);
+  // Reset the mock query to default state
+  Object.keys(mockChainable).forEach((key) => {
+    const mock = mockChainable[key];
+    if (typeof mock === 'function' && 'mockClear' in mock) {
+      mock.mockClear();
+      if (key !== 'single' && key !== 'maybeSingle' && key !== 'then') {
+        mock.mockReturnValue(mockChainable);
+      }
     }
   });
-
-  // Helper to set the resolve value
-  (chainable as Record<string, unknown>).setResolveData = (data: unknown) => {
-    resolveData = data;
-    chainable.single.mockResolvedValue(data);
-  };
-
-  return chainable;
+  mockChainable.single.mockResolvedValue({ data: null, error: null });
+  mockChainable.maybeSingle.mockResolvedValue({ data: null, error: null });
 }
-
-// Mock Supabase client with chainable query builder
-const mockChainable = createChainableMock();
-
-jest.mock('@/lib/supabase/server', () => ({
-  createClient: jest.fn(() => ({
-    from: jest.fn(() => mockChainable),
-  })),
-}));
 
 describe('Reactions Database Operations', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    // Reset chain methods - all are jest.Mock functions
-    Object.keys(mockChainable).forEach((key) => {
-      const mock = mockChainable[key];
-      if (typeof mock === 'function' && 'mockClear' in mock) {
-        mock.mockClear();
-        if (key !== 'single' && key !== 'then') {
-          mock.mockReturnValue(mockChainable);
-        }
-      }
-    });
-    mockChainable.single.mockResolvedValue({ data: null, error: null });
+    resetMockChainable();
   });
 
   describe('togglePostReaction', () => {
@@ -73,7 +41,7 @@ describe('Reactions Database Operations', () => {
       // Mock: no existing reaction of this type found
       mockChainable.single.mockResolvedValueOnce({ data: null, error: null });
 
-      const { togglePostReaction } = await import('@/lib/db/reactions');
+      const { togglePostReaction } = require('@/lib/db/reactions');
       const result = await togglePostReaction(mockPost.id, mockUser.id, 'star');
 
       expect(result.action).toBe('added');
@@ -91,7 +59,7 @@ describe('Reactions Database Operations', () => {
         error: null,
       });
 
-      const { togglePostReaction } = await import('@/lib/db/reactions');
+      const { togglePostReaction } = require('@/lib/db/reactions');
       const result = await togglePostReaction(mockPost.id, mockUser.id, 'star');
 
       expect(result.action).toBe('removed');
@@ -104,7 +72,7 @@ describe('Reactions Database Operations', () => {
       // the query for 'star' will not find existing (since it queries exact type)
       mockChainable.single.mockResolvedValueOnce({ data: null, error: null });
 
-      const { togglePostReaction } = await import('@/lib/db/reactions');
+      const { togglePostReaction } = require('@/lib/db/reactions');
       const result = await togglePostReaction(mockPost.id, mockUser.id, 'star');
 
       // Should add a new 'star' reaction (user might already have 'heart')
@@ -129,7 +97,7 @@ describe('Reactions Database Operations', () => {
         then: jest.fn((resolve) => resolve({ data: mockReactions, error: null })),
       });
 
-      const { getPostReactionSummary } = await import('@/lib/db/reactions');
+      const { getPostReactionSummary } = require('@/lib/db/reactions');
       const result = await getPostReactionSummary(mockPost.id);
 
       expect(result.counts.star).toBe(2);
@@ -150,7 +118,7 @@ describe('Reactions Database Operations', () => {
         then: jest.fn((resolve) => resolve({ data: mockReactions, error: null })),
       });
 
-      const { getPostReactionSummary } = await import('@/lib/db/reactions');
+      const { getPostReactionSummary } = require('@/lib/db/reactions');
       const result = await getPostReactionSummary(mockPost.id, mockUser.id);
 
       expect(result.userReaction).toBe('heart');
@@ -164,7 +132,7 @@ describe('Reactions Database Operations', () => {
         then: jest.fn((resolve) => resolve({ data: mockReactions, error: null })),
       });
 
-      const { getPostReactionSummary } = await import('@/lib/db/reactions');
+      const { getPostReactionSummary } = require('@/lib/db/reactions');
       const result = await getPostReactionSummary(mockPost.id, mockUser.id);
 
       expect(result.userReaction).toBeNull();
@@ -176,7 +144,7 @@ describe('Reactions Database Operations', () => {
         then: jest.fn((resolve) => resolve({ data: [], error: null })),
       });
 
-      const { getPostReactionSummary } = await import('@/lib/db/reactions');
+      const { getPostReactionSummary } = require('@/lib/db/reactions');
       const result = await getPostReactionSummary(mockPost.id);
 
       expect(result.counts.total).toBe(0);

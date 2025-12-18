@@ -2,20 +2,16 @@
  * Unit tests for comments database operations
  */
 
-import { createMockSupabaseClient, createChainableMock } from '@/lib/test/mocks';
+import { createChainableMock } from '@/lib/test/mocks';
 import { mockComment, mockPost, mockUser } from '@/lib/test/fixtures';
 
-// Create a persistent mock instance
-const mockSupabaseClient = createMockSupabaseClient();
-
-// Mock Supabase client to return our mock asynchronously
-jest.mock('@/lib/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue(mockSupabaseClient),
-}));
+// Use the global mock from setup.ts
+const mockSupabaseClient = globalThis.__mockSupabaseClient;
 
 describe('Comments Database Operations', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.resetModules();
   });
 
   describe('getCommentById', () => {
