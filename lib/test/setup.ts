@@ -3,6 +3,8 @@
  * Provides mocks and test helpers
  */
 
+import { createMockSupabaseClient, type createChainableMock } from './mocks';
+
 // Ensure this file is treated as a module
 export {};
 
@@ -10,6 +12,10 @@ export {};
 declare global {
   function createMockRequest(overrides?: Record<string, unknown>): Record<string, unknown>;
   function createMockResponse(data: unknown, status?: number): Record<string, unknown>;
+
+  var __mockSupabaseClient: ReturnType<typeof createMockSupabaseClient>;
+
+  var __mockSupabaseQuery: ReturnType<typeof createChainableMock>;
 }
 
 // Mock environment variables
@@ -19,6 +25,23 @@ process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
 process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key';
 
+// Mock Supabase server client globally - createClient is ASYNC
+// Note: Use a getter function because jest.mock is hoisted before variable assignments
+jest.mock('@/lib/supabase/server', () => ({
+  createClient: jest.fn(async () => {
+    // Access the global mock lazily to avoid hoisting issues
+    return globalThis.__mockSupabaseClient;
+  }),
+  createServiceClient: jest.fn(async () => {
+    return globalThis.__mockSupabaseClient;
+  }),
+}));
+
+// Create global mock Supabase client that tests can access
+// This must happen after imports but the mock above accesses it lazily
+globalThis.__mockSupabaseClient = createMockSupabaseClient();
+globalThis.__mockSupabaseQuery = globalThis.__mockSupabaseClient._query;
+
 // Mock isomorphic-dompurify with basic sanitization for testing
 jest.mock('isomorphic-dompurify', () => {
   interface SanitizeOptions {
@@ -27,7 +50,7 @@ jest.mock('isomorphic-dompurify', () => {
   }
 
   // Basic sanitization that mimics DOMPurify behavior for testing
-  const sanitize = (dirty: string, options?: SanitizeOptions): string => {
+  const sanitizeImpl = (dirty: string, options?: SanitizeOptions): string => {
     if (!dirty) return '';
 
     // If ALLOWED_TAGS is empty array, strip ALL HTML tags but keep text content
@@ -49,11 +72,14 @@ jest.mock('isomorphic-dompurify', () => {
     );
   };
 
+  // Create the mock object with sanitize method
+  const mockDOMPurify = {
+    sanitize: sanitizeImpl,
+  };
+
   return {
     __esModule: true,
-    default: {
-      sanitize: jest.fn(sanitize),
-    },
+    default: mockDOMPurify,
   };
 });
 
@@ -99,13 +125,36 @@ jest.mock('next/server', () => {
     }
   }
 
+  // NextRequest mock that properly handles URL parsing
+  class MockNextRequest {
+    url: string;
+    method: string;
+    headers: Headers;
+    private _body: unknown;
+    nextUrl: URL;
+
+    constructor(url: string, init?: RequestInit) {
+      this.url = url;
+      this.method = init?.method || 'GET';
+      this.headers = new Headers(init?.headers);
+      this._body = init?.body;
+      this.nextUrl = new URL(url);
+    }
+
+    async json() {
+      if (typeof this._body === 'string') {
+        return JSON.parse(this._body);
+      }
+      return this._body || {};
+    }
+
+    async text() {
+      return typeof this._body === 'string' ? this._body : JSON.stringify(this._body || {});
+    }
+  }
+
   return {
-    NextRequest: jest.fn().mockImplementation((url: string, init?: RequestInit) => ({
-      url,
-      method: init?.method || 'GET',
-      headers: new Headers(init?.headers),
-      json: jest.fn().mockResolvedValue(init?.body ? JSON.parse(init.body as string) : {}),
-    })),
+    NextRequest: MockNextRequest,
     NextResponse: MockNextResponse,
   };
 });
