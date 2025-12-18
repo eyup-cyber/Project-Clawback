@@ -9,6 +9,16 @@ process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
 process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key';
 
+// Mock isomorphic-dompurify to avoid ESM issues with parse5/jsdom
+jest.mock('isomorphic-dompurify', () => {
+  return {
+    __esModule: true,
+    default: {
+      sanitize: jest.fn((dirty: string) => dirty),
+    },
+  };
+});
+
 // Suppress console logs in tests unless DEBUG is set
 if (!process.env.DEBUG) {
   global.console = {
@@ -35,25 +45,6 @@ jest.mock('next/server', () => ({
       status: 302,
     })),
   },
-}));
-
-// Mock Supabase
-jest.mock('@/lib/supabase/server', () => ({
-  createClient: jest.fn(() => ({
-    auth: {
-      getUser: jest.fn(),
-    },
-    from: jest.fn(() => ({
-      select: jest.fn().mockReturnThis(),
-      insert: jest.fn().mockReturnThis(),
-      update: jest.fn().mockReturnThis(),
-      delete: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      single: jest.fn(),
-      limit: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis(),
-    })),
-  })),
 }));
 
 // Global test utilities

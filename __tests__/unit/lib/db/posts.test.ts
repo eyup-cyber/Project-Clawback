@@ -2,35 +2,14 @@
  * Unit tests for posts database operations
  */
 
-// Mock Supabase client
+import { createMockSupabaseClient } from '@/lib/test/mocks';
+
+// Create a persistent mock instance
+const mockSupabaseClient = createMockSupabaseClient();
+
+// Mock Supabase client to return our persistent mock
 jest.mock('@/lib/supabase/server', () => ({
-  createClient: jest.fn(() => ({
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          single: jest.fn(),
-          order: jest.fn(() => ({
-            limit: jest.fn(),
-          })),
-        })),
-        order: jest.fn(() => ({
-          limit: jest.fn(),
-          range: jest.fn(),
-        })),
-      })),
-      insert: jest.fn(() => ({
-        select: jest.fn(() => ({
-          single: jest.fn(),
-        })),
-      })),
-      update: jest.fn(() => ({
-        eq: jest.fn(),
-      })),
-      delete: jest.fn(() => ({
-        eq: jest.fn(),
-      })),
-    })),
-  })),
+  createClient: jest.fn(() => mockSupabaseClient),
 }));
 
 import { createClient } from '@/lib/supabase/server';
@@ -43,7 +22,6 @@ describe('Posts Database Operations', () => {
 
   describe('getPostById', () => {
     it('should fetch post with author and category', async () => {
-      const mockSupabase = await createClient();
       const mockPostData = {
         ...mockPost,
         author: {
@@ -60,7 +38,7 @@ describe('Posts Database Operations', () => {
         },
       };
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -79,9 +57,7 @@ describe('Posts Database Operations', () => {
     });
 
     it('should throw not found error for non-existent post', async () => {
-      const mockSupabase = await createClient();
-
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -99,10 +75,9 @@ describe('Posts Database Operations', () => {
 
   describe('listPosts', () => {
     it('should return paginated posts', async () => {
-      const mockSupabase = await createClient();
       const mockPosts = [mockPost, { ...mockPost, id: 'post-2' }];
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             order: jest.fn().mockReturnValue({
@@ -126,7 +101,6 @@ describe('Posts Database Operations', () => {
 
   describe('createPost', () => {
     it('should create post with generated slug', async () => {
-      const mockSupabase = await createClient();
       const newPost = {
         title: 'New Test Post',
         content_type: 'written' as const,
@@ -135,7 +109,7 @@ describe('Posts Database Operations', () => {
       };
 
       // Mock slug check
-      (mockSupabase.from as jest.Mock).mockReturnValueOnce({
+      (mockSupabaseClient.from as jest.Mock).mockReturnValueOnce({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -147,7 +121,7 @@ describe('Posts Database Operations', () => {
       });
 
       // Mock insert
-      (mockSupabase.from as jest.Mock).mockReturnValueOnce({
+      (mockSupabaseClient.from as jest.Mock).mockReturnValueOnce({
         insert: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -167,10 +141,9 @@ describe('Posts Database Operations', () => {
 
   describe('updatePost', () => {
     it('should update post fields', async () => {
-      const mockSupabase = await createClient();
       const updates = { title: 'Updated Title' };
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue({
         update: jest.fn().mockReturnValue({
           eq: jest.fn().mockResolvedValue({
             error: null,
@@ -186,9 +159,7 @@ describe('Posts Database Operations', () => {
 
   describe('deletePost', () => {
     it('should soft delete by setting status to archived', async () => {
-      const mockSupabase = await createClient();
-
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue({
         update: jest.fn().mockReturnValue({
           eq: jest.fn().mockResolvedValue({
             error: null,
