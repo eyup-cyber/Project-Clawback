@@ -16,17 +16,10 @@ export interface ParallaxOptions {
   depth?: number; // 0-1, where 1 is foreground and 0 is background
 }
 
-export const createParallaxLayer = (
-  element: gsap.TweenTarget,
-  options: ParallaxOptions = {}
-) => {
+export const createParallaxLayer = (element: gsap.TweenTarget, options: ParallaxOptions = {}) => {
   if (prefersReducedMotion()) return;
 
-  const {
-    speed = 0.5,
-    direction = 'up',
-    depth = 0.5,
-  } = options;
+  const { speed = 0.5, direction = 'up', depth = 0.5 } = options;
 
   const depthMultiplier = 1 - depth; // Invert so higher depth = more movement
   const actualSpeed = speed * depthMultiplier;
@@ -40,9 +33,9 @@ export const createParallaxLayer = (
 
   return gsap.to(element, {
     ...transformMap[direction],
-    ease: EASING.none,
+    ease: EASING.linear,
     scrollTrigger: {
-      trigger: element,
+      trigger: element as gsap.DOMTarget,
       start: SCROLL_TRIGGER.start.top,
       end: SCROLL_TRIGGER.end.bottom,
       scrub: true,
@@ -70,12 +63,7 @@ export const createScrollReveal = (
     return;
   }
 
-  const {
-    direction = 'up',
-    distance = 50,
-    delay = 0,
-    stagger = 0,
-  } = options;
+  const { direction = 'up', distance = 50, delay = 0, stagger = 0 } = options;
 
   const fromProps: Record<string, gsap.TweenVars> = {
     up: { opacity: 0, y: distance },
@@ -109,17 +97,14 @@ export const createScrollReveal = (
 // SCROLL-LINKED ROTATIONS AND TRANSFORMS
 // ============================================
 
-export const createScrollRotation = (
-  element: gsap.TweenTarget,
-  rotation: number = 360
-) => {
+export const createScrollRotation = (element: gsap.TweenTarget, rotation: number = 360) => {
   if (prefersReducedMotion()) return;
 
   return gsap.to(element, {
     rotation,
-    ease: EASING.none,
+    ease: EASING.linear,
     scrollTrigger: {
-      trigger: element,
+      trigger: element as gsap.DOMTarget,
       start: SCROLL_TRIGGER.start.top,
       end: SCROLL_TRIGGER.end.bottom,
       scrub: true,
@@ -144,7 +129,7 @@ export const createScrollScale = (
       scale: toScale,
       ease: EASING.smooth,
       scrollTrigger: {
-        trigger: element,
+        trigger: element as gsap.DOMTarget,
         start: SCROLL_TRIGGER.start.center,
         end: SCROLL_TRIGGER.end.center,
         scrub: true,
@@ -167,7 +152,7 @@ export const createScrollProgress = (
 
   return gsap.to(element, {
     [isHorizontal ? 'scaleX' : 'scaleY']: 1,
-    ease: EASING.none,
+    ease: EASING.linear,
     scrollTrigger: {
       trigger: 'body',
       start: SCROLL_TRIGGER.start.top,
@@ -177,15 +162,12 @@ export const createScrollProgress = (
   });
 };
 
-export const createSectionProgress = (
-  progressBar: HTMLElement,
-  section: HTMLElement
-) => {
+export const createSectionProgress = (progressBar: HTMLElement, section: HTMLElement) => {
   if (prefersReducedMotion()) return;
 
   return gsap.to(progressBar, {
     scaleX: 1,
-    ease: EASING.none,
+    ease: EASING.linear,
     scrollTrigger: {
       trigger: section,
       start: SCROLL_TRIGGER.start.top,
@@ -207,10 +189,7 @@ export interface StickyOptions {
   end?: string;
 }
 
-export const createStickyElement = (
-  element: gsap.TweenTarget,
-  options: StickyOptions = {}
-) => {
+export const createStickyElement = (element: gsap.TweenTarget, options: StickyOptions = {}) => {
   if (prefersReducedMotion()) return;
 
   const {
@@ -222,7 +201,7 @@ export const createStickyElement = (
   } = options;
 
   const scrollTrigger: ScrollTrigger.Vars = {
-    trigger: element,
+    trigger: element as gsap.DOMTarget,
     start,
     end,
     pin,
@@ -244,10 +223,7 @@ export const createStickyElement = (
 // MOMENTUM-BASED PARALLAX
 // ============================================
 
-export const createMomentumParallax = (
-  element: gsap.TweenTarget,
-  intensity: number = 0.5
-) => {
+export const createMomentumParallax = (element: gsap.TweenTarget, intensity: number = 0.5) => {
   if (prefersReducedMotion()) return;
 
   let lastScrollY = window.scrollY;
@@ -278,16 +254,14 @@ export const createMomentumParallax = (
 // SCROLL-SNAPPED SECTIONS
 // ============================================
 
-export const createScrollSnap = (
-  container: HTMLElement,
-  snapPoints: number[] = []
-) => {
+export const createScrollSnap = (container: HTMLElement, snapPoints: number[] = []) => {
   if (prefersReducedMotion()) return;
 
-  const snapConfig: ScrollTrigger.SnapInstanceVars = {
-    snapTo: snapPoints.length > 0 
-      ? snapPoints.map(point => point / 100) // Convert to 0-1 range
-      : 1 / (container.children.length || 1),
+  const snapConfig: ScrollTrigger.SnapVars = {
+    snapTo:
+      snapPoints.length > 0
+        ? snapPoints.map((point) => point / 100) // Convert to 0-1 range
+        : 1 / (container.children.length || 1),
     duration: { min: 0.2, max: 0.6 },
     delay: 0,
     ease: EASING.smooth,
@@ -300,7 +274,3 @@ export const createScrollSnap = (
     snap: snapConfig,
   });
 };
-
-
-
-

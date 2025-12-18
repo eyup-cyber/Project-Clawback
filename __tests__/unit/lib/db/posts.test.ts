@@ -2,39 +2,16 @@
  * Unit tests for posts database operations
  */
 
-// Mock Supabase client
-jest.mock('@/lib/supabase/server', () => ({
-  createClient: jest.fn(() => ({
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          single: jest.fn(),
-          order: jest.fn(() => ({
-            limit: jest.fn(),
-          })),
-        })),
-        order: jest.fn(() => ({
-          limit: jest.fn(),
-          range: jest.fn(),
-        })),
-      })),
-      insert: jest.fn(() => ({
-        select: jest.fn(() => ({
-          single: jest.fn(),
-        })),
-      })),
-      update: jest.fn(() => ({
-        eq: jest.fn(),
-      })),
-      delete: jest.fn(() => ({
-        eq: jest.fn(),
-      })),
-    })),
-  })),
-}));
-
-import { createClient } from '@/lib/supabase/server';
+import { createMockSupabaseClient, createChainableMock } from '@/lib/test/mocks';
 import { mockPost } from '@/lib/test/fixtures';
+
+// Create a persistent mock instance
+const mockSupabaseClient = createMockSupabaseClient();
+
+// Mock Supabase client to return our mock asynchronously
+jest.mock('@/lib/supabase/server', () => ({
+  createClient: jest.fn().mockResolvedValue(mockSupabaseClient),
+}));
 
 describe('Posts Database Operations', () => {
   beforeEach(() => {
@@ -43,7 +20,6 @@ describe('Posts Database Operations', () => {
 
   describe('getPostById', () => {
     it('should fetch post with author and category', async () => {
-      const mockSupabase = await createClient();
       const mockPostData = {
         ...mockPost,
         author: {
@@ -60,16 +36,9 @@ describe('Posts Database Operations', () => {
         },
       };
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: mockPostData,
-              error: null,
-            }),
-          }),
-        }),
-      });
+      const query = createChainableMock();
+      query.single.mockResolvedValue({ data: mockPostData, error: null });
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       // Import after mocking
       const { getPostById } = await import('@/lib/db/posts');
@@ -79,18 +48,12 @@ describe('Posts Database Operations', () => {
     });
 
     it('should throw not found error for non-existent post', async () => {
-      const mockSupabase = await createClient();
-
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: null,
-              error: { code: 'PGRST116', message: 'Not found' },
-            }),
-          }),
-        }),
+      const query = createChainableMock();
+      query.single.mockResolvedValue({
+        data: null,
+        error: { code: 'PGRST116', message: 'Not found' },
       });
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       const { getPostById } = await import('@/lib/db/posts');
       await expect(getPostById('non-existent-id')).rejects.toThrow();
@@ -99,22 +62,12 @@ describe('Posts Database Operations', () => {
 
   describe('listPosts', () => {
     it('should return paginated posts', async () => {
-      const mockSupabase = await createClient();
       const mockPosts = [mockPost, { ...mockPost, id: 'post-2' }];
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockReturnValue({
-              range: jest.fn().mockResolvedValue({
-                data: mockPosts,
-                error: null,
-                count: 10,
-              }),
-            }),
-          }),
-        }),
-      });
+      const query = createChainableMock();
+      // .range() returns a thenable
+      query.range.mockResolvedValue({ data: mockPosts, error: null, count: 10 });
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       const { listPosts } = await import('@/lib/db/posts');
       const result = await listPosts({ page: 1, limit: 10 });
@@ -126,7 +79,6 @@ describe('Posts Database Operations', () => {
 
   describe('createPost', () => {
     it('should create post with generated slug', async () => {
-      const mockSupabase = await createClient();
       const newPost = {
         title: 'New Test Post',
         content_type: 'written' as const,
@@ -134,29 +86,33 @@ describe('Posts Database Operations', () => {
         author_id: 'author-123',
       };
 
-      // Mock slug check
-      (mockSupabase.from as jest.Mock).mockReturnValueOnce({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: null,
-              error: null,
-            }),
-          }),
-        }),
+      const createdPostData = {
+        id: 'new-post-id',
+        ...newPost,
+        slug: 'new-test-post',
+        author: { id: 'author-123', username: 'author', display_name: 'Author' },
+        category: { id: 'cat-123', name: 'Politics', slug: 'politics', color: '#ff0000' },
+      };
+
+      // Mock #1: slug uniqueness check - no conflict
+      const slugQuery = createChainableMock();
+      slugQuery.single.mockResolvedValue({ data: null, error: null });
+
+      // Mock #2: insert
+      const insertQuery = createChainableMock();
+      insertQuery.single.mockResolvedValue({
+        data: { id: 'new-post-id', slug: 'new-test-post' },
+        error: null,
       });
 
-      // Mock insert
-      (mockSupabase.from as jest.Mock).mockReturnValueOnce({
-        insert: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: { id: 'new-post-id', ...newPost, slug: 'new-test-post' },
-              error: null,
-            }),
-          }),
-        }),
-      });
+      // Mock #3: getPostById refetch
+      const getQuery = createChainableMock();
+      getQuery.single.mockResolvedValue({ data: createdPostData, error: null });
+
+      (mockSupabaseClient.from as jest.Mock)
+        .mockReturnValueOnce(slugQuery) // Slug check
+        .mockReturnValueOnce(insertQuery) // Insert
+        .mockReturnValueOnce(getQuery); // getPostById
 
       const { createPost } = await import('@/lib/db/posts');
       const result = await createPost(newPost);
@@ -167,34 +123,42 @@ describe('Posts Database Operations', () => {
 
   describe('updatePost', () => {
     it('should update post fields', async () => {
-      const mockSupabase = await createClient();
       const updates = { title: 'Updated Title' };
+      const mockPostData = {
+        ...mockPost,
+        ...updates,
+        slug: 'updated-title',
+        author: { id: 'author-123', username: 'author', display_name: 'Author' },
+        category: { id: 'cat-123', name: 'Politics', slug: 'politics', color: '#ff0000' },
+      };
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({
-            error: null,
-          }),
-        }),
-      });
+      // Mock #1: slug conflict check (when title changes)
+      const slugQuery = createChainableMock();
+      slugQuery.single.mockResolvedValue({ data: null, error: null });
+
+      // Mock #2: update
+      const updateQuery = createChainableMock();
+      updateQuery.then.mockImplementation((resolve) => resolve({ error: null }));
+
+      // Mock #3: getPostById refetch
+      const getQuery = createChainableMock();
+      getQuery.single.mockResolvedValue({ data: mockPostData, error: null });
+
+      (mockSupabaseClient.from as jest.Mock)
+        .mockReturnValueOnce(slugQuery) // Slug check
+        .mockReturnValueOnce(updateQuery) // Update
+        .mockReturnValueOnce(getQuery); // getPostById
 
       const { updatePost } = await import('@/lib/db/posts');
-      // This will also call getPostById internally
       await expect(updatePost(mockPost.id, updates)).resolves.toBeDefined();
     });
   });
 
   describe('deletePost', () => {
     it('should soft delete by setting status to archived', async () => {
-      const mockSupabase = await createClient();
-
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({
-            error: null,
-          }),
-        }),
-      });
+      const query = createChainableMock();
+      query.then.mockImplementation((resolve) => resolve({ error: null }));
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       const { deletePost } = await import('@/lib/db/posts');
       await expect(deletePost(mockPost.id)).resolves.not.toThrow();

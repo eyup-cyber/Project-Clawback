@@ -5,7 +5,7 @@
 
 import { cookies } from 'next/headers';
 import { randomBytes, createHmac } from 'crypto';
-import logger from '@/lib/logger';
+import { logger } from '@/lib/logger';
 
 const CSRF_TOKEN_COOKIE = 'csrf-token';
 const CSRF_TOKEN_HEADER = 'x-csrf-token';

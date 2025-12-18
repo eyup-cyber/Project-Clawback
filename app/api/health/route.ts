@@ -4,7 +4,7 @@ import { getHealthStatus } from '@/lib/monitoring/health';
 import { applySecurityHeaders } from '@/lib/security/headers';
 import { generateRequestId, createContext, clearContext } from '@/lib/logger/context';
 import { logger } from '@/lib/logger';
-import { handleApiError } from './error-handler';
+import { handleApiError } from '@/lib/api/error-handler';
 
 // ============================================================================
 // GET /api/health - Enhanced health check endpoint
@@ -21,7 +21,8 @@ export async function GET(request: NextRequest) {
 
     const healthStatus = await getHealthStatus();
 
-    const statusCode = healthStatus.status === 'unhealthy' ? 503 : healthStatus.status === 'degraded' ? 200 : 200;
+    const statusCode =
+      healthStatus.status === 'unhealthy' ? 503 : healthStatus.status === 'degraded' ? 200 : 200;
 
     const response = success(healthStatus, statusCode);
     return applySecurityHeaders(response);
@@ -31,6 +32,3 @@ export async function GET(request: NextRequest) {
     clearContext(requestId);
   }
 }
-
-
-

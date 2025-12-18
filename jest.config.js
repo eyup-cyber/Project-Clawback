@@ -4,9 +4,22 @@ const config = {
   testEnvironment: 'node',
   roots: ['<rootDir>'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/?(*.)+(spec|test).ts'],
+  maxWorkers: 2, // Limit workers to prevent heap exhaustion
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
   },
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', {
+      tsconfig: {
+        jsx: 'react',
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true,
+      },
+    }],
+  },
+  transformIgnorePatterns: [
+    'node_modules/(?!(parse5|isomorphic-dompurify|@supabase|jsdom)/)',
+  ],
   collectCoverageFrom: [
     'app/api/**/*.ts',
     'lib/**/*.ts',
@@ -25,6 +38,7 @@ const config = {
   },
   setupFilesAfterEnv: ['<rootDir>/lib/test/setup.ts'],
   testTimeout: 10000,
+  extensionsToTreatAsEsm: ['.ts'],
 };
 
 module.exports = config;

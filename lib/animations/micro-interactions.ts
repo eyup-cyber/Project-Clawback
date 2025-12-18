@@ -46,10 +46,7 @@ export const createHoverAnimation = (
   return gsap.to(element, hoverProps);
 };
 
-export const createHoverReset = (
-  element: gsap.TweenTarget,
-  duration: number = DURATION.quick
-) => {
+export const createHoverReset = (element: gsap.TweenTarget, duration: number = DURATION.quick) => {
   if (prefersReducedMotion()) return;
 
   return gsap.to(element, {
@@ -82,7 +79,7 @@ export const createRippleEffect = (
   const rect = element.getBoundingClientRect();
   const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX;
   const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY;
-  
+
   const x = clientX - rect.left;
   const y = clientY - rect.top;
   const size = Math.max(rect.width, rect.height);
@@ -154,10 +151,7 @@ export const createMagneticPull = (
 // FOCUS STATE ANIMATIONS
 // ============================================
 
-export const createFocusRing = (
-  element: HTMLElement,
-  color: string = 'var(--primary)'
-) => {
+export const createFocusRing = (element: HTMLElement, color: string = 'var(--primary)') => {
   if (prefersReducedMotion()) return;
 
   const ring = document.createElement('div');
@@ -237,10 +231,7 @@ export const createSpinner = (
   };
 };
 
-export const createSkeletonLoader = (
-  element: HTMLElement,
-  shimmer: boolean = true
-) => {
+export const createSkeletonLoader = (element: HTMLElement, shimmer: boolean = true) => {
   if (prefersReducedMotion()) return;
 
   const originalContent = element.innerHTML;
@@ -284,13 +275,12 @@ export const createSuccessAnimation = (element: gsap.TweenTarget) => {
   if (prefersReducedMotion()) return;
 
   const tl = gsap.timeline();
-  
+
   tl.to(element, {
     scale: 1.2,
     duration: getDuration(DURATION.fast),
     ease: EASING.snappy,
-  })
-  .to(element, {
+  }).to(element, {
     scale: 1,
     duration: getDuration(DURATION.fast),
     ease: EASING.elastic,
@@ -303,7 +293,7 @@ export const createErrorAnimation = (element: gsap.TweenTarget) => {
   if (prefersReducedMotion()) return;
 
   return gsap.to(element, {
-    x: [0, -10, 10, -10, 10, 0],
+    keyframes: [{ x: 0 }, { x: -10 }, { x: 10 }, { x: -10 }, { x: 10 }, { x: 0 }],
     duration: getDuration(DURATION.medium),
     ease: EASING.snappy,
   });
@@ -329,10 +319,10 @@ export const createInteractiveButton = (
   if (options.hover) {
     const handleMouseEnter = () => createHoverAnimation(button, options.hover);
     const handleMouseLeave = () => createHoverReset(button);
-    
+
     button.addEventListener('mouseenter', handleMouseEnter);
     button.addEventListener('mouseleave', handleMouseLeave);
-    
+
     cleanup.push(() => {
       button.removeEventListener('mouseenter', handleMouseEnter);
       button.removeEventListener('mouseleave', handleMouseLeave);
@@ -341,15 +331,15 @@ export const createInteractiveButton = (
 
   // Click effects
   if (options.click) {
-    const handleClick = (e: MouseEvent) => {
+    const handleClick = (e: Event) => {
       if (options.click?.ripple) {
-        createRippleEffect(button, e, options.click);
+        createRippleEffect(button, e as MouseEvent, options.click);
       }
       if (options.click?.pulse) {
         createPulseEffect(button, options.click);
       }
     };
-    
+
     button.addEventListener('click', handleClick);
     cleanup.push(() => button.removeEventListener('click', handleClick));
   }
@@ -357,12 +347,10 @@ export const createInteractiveButton = (
   // Focus effects
   if (options.focus) {
     const focusCleanup = createFocusRing(button);
-    cleanup.push(focusCleanup);
+    if (focusCleanup) {
+      cleanup.push(focusCleanup);
+    }
   }
 
-  return () => cleanup.forEach(fn => fn());
+  return () => cleanup.forEach((fn) => fn());
 };
-
-
-
-

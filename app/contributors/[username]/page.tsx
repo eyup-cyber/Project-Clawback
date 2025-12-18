@@ -17,12 +17,13 @@ interface ContributorPost {
   reaction_count: number;
 }
 
-export async function generateMetadata({ params }: { params: { username: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
+  const { username } = await params;
   const supabase = await createClient();
   const { data: contributor } = await supabase
     .from('profiles')
     .select('display_name, bio')
-    .eq('username', params.username)
+    .eq('username', username)
     .single();
 
   if (!contributor) return {};
@@ -33,13 +34,14 @@ export async function generateMetadata({ params }: { params: { username: string 
   };
 }
 
-export default async function ContributorProfilePage({ params }: { params: { username: string } }) {
+export default async function ContributorProfilePage({ params }: { params: Promise<{ username: string }> }) {
+  const { username } = await params;
   const supabase = await createClient();
 
   const { data: contributor } = await supabase
     .from('profiles')
     .select('*')
-    .eq('username', params.username)
+    .eq('username', username)
     .single();
 
   if (!contributor) {

@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Docker standalone output for containerized deployments
+  output: 'standalone',
+
   // Image optimization
   images: {
     remotePatterns: [

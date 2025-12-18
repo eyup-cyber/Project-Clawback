@@ -22,14 +22,13 @@ export function useAuth() {
 
   const supabase = createClient();
 
-  const fetchProfile = useCallback(async (userId: string) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    return data;
-  }, [supabase]);
+  const fetchProfile = useCallback(
+    async (userId: string): Promise<Profile | null> => {
+      const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
+      return data as Profile | null;
+    },
+    [supabase]
+  );
 
   useEffect(() => {
     // Get initial session
@@ -48,21 +47,21 @@ export function useAuth() {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session?.user) {
-          const profile = await fetchProfile(session.user.id);
-          setState({
-            user: session.user,
-            profile,
-            session,
-            loading: false,
-          });
-        } else {
-          setState({ user: null, profile: null, session: null, loading: false });
-        }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        const profile = await fetchProfile(session.user.id);
+        setState({
+          user: session.user,
+          profile,
+          session,
+          loading: false,
+        });
+      } else {
+        setState({ user: null, profile: null, session: null, loading: false });
       }
-    );
+    });
 
     return () => {
       subscription.unsubscribe();
@@ -111,25 +110,25 @@ export function useAuth() {
 
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!state.user) return { data: null, error: new Error('Not authenticated') };
-    
+
     const { data, error } = await supabase
       .from('profiles')
-      .update(updates)
+      .update(updates as Record<string, unknown>)
       .eq('id', state.user.id)
       .select()
       .single();
 
     if (data) {
-      setState(prev => ({ ...prev, profile: data }));
+      setState((prev) => ({ ...prev, profile: data as Profile }));
     }
 
-    return { data, error };
+    return { data: data as Profile | null, error };
   };
 
   const refreshProfile = async () => {
     if (!state.user) return;
     const profile = await fetchProfile(state.user.id);
-    setState(prev => ({ ...prev, profile }));
+    setState((prev) => ({ ...prev, profile }));
   };
 
   return {
@@ -149,14 +148,3 @@ export function useAuth() {
     refreshProfile,
   };
 }
-
-
-
-
-
-
-
-
-
-
-

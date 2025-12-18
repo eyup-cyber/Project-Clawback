@@ -1,9 +1,8 @@
 #!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
 
 # Lint staged changes and block commits on failures
 npm run lint-staged
 
 # Type-check the project to catch regressions early
-npm run typecheck -- --pretty false
+npm run typecheck
 

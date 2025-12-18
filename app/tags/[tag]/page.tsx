@@ -22,22 +22,24 @@ interface TagPost {
   category: { name: string; slug: string } | null;
 }
 
-export async function generateMetadata({ params }: { params: { tag: string } }) {
-  const tagName = params.tag.replace(/-/g, ' ');
+export async function generateMetadata({ params }: { params: Promise<{ tag: string }> }) {
+  const { tag } = await params;
+  const tagName = tag.replace(/-/g, ' ');
   return {
     title: `#${tagName} | Tags`,
     description: `Browse all posts tagged with #${tagName} on Scroungers Multimedia.`,
   };
 }
 
-export default async function TagPage({ params }: { params: { tag: string } }) {
+export default async function TagPage({ params }: { params: Promise<{ tag: string }> }) {
+  const { tag: tagSlug } = await params;
   const supabase = await createClient();
 
   // Get tag
   const { data: tag } = await supabase
     .from('tags')
     .select('*')
-    .eq('slug', params.tag)
+    .eq('slug', tagSlug)
     .single();
 
   if (!tag) {

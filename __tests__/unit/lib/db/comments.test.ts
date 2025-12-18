@@ -2,45 +2,16 @@
  * Unit tests for comments database operations
  */
 
-// Mock Supabase client
-jest.mock('@/lib/supabase/server', () => ({
-  createClient: jest.fn(() => ({
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          single: jest.fn(),
-          order: jest.fn(() => ({
-            limit: jest.fn(),
-            range: jest.fn(),
-          })),
-        })),
-        is: jest.fn(() => ({
-          order: jest.fn(() => ({
-            range: jest.fn(),
-          })),
-        })),
-      })),
-      insert: jest.fn(() => ({
-        select: jest.fn(() => ({
-          single: jest.fn(),
-        })),
-      })),
-      update: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          select: jest.fn(() => ({
-            single: jest.fn(),
-          })),
-        })),
-      })),
-      delete: jest.fn(() => ({
-        eq: jest.fn(),
-      })),
-    })),
-  })),
-}));
-
-import { createClient } from '@/lib/supabase/server';
+import { createMockSupabaseClient, createChainableMock } from '@/lib/test/mocks';
 import { mockComment, mockPost, mockUser } from '@/lib/test/fixtures';
+
+// Create a persistent mock instance
+const mockSupabaseClient = createMockSupabaseClient();
+
+// Mock Supabase client to return our mock asynchronously
+jest.mock('@/lib/supabase/server', () => ({
+  createClient: jest.fn().mockResolvedValue(mockSupabaseClient),
+}));
 
 describe('Comments Database Operations', () => {
   beforeEach(() => {
@@ -49,7 +20,6 @@ describe('Comments Database Operations', () => {
 
   describe('getCommentById', () => {
     it('should fetch comment with author', async () => {
-      const mockSupabase = await createClient();
       const mockCommentData = {
         ...mockComment,
         author: {
@@ -60,16 +30,9 @@ describe('Comments Database Operations', () => {
         },
       };
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: mockCommentData,
-              error: null,
-            }),
-          }),
-        }),
-      });
+      const query = createChainableMock();
+      query.single.mockResolvedValue({ data: mockCommentData, error: null });
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       const { getCommentById } = await import('@/lib/db/comments');
       const result = await getCommentById(mockComment.id);
@@ -79,18 +42,9 @@ describe('Comments Database Operations', () => {
     });
 
     it('should throw not found for non-existent comment', async () => {
-      const mockSupabase = await createClient();
-
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: null,
-              error: { code: 'PGRST116' },
-            }),
-          }),
-        }),
-      });
+      const query = createChainableMock();
+      query.single.mockResolvedValue({ data: null, error: { code: 'PGRST116' } });
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       const { getCommentById } = await import('@/lib/db/comments');
       await expect(getCommentById('non-existent')).rejects.toThrow();
@@ -99,24 +53,12 @@ describe('Comments Database Operations', () => {
 
   describe('listComments', () => {
     it('should list comments for a post', async () => {
-      const mockSupabase = await createClient();
       const mockComments = [mockComment, { ...mockComment, id: 'comment-2' }];
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            is: jest.fn().mockReturnValue({
-              order: jest.fn().mockReturnValue({
-                range: jest.fn().mockResolvedValue({
-                  data: mockComments,
-                  error: null,
-                  count: 2,
-                }),
-              }),
-            }),
-          }),
-        }),
-      });
+      const query = createChainableMock();
+      // Configure .range() to return the result (it's thenable through the mock's then)
+      query.range.mockResolvedValue({ data: mockComments, error: null, count: 2 });
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       const { listComments } = await import('@/lib/db/comments');
       const result = await listComments({
@@ -129,24 +71,11 @@ describe('Comments Database Operations', () => {
     });
 
     it('should filter by parent_id for replies', async () => {
-      const mockSupabase = await createClient();
       const parentId = 'parent-comment-id';
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockReturnValue({
-                range: jest.fn().mockResolvedValue({
-                  data: [],
-                  error: null,
-                  count: 0,
-                }),
-              }),
-            }),
-          }),
-        }),
-      });
+      const query = createChainableMock();
+      query.range.mockResolvedValue({ data: [], error: null, count: 0 });
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       const { listComments } = await import('@/lib/db/comments');
       await listComments({
@@ -156,29 +85,35 @@ describe('Comments Database Operations', () => {
         limit: 10,
       });
 
-      expect(mockSupabase.from).toHaveBeenCalledWith('comments');
+      expect(mockSupabaseClient.from).toHaveBeenCalledWith('comments');
     });
   });
 
   describe('createComment', () => {
     it('should create a new comment', async () => {
-      const mockSupabase = await createClient();
       const newComment = {
         post_id: mockPost.id,
         author_id: mockUser.id,
         content: 'Test comment content',
       };
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        insert: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: { id: 'new-comment-id', ...newComment },
-              error: null,
-            }),
-          }),
-        }),
+      // Mock post check
+      const postQuery = createChainableMock();
+      postQuery.single.mockResolvedValue({
+        data: { id: mockPost.id, status: 'published' },
+        error: null,
       });
+
+      // Mock insert
+      const insertQuery = createChainableMock();
+      insertQuery.single.mockResolvedValue({
+        data: { id: 'new-comment-id', ...newComment },
+        error: null,
+      });
+
+      (mockSupabaseClient.from as jest.Mock)
+        .mockReturnValueOnce(postQuery)
+        .mockReturnValueOnce(insertQuery);
 
       const { createComment } = await import('@/lib/db/comments');
       const result = await createComment(newComment);
@@ -188,7 +123,6 @@ describe('Comments Database Operations', () => {
     });
 
     it('should create a reply to another comment', async () => {
-      const mockSupabase = await createClient();
       const reply = {
         post_id: mockPost.id,
         author_id: mockUser.id,
@@ -196,16 +130,31 @@ describe('Comments Database Operations', () => {
         parent_id: mockComment.id,
       };
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        insert: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: { id: 'reply-id', ...reply },
-              error: null,
-            }),
-          }),
-        }),
+      // Mock post check
+      const postQuery = createChainableMock();
+      postQuery.single.mockResolvedValue({
+        data: { id: mockPost.id, status: 'published' },
+        error: null,
       });
+
+      // Mock parent comment check
+      const parentQuery = createChainableMock();
+      parentQuery.single.mockResolvedValue({
+        data: { id: mockComment.id, post_id: mockPost.id },
+        error: null,
+      });
+
+      // Mock insert
+      const insertQuery = createChainableMock();
+      insertQuery.single.mockResolvedValue({
+        data: { id: 'reply-id', ...reply },
+        error: null,
+      });
+
+      (mockSupabaseClient.from as jest.Mock)
+        .mockReturnValueOnce(postQuery)
+        .mockReturnValueOnce(parentQuery)
+        .mockReturnValueOnce(insertQuery);
 
       const { createComment } = await import('@/lib/db/comments');
       const result = await createComment(reply);
@@ -216,21 +165,25 @@ describe('Comments Database Operations', () => {
 
   describe('updateComment', () => {
     it('should update comment content', async () => {
-      const mockSupabase = await createClient();
       const newContent = 'Updated comment content';
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            select: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
-                data: { ...mockComment, content: newContent },
-                error: null,
-              }),
-            }),
-          }),
-        }),
+      // Mock getCommentById first
+      const getQuery = createChainableMock();
+      getQuery.single.mockResolvedValue({
+        data: { ...mockComment, author: { id: mockUser.id } },
+        error: null,
       });
+
+      // Mock update
+      const updateQuery = createChainableMock();
+      updateQuery.single.mockResolvedValue({
+        data: { ...mockComment, content: newContent },
+        error: null,
+      });
+
+      (mockSupabaseClient.from as jest.Mock)
+        .mockReturnValueOnce(getQuery)
+        .mockReturnValueOnce(updateQuery);
 
       const { updateComment } = await import('@/lib/db/comments');
       const result = await updateComment(mockComment.id, newContent);
@@ -241,15 +194,9 @@ describe('Comments Database Operations', () => {
 
   describe('deleteComment', () => {
     it('should soft delete by setting status to deleted', async () => {
-      const mockSupabase = await createClient();
-
-      (mockSupabase.from as jest.Mock).mockReturnValue({
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({
-            error: null,
-          }),
-        }),
-      });
+      const query = createChainableMock();
+      query.then.mockImplementation((resolve) => resolve({ error: null }));
+      (mockSupabaseClient.from as jest.Mock).mockReturnValue(query);
 
       const { deleteComment } = await import('@/lib/db/comments');
       await expect(deleteComment(mockComment.id)).resolves.not.toThrow();

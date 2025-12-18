@@ -1,21 +1,18 @@
-import type { Metadata, Viewport } from "next";
-import localFont from "next/font/local";
-import "./globals.css";
-import SmoothScroll from "./components/SmoothScroll";
-import ScrollAnimations from "./components/ScrollAnimations";
-import ScrollProgress from "./components/ScrollProgress";
-import { Providers } from "./components/providers/Providers";
-import SkipLink from "./components/ui/SkipLink";
+import type { Metadata, Viewport } from 'next';
+import localFont from 'next/font/local';
+import './globals.css';
+import ClientLayoutWrapper from './components/ClientLayoutWrapper';
 
 const kindergarten = localFont({
-  src: "./fonts/kindergarten.ttf",
-  variable: "--font-kindergarten",
-  display: "swap",
+  src: './fonts/kindergarten.ttf',
+  variable: '--font-kindergarten',
+  display: 'swap',
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://scroungers.media';
 const SITE_NAME = 'Scroungers Multimedia';
-const SITE_DESCRIPTION = 'Political journalism from the people who live it. No credentials required. 100% your revenue. Your voice, amplified.';
+const SITE_DESCRIPTION =
+  'Political journalism from the people who live it. No credentials required. 100% your revenue. Your voice, amplified.';
 
 export const viewport: Viewport = {
   themeColor: '#0D2818',
@@ -90,29 +87,9 @@ export const metadata: Metadata = {
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
     ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   manifest: '/site.webmanifest',
-};
-
-// Structured data for organization
-const organizationSchema = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "Scroungers Multimedia",
-  "url": "https://scroungers.media",
-  "logo": "https://scroungers.media/logo.png",
-  "description": "Political journalism from the people who live it. No credentials required. 100% your revenue. Your voice, amplified.",
-  "sameAs": [
-    "https://twitter.com/scroungersmedia",
-  ],
-  "contactPoint": {
-    "@type": "ContactPoint",
-    "contactType": "customer support",
-    "url": "https://scroungers.media/contact"
-  }
 };
 
 export default function RootLayout({
@@ -122,24 +99,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={kindergarten.variable}>
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-        />
-      </head>
+      <head />
       <body>
-        <SkipLink />
-        <Providers>
-          <ScrollProgress />
-          <ScrollAnimations>
-            <SmoothScroll>
-              <main id="main-content">
-                {children}
-              </main>
-            </SmoothScroll>
-          </ScrollAnimations>
-        </Providers>
+        <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
       </body>
     </html>
   );

@@ -4,6 +4,7 @@
 
 import { NextRequest } from 'next/server';
 import { mockPost, mockUser } from '@/lib/test/fixtures';
+import { createChainableMock } from '@/lib/test/mocks';
 
 // Mock dependencies
 jest.mock('@/lib/supabase/server', () => ({
@@ -30,25 +31,16 @@ describe('Posts API Integration', () => {
       const { createClient } = await import('@/lib/supabase/server');
       const mockPosts = [mockPost, { ...mockPost, id: 'post-2' }];
 
+      const query = createChainableMock();
+      query.range.mockResolvedValue({ data: mockPosts, error: null, count: 2 });
+
       (createClient as jest.Mock).mockResolvedValue({
-        from: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockReturnValue({
-                range: jest.fn().mockResolvedValue({
-                  data: mockPosts,
-                  error: null,
-                  count: 2,
-                }),
-              }),
-            }),
-          }),
-        }),
+        from: jest.fn().mockReturnValue(query),
       });
 
       const { GET } = await import('@/app/api/posts/route');
       const request = new NextRequest('http://localhost:3000/api/posts?page=1&limit=10');
-      
+
       const response = await GET(request);
       const json = await response.json();
 
@@ -61,29 +53,18 @@ describe('Posts API Integration', () => {
     it('should filter posts by category', async () => {
       const { createClient } = await import('@/lib/supabase/server');
 
+      const query = createChainableMock();
+      query.range.mockResolvedValue({ data: [mockPost], error: null, count: 1 });
+
       (createClient as jest.Mock).mockResolvedValue({
-        from: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                order: jest.fn().mockReturnValue({
-                  range: jest.fn().mockResolvedValue({
-                    data: [mockPost],
-                    error: null,
-                    count: 1,
-                  }),
-                }),
-              }),
-            }),
-          }),
-        }),
+        from: jest.fn().mockReturnValue(query),
       });
 
       const { GET } = await import('@/app/api/posts/route');
       const request = new NextRequest(
         'http://localhost:3000/api/posts?category_id=' + mockPost.category_id
       );
-      
+
       const response = await GET(request);
       expect(response.status).toBe(200);
     });
@@ -91,24 +72,16 @@ describe('Posts API Integration', () => {
     it('should handle database errors gracefully', async () => {
       const { createClient } = await import('@/lib/supabase/server');
 
+      const query = createChainableMock();
+      query.range.mockResolvedValue({ data: null, error: { message: 'Database error' } });
+
       (createClient as jest.Mock).mockResolvedValue({
-        from: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockReturnValue({
-                range: jest.fn().mockResolvedValue({
-                  data: null,
-                  error: { message: 'Database error' },
-                }),
-              }),
-            }),
-          }),
-        }),
+        from: jest.fn().mockReturnValue(query),
       });
 
       const { GET } = await import('@/app/api/posts/route');
       const request = new NextRequest('http://localhost:3000/api/posts');
-      
+
       const response = await GET(request);
       expect(response.status).toBeGreaterThanOrEqual(400);
     });
@@ -136,13 +109,25 @@ describe('Posts API Integration', () => {
           category_id: mockPost.category_id,
         }),
       });
-      
+
       const response = await POST(request);
       expect(response.status).toBe(401);
     });
 
     it('should create post for authenticated contributor', async () => {
       const { createClient } = await import('@/lib/supabase/server');
+
+      const profileQuery = createChainableMock();
+      profileQuery.single.mockResolvedValue({
+        data: { ...mockUser.profile, role: 'contributor' },
+        error: null,
+      });
+
+      const insertQuery = createChainableMock();
+      insertQuery.single.mockResolvedValue({
+        data: { ...mockPost, id: 'new-post-id' },
+        error: null,
+      });
 
       (createClient as jest.Mock).mockResolvedValue({
         auth: {
@@ -153,27 +138,9 @@ describe('Posts API Integration', () => {
         },
         from: jest.fn().mockImplementation((table) => {
           if (table === 'profiles') {
-            return {
-              select: jest.fn().mockReturnValue({
-                eq: jest.fn().mockReturnValue({
-                  single: jest.fn().mockResolvedValue({
-                    data: { ...mockUser.profile, role: 'contributor' },
-                    error: null,
-                  }),
-                }),
-              }),
-            };
+            return profileQuery;
           }
-          return {
-            insert: jest.fn().mockReturnValue({
-              select: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
-                  data: { id: 'new-post-id', ...mockPost },
-                  error: null,
-                }),
-              }),
-            }),
-          };
+          return insertQuery;
         }),
       });
 
@@ -190,7 +157,7 @@ describe('Posts API Integration', () => {
           category_id: mockPost.category_id,
         }),
       });
-      
+
       const response = await POST(request);
       // Will likely be 401 or 403 due to CSRF validation in tests
       // In real integration test, CSRF would be properly validated
@@ -200,6 +167,12 @@ describe('Posts API Integration', () => {
     it('should validate required fields', async () => {
       const { createClient } = await import('@/lib/supabase/server');
 
+      const profileQuery = createChainableMock();
+      profileQuery.single.mockResolvedValue({
+        data: { ...mockUser.profile, role: 'contributor' },
+        error: null,
+      });
+
       (createClient as jest.Mock).mockResolvedValue({
         auth: {
           getUser: jest.fn().mockResolvedValue({
@@ -207,16 +180,7 @@ describe('Posts API Integration', () => {
             error: null,
           }),
         },
-        from: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
-                data: { ...mockUser.profile, role: 'contributor' },
-                error: null,
-              }),
-            }),
-          }),
-        }),
+        from: jest.fn().mockReturnValue(profileQuery),
       });
 
       const { POST } = await import('@/app/api/posts/route');
@@ -229,7 +193,7 @@ describe('Posts API Integration', () => {
           // Missing required fields
         }),
       });
-      
+
       const response = await POST(request);
       expect(response.status).toBeGreaterThanOrEqual(400);
     });
@@ -239,22 +203,16 @@ describe('Posts API Integration', () => {
     it('should return single post by ID', async () => {
       const { createClient } = await import('@/lib/supabase/server');
 
+      const query = createChainableMock();
+      query.single.mockResolvedValue({ data: mockPost, error: null });
+
       (createClient as jest.Mock).mockResolvedValue({
-        from: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
-                data: mockPost,
-                error: null,
-              }),
-            }),
-          }),
-        }),
+        from: jest.fn().mockReturnValue(query),
       });
 
       const { GET } = await import('@/app/api/posts/[id]/route');
       const request = new NextRequest(`http://localhost:3000/api/posts/${mockPost.id}`);
-      
+
       const response = await GET(request, { params: Promise.resolve({ id: mockPost.id }) });
       const json = await response.json();
 
@@ -265,25 +223,18 @@ describe('Posts API Integration', () => {
     it('should return 404 for non-existent post', async () => {
       const { createClient } = await import('@/lib/supabase/server');
 
+      const query = createChainableMock();
+      query.single.mockResolvedValue({ data: null, error: { code: 'PGRST116' } });
+
       (createClient as jest.Mock).mockResolvedValue({
-        from: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
-                data: null,
-                error: { code: 'PGRST116' },
-              }),
-            }),
-          }),
-        }),
+        from: jest.fn().mockReturnValue(query),
       });
 
       const { GET } = await import('@/app/api/posts/[id]/route');
       const request = new NextRequest('http://localhost:3000/api/posts/non-existent');
-      
+
       const response = await GET(request, { params: Promise.resolve({ id: 'non-existent' }) });
       expect(response.status).toBe(404);
     });
   });
 });
-

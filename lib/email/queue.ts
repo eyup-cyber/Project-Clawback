@@ -3,7 +3,7 @@
  */
 
 import { logger } from '@/lib/logger';
-import { sendEmail, type SendEmailOptions } from './client';
+import { sendEmail, type EmailOptions } from './client';
 
 // ============================================================================
 // TYPES
@@ -11,7 +11,7 @@ import { sendEmail, type SendEmailOptions } from './client';
 
 interface QueuedEmail {
   id: string;
-  options: SendEmailOptions;
+  options: EmailOptions;
   attempts: number;
   maxAttempts: number;
   lastAttempt?: Date;
@@ -57,7 +57,7 @@ class EmailQueue {
   /**
    * Add email to the queue
    */
-  enqueue(options: SendEmailOptions, maxAttempts?: number): string {
+  enqueue(options: EmailOptions, maxAttempts?: number): string {
     const id = this.generateId();
     const email: QueuedEmail = {
       id,
@@ -135,14 +135,14 @@ class EmailQueue {
       const pendingEmails = Array.from(this.queue.values())
         .filter((email) => {
           if (email.status !== 'pending') return false;
-          
+
           // Check retry delay
           if (email.attempts > 0 && email.lastAttempt) {
             const timeSinceLastAttempt = Date.now() - email.lastAttempt.getTime();
             const requiredDelay = this.options.retryDelayMs * Math.pow(2, email.attempts - 1); // Exponential backoff
             if (timeSinceLastAttempt < requiredDelay) return false;
           }
-          
+
           return true;
         })
         .slice(0, this.options.batchSize);
@@ -299,21 +299,21 @@ export const emailQueue = new EmailQueue();
 /**
  * Queue an email for sending
  */
-export function queueEmail(options: SendEmailOptions, maxRetries?: number): string {
+export function queueEmail(options: EmailOptions, maxRetries?: number): string {
   return emailQueue.enqueue(options, maxRetries);
 }
 
 /**
  * Queue multiple emails for batch sending
  */
-export function queueEmails(emailsToSend: SendEmailOptions[]): string[] {
+export function queueEmails(emailsToSend: EmailOptions[]): string[] {
   return emailsToSend.map((options) => emailQueue.enqueue(options));
 }
 
 /**
  * Send email immediately (bypasses queue)
  */
-export async function sendEmailNow(options: SendEmailOptions): Promise<{
+export async function sendEmailNow(options: EmailOptions): Promise<{
   success: boolean;
   messageId?: string;
   error?: string;
@@ -341,4 +341,3 @@ export function startEmailQueue(): void {
 export function stopEmailQueue(): void {
   emailQueue.stop();
 }
-

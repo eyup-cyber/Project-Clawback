@@ -17,22 +17,24 @@ interface CategoryPost {
   author: { display_name: string } | null;
 }
 
-export async function generateMetadata({ params }: { params: { category: string } }) {
-  const categoryName = params.category.replace(/-/g, ' ');
+export async function generateMetadata({ params }: { params: Promise<{ category: string }> }) {
+  const { category } = await params;
+  const categoryName = category.replace(/-/g, ' ');
   return {
     title: `${categoryName.charAt(0).toUpperCase() + categoryName.slice(1)} | Categories`,
     description: `Browse all posts in the ${categoryName} category on Scroungers Multimedia.`,
   };
 }
 
-export default async function CategoryPage({ params }: { params: { category: string } }) {
+export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
+  const { category: categorySlug } = await params;
   const supabase = await createClient();
 
   // Get category
   const { data: category } = await supabase
     .from('categories')
     .select('*')
-    .eq('slug', params.category)
+    .eq('slug', categorySlug)
     .single();
 
   if (!category) {

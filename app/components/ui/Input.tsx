@@ -194,7 +194,6 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               aria-describedby={error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined}
               maxLength={maxLength}
               onChange={(e) => {
-                setHasValue(!!e.target.value);
                 props.onChange?.(e);
               }}
               {...props}

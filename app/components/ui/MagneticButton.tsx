@@ -20,6 +20,10 @@ interface MagneticButtonProps {
   onClick?: () => void;
   href?: string;
   type?: 'button' | 'submit' | 'reset';
+  rainbowBend?: boolean;
+  rainbowBendAmount?: number;
+  rainbowBox?: boolean;
+  rainbowBoxDirection?: 'up' | 'down';
 }
 
 const MagneticButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, MagneticButtonProps>(
@@ -53,7 +57,8 @@ const MagneticButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Magneti
     const particlesRef = useRef<Array<{ id: number; element: HTMLSpanElement }>>([]);
     const particleIdRef = useRef(0);
 
-    const ref = (forwardedRef as React.RefObject<HTMLButtonElement | HTMLAnchorElement>) || buttonRef;
+    const ref =
+      (forwardedRef as React.RefObject<HTMLButtonElement | HTMLAnchorElement>) || buttonRef;
 
     // Variant styles
     const variantStyles = {
@@ -130,7 +135,7 @@ const MagneticButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Magneti
         const randomY = (Math.random() - 0.5) * 0.4; // Very limited: -0.2 to 0.2
         const randomDuration = 4 + Math.random() * 4; // 4-8 seconds
         const randomDelay = Math.random() * 0.5;
-        
+
         return gsap.to(floatProxy, {
           y: randomY,
           duration: randomDuration,
@@ -243,7 +248,7 @@ const MagneticButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Magneti
           ease: EASING.trail,
           onComplete: () => {
             particle.remove();
-            particlesRef.current = particlesRef.current.filter(p => p.id !== id);
+            particlesRef.current = particlesRef.current.filter((p) => p.id !== id);
           },
         });
       };
@@ -251,7 +256,7 @@ const MagneticButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Magneti
       const handleMouseLeave = () => {
         magneticX = 0;
         magneticY = 0;
-        
+
         // Reset scale only, position continues floating
         gsap.to(element, {
           scale: 1,
@@ -306,10 +311,20 @@ const MagneticButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Magneti
         window.removeEventListener('scroll', updateBounding);
         element.removeEventListener('mouseleave', handleMouseLeave);
         // Clean up particles
-        particlesRef.current.forEach(p => p.element.remove());
+        particlesRef.current.forEach((p) => p.element.remove());
         particlesRef.current = [];
       };
-    }, [ref, strength, radius, scale, glow, styles.glowColor, particleTrail, liquidMorph, disabled]);
+    }, [
+      ref,
+      strength,
+      radius,
+      scale,
+      glow,
+      styles.glowColor,
+      particleTrail,
+      liquidMorph,
+      disabled,
+    ]);
 
     const handleClick = (_e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
       if (disabled) return;
@@ -468,11 +483,8 @@ export function PulsingCTA({
         }}
         aria-hidden="true"
       />
-      
+
       <MagneticButton {...props}>{children}</MagneticButton>
     </div>
   );
 }
-
-
-
