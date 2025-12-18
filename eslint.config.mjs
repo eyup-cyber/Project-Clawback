@@ -1,61 +1,61 @@
-import { defineConfig, globalIgnores } from "eslint/config";
-import tseslint from "@typescript-eslint/eslint-plugin";
-import tsParser from "@typescript-eslint/parser";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+import { defineConfig, globalIgnores } from 'eslint/config';
+import tseslint from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
+import nextVitals from 'eslint-config-next/core-web-vitals';
+import nextTs from 'eslint-config-next/typescript';
 
-const projectRoot = new URL(".", import.meta.url).pathname;
+const projectRoot = new URL('.', import.meta.url).pathname;
 const commonIgnores = [
-  ".next/**",
-  "out/**",
-  "build/**",
-  "dist/**",
-  "coverage/**",
-  "node_modules/**",
-  ".vercel/**",
-  "public/**",
+  '.next/**',
+  'out/**',
+  'build/**',
+  'dist/**',
+  'coverage/**',
+  'node_modules/**',
+  '.vercel/**',
+  'public/**',
 ];
 
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
-    files: ["**/*.ts", "**/*.tsx"],
+    files: ['**/*.ts', '**/*.tsx'],
     ignores: commonIgnores,
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        project: `${projectRoot}tsconfig.json`,
+        projectService: true,
         tsconfigRootDir: projectRoot,
       },
     },
     plugins: {
-      "@typescript-eslint": tseslint,
+      '@typescript-eslint': tseslint,
     },
     rules: {
-      "@typescript-eslint/consistent-type-imports": [
-        "error",
-        { prefer: "type-imports", fixStyle: "inline-type-imports" },
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
       ],
-      "@typescript-eslint/explicit-function-return-type": "off",
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-floating-promises": "error",
-      "@typescript-eslint/no-misused-promises": [
-        "error",
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': [
+        'error',
         { checksVoidReturn: { arguments: false } },
       ],
-      "@typescript-eslint/no-unsafe-function-type": "off",
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      '@typescript-eslint/no-unsafe-function-type': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
-      eqeqeq: ["error", "always"],
-      "no-console": ["warn", { allow: ["warn", "error"] }],
-      "prefer-const": "error",
+      eqeqeq: ['error', 'always'],
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'prefer-const': 'error',
     },
   },
   {
-    files: ["**/*.js", "**/*.jsx"],
+    files: ['**/*.js', '**/*.jsx'],
     ignores: commonIgnores,
     languageOptions: {
       parserOptions: {
@@ -63,15 +63,12 @@ const eslintConfig = defineConfig([
       },
     },
     rules: {
-      eqeqeq: ["error", "always"],
-      "no-console": ["warn", { allow: ["warn", "error"] }],
-      "prefer-const": "error",
+      eqeqeq: ['error', 'always'],
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'prefer-const': 'error',
     },
   },
-  globalIgnores([
-    ...commonIgnores,
-    "next-env.d.ts",
-  ]),
+  globalIgnores([...commonIgnores, 'next-env.d.ts']),
 ]);
 
 export default eslintConfig;
