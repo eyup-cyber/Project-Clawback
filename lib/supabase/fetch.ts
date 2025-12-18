@@ -1,4 +1,5 @@
-import { setTimeout as delay } from 'timers/promises';
+// Edge-compatible delay function (timers/promises not available in Edge Runtime)
+const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 const DEFAULT_TIMEOUT_MS = Number(process.env.SUPABASE_FETCH_TIMEOUT_MS || 10_000);
 const MAX_RETRIES = Number(process.env.SUPABASE_FETCH_MAX_RETRIES || 2);
@@ -59,4 +60,3 @@ export async function supabaseFetch(
   // Should be unreachable
   throw new Error('supabaseFetch exhausted retries');
 }
-

@@ -55,12 +55,13 @@ jest.mock('@/lib/supabase/server', () => ({
 describe('Reactions Database Operations', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Reset chain methods
+    // Reset chain methods - all are jest.Mock functions
     Object.keys(mockChainable).forEach((key) => {
-      if (typeof mockChainable[key] === 'function' && mockChainable[key].mockClear) {
-        mockChainable[key].mockClear();
+      const mock = mockChainable[key];
+      if (typeof mock === 'function' && 'mockClear' in mock) {
+        mock.mockClear();
         if (key !== 'single' && key !== 'then') {
-          mockChainable[key].mockReturnValue(mockChainable);
+          mock.mockReturnValue(mockChainable);
         }
       }
     });
