@@ -49,6 +49,8 @@ const eslintConfig = defineConfig([
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
+      // Allow <img> for user-uploaded media from R2/Supabase (dynamic URLs)
+      '@next/next/no-img-element': 'off',
       eqeqeq: ['error', 'always'],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'prefer-const': 'error',

@@ -1,286 +1,242 @@
 /**
- * In-memory cache with TTL support
- * Provides cache-aside pattern implementation
+ * Unified Cache Interface
+ * Provides a consistent API with Redis or in-memory fallback
  */
 
-import { logger } from '@/lib/logger';
+import { redis, isRedisConnected } from './redis';
+import { cacheAside, invalidateByTag, invalidateByPattern, cacheHealthCheck, type CacheOptions } from './strategies';
 
-interface CacheEntry<T> {
-  value: T;
-  expiresAt: number;
-}
+// In-memory fallback cache
+const memoryCache = new Map<string, { data: unknown; expires: number }>();
+const memoryCacheTags = new Map<string, Set<string>>();
 
-interface CacheOptions {
-  ttlMs: number; // Time to live in milliseconds
-}
-
-// Default TTL values
-export const TTL = {
-  SHORT: 10_000, // 10 seconds
-  MEDIUM: 60_000, // 1 minute
-  LONG: 300_000, // 5 minutes
-  VERY_LONG: 900_000, // 15 minutes
-} as const;
-
-class MemoryCache {
-  private cache = new Map<string, CacheEntry<unknown>>();
-  private cleanupInterval: NodeJS.Timeout | null = null;
-
-  constructor() {
-    // Run cleanup every minute
-    if (typeof setInterval !== 'undefined') {
-      this.cleanupInterval = setInterval(() => this.cleanup(), 60_000);
+// Cleanup expired entries periodically
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, entry] of memoryCache) {
+      if (entry.expires < now) {
+        memoryCache.delete(key);
+      }
     }
-  }
+  }, 60000); // Every minute
+}
 
+/**
+ * Unified cache interface
+ */
+export const cache = {
   /**
-   * Get a value from cache
+   * Get a value from cache (Redis or memory fallback)
    */
-  get<T>(key: string): T | null {
-    const entry = this.cache.get(key) as CacheEntry<T> | undefined;
-
-    if (!entry) {
+  async get<T>(key: string): Promise<T | null> {
+    if (isRedisConnected()) {
+      return redis.get<T>(key);
+    }
+    
+    // Memory fallback
+    const entry = memoryCache.get(key);
+    if (!entry) return null;
+    if (entry.expires < Date.now()) {
+      memoryCache.delete(key);
       return null;
     }
-
-    // Check if expired
-    if (Date.now() > entry.expiresAt) {
-      this.cache.delete(key);
-      return null;
-    }
-
-    logger.debug('Cache hit', { key });
-    return entry.value;
-  }
+    return entry.data as T;
+  },
 
   /**
    * Set a value in cache
    */
-  set<T>(key: string, value: T, options: CacheOptions): void {
-    const entry: CacheEntry<T> = {
-      value,
-      expiresAt: Date.now() + options.ttlMs,
-    };
-
-    this.cache.set(key, entry);
-    logger.debug('Cache set', { key, ttlMs: options.ttlMs });
-  }
+  async set<T>(key: string, value: T, ttlSeconds: number = 300, tags?: string[]): Promise<boolean> {
+    if (isRedisConnected()) {
+      const success = await redis.set(key, value, ttlSeconds);
+      if (success && tags) {
+        for (const tag of tags) {
+          await redis.sets.add(`cache:tag:${tag}`, key);
+        }
+      }
+      return success;
+    }
+    
+    // Memory fallback
+    memoryCache.set(key, {
+      data: value,
+      expires: Date.now() + ttlSeconds * 1000,
+    });
+    
+    if (tags) {
+      for (const tag of tags) {
+        if (!memoryCacheTags.has(tag)) {
+          memoryCacheTags.set(tag, new Set());
+        }
+        memoryCacheTags.get(tag)!.add(key);
+      }
+    }
+    
+    return true;
+  },
 
   /**
-   * Delete a value from cache
+   * Delete a key from cache
    */
-  delete(key: string): boolean {
-    const deleted = this.cache.delete(key);
-    if (deleted) {
-      logger.debug('Cache delete', { key });
+  async del(key: string): Promise<boolean> {
+    if (isRedisConnected()) {
+      return redis.del(key);
+    }
+    
+    // Memory fallback
+    memoryCache.delete(key);
+    return true;
+  },
+
+  /**
+   * Delete keys matching a pattern
+   */
+  async delPattern(pattern: string): Promise<number> {
+    if (isRedisConnected()) {
+      return redis.delPattern(pattern);
+    }
+    
+    // Memory fallback - simple pattern matching
+    const regex = new RegExp(pattern.replace(/\*/g, '.*'));
+    let deleted = 0;
+    for (const key of memoryCache.keys()) {
+      if (regex.test(key)) {
+        memoryCache.delete(key);
+        deleted++;
+      }
     }
     return deleted;
-  }
+  },
 
   /**
-   * Delete all values matching a prefix
+   * Check if key exists
    */
-  deleteByPrefix(prefix: string): number {
-    let count = 0;
-    for (const key of this.cache.keys()) {
-      if (key.startsWith(prefix)) {
-        this.cache.delete(key);
-        count++;
+  async exists(key: string): Promise<boolean> {
+    if (isRedisConnected()) {
+      return redis.exists(key);
+    }
+    
+    // Memory fallback
+    const entry = memoryCache.get(key);
+    if (!entry) return false;
+    if (entry.expires < Date.now()) {
+      memoryCache.delete(key);
+      return false;
+    }
+    return true;
+  },
+
+  /**
+   * Cache-aside with automatic source fetching
+   */
+  async fetch<T>(
+    key: string,
+    fetchFn: () => Promise<T>,
+    options: CacheOptions = {}
+  ): Promise<T> {
+    if (isRedisConnected()) {
+      return cacheAside(key, fetchFn, options);
+    }
+
+    // Memory fallback
+    const cached = await this.get<T>(key);
+    if (cached !== null) {
+      return cached;
+    }
+
+    const data = await fetchFn();
+    await this.set(key, data, options.ttl, options.tags);
+    return data;
+  },
+
+  /**
+   * Invalidate cache by tag
+   */
+  async invalidateTag(tag: string): Promise<number> {
+    if (isRedisConnected()) {
+      return invalidateByTag(tag);
+    }
+    
+    // Memory fallback
+    const keys = memoryCacheTags.get(tag);
+    if (!keys) return 0;
+    
+    let deleted = 0;
+    for (const key of keys) {
+      if (memoryCache.delete(key)) {
+        deleted++;
       }
     }
-    if (count > 0) {
-      logger.debug('Cache delete by prefix', { prefix, count });
+    memoryCacheTags.delete(tag);
+    return deleted;
+  },
+
+  /**
+   * Invalidate cache by pattern
+   */
+  async invalidatePattern(pattern: string): Promise<number> {
+    if (isRedisConnected()) {
+      return invalidateByPattern(pattern);
     }
-    return count;
-  }
+    return this.delPattern(pattern);
+  },
 
   /**
-   * Clear the entire cache
+   * Health check
    */
-  clear(): void {
-    const size = this.cache.size;
-    this.cache.clear();
-    logger.debug('Cache cleared', { size });
-  }
+  async health(): Promise<{ redis: boolean; memory: boolean; latencyMs: number | null }> {
+    const redisHealth = await cacheHealthCheck();
+    return {
+      redis: redisHealth.connected,
+      memory: true,
+      latencyMs: redisHealth.latencyMs,
+    };
+  },
 
   /**
-   * Get cache size
+   * Clear all cache
    */
-  size(): number {
-    return this.cache.size;
-  }
+  async clear(): Promise<void> {
+    if (isRedisConnected()) {
+      await redis.delPattern('*');
+    }
+    memoryCache.clear();
+    memoryCacheTags.clear();
+  },
 
   /**
-   * Clean up expired entries
+   * Get cache stats
    */
-  private cleanup(): void {
-    const now = Date.now();
-    let cleaned = 0;
-
-    for (const [key, entry] of this.cache.entries()) {
-      if (now > entry.expiresAt) {
-        this.cache.delete(key);
-        cleaned++;
+  async stats(): Promise<{
+    type: 'redis' | 'memory';
+    keys: number;
+    memoryUsage?: number;
+  }> {
+    if (isRedisConnected()) {
+      const client = await import('./redis').then(m => m.getRedisClient());
+      if (client) {
+        const info = await client.info('keyspace');
+        const match = info.match(/keys=(\d+)/);
+        return {
+          type: 'redis',
+          keys: match ? parseInt(match[1], 10) : 0,
+        };
       }
     }
+    
+    return {
+      type: 'memory',
+      keys: memoryCache.size,
+      memoryUsage: process.memoryUsage?.().heapUsed,
+    };
+  },
+};
 
-    if (cleaned > 0) {
-      logger.debug('Cache cleanup', { cleaned });
-    }
-  }
+// Export individual modules for advanced use cases
+export { redis, isRedisConnected, getRedisClient, closeRedis } from './redis';
+export { cacheAside, writeThrough, writeBehind, invalidateByTag, invalidateByPattern, memoize, singleFlight, withLock, warmCache, cacheHealthCheck } from './strategies';
+export type { CacheOptions, CacheEntry } from './strategies';
 
-  /**
-   * Stop the cleanup interval (for testing)
-   */
-  destroy(): void {
-    if (this.cleanupInterval) {
-      clearInterval(this.cleanupInterval);
-      this.cleanupInterval = null;
-    }
-  }
-}
-
-// Singleton instance
-export const cache = new MemoryCache();
-
-// ============================================================================
-// CACHE-ASIDE PATTERN HELPERS
-// ============================================================================
-
-/**
- * Get or set pattern - fetches from cache or calls loader function
- */
-export async function getOrSet<T>(
-  key: string,
-  loader: () => Promise<T>,
-  options: CacheOptions
-): Promise<T> {
-  // Try cache first
-  const cached = cache.get<T>(key);
-  if (cached !== null) {
-    return cached;
-  }
-
-  // Load from source
-  const value = await loader();
-
-  // Store in cache
-  cache.set(key, value, options);
-
-  return value;
-}
-
-/**
- * Invalidate cache entries by key or prefix
- */
-export function invalidate(keyOrPrefix: string, isPrefix = false): void {
-  if (isPrefix) {
-    cache.deleteByPrefix(keyOrPrefix);
-  } else {
-    cache.delete(keyOrPrefix);
-  }
-}
-
-// ============================================================================
-// PRE-DEFINED CACHE KEYS
-// ============================================================================
-
-export const CacheKeys = {
-  // Categories
-  categories: () => 'categories:all',
-  categoriesWithCounts: () => 'categories:with_counts',
-  category: (slug: string) => `category:${slug}`,
-
-  // Site settings
-  siteContent: () => 'site:content',
-  siteSettings: (key: string) => `site:settings:${key}`,
-
-  // Posts
-  featuredPosts: () => 'posts:featured',
-  trendingPosts: () => 'posts:trending',
-  postBySlug: (slug: string) => `post:slug:${slug}`,
-  postById: (id: string) => `post:id:${id}`,
-
-  // Users
-  userProfile: (id: string) => `user:profile:${id}`,
-  userByUsername: (username: string) => `user:username:${username}`,
-} as const;
-
-// ============================================================================
-// CACHED DATA FETCHERS
-// ============================================================================
-
-import { getCategories, getCategoriesWithCounts } from '@/lib/db/categories';
-import { getSiteContent } from '@/lib/db/site-content';
-import { getFeaturedPosts, getTrendingPosts } from '@/lib/db/posts';
-
-/**
- * Get categories (cached 5 minutes)
- */
-export async function getCachedCategories() {
-  return getOrSet(CacheKeys.categories(), () => getCategories(), { ttlMs: TTL.LONG });
-}
-
-/**
- * Get categories with counts (cached 5 minutes)
- */
-export async function getCachedCategoriesWithCounts() {
-  return getOrSet(CacheKeys.categoriesWithCounts(), () => getCategoriesWithCounts(), {
-    ttlMs: TTL.LONG,
-  });
-}
-
-/**
- * Get site content (cached 1 minute)
- */
-export async function getCachedSiteContent() {
-  return getOrSet(CacheKeys.siteContent(), () => getSiteContent(), { ttlMs: TTL.MEDIUM });
-}
-
-/**
- * Get featured posts (cached 1 minute)
- */
-export async function getCachedFeaturedPosts(limit = 6) {
-  return getOrSet(CacheKeys.featuredPosts(), () => getFeaturedPosts(limit), { ttlMs: TTL.MEDIUM });
-}
-
-/**
- * Get trending posts (cached 1 minute)
- */
-export async function getCachedTrendingPosts(limit = 10) {
-  return getOrSet(CacheKeys.trendingPosts(), () => getTrendingPosts(limit), { ttlMs: TTL.MEDIUM });
-}
-
-// ============================================================================
-// CACHE INVALIDATION HELPERS
-// ============================================================================
-
-/**
- * Invalidate all category caches
- */
-export function invalidateCategories(): void {
-  invalidate('categories:', true);
-  invalidate('category:', true);
-}
-
-/**
- * Invalidate all post caches
- */
-export function invalidatePosts(): void {
-  invalidate('posts:', true);
-  invalidate('post:', true);
-}
-
-/**
- * Invalidate site content cache
- */
-export function invalidateSiteContent(): void {
-  invalidate('site:', true);
-}
-
-/**
- * Invalidate user cache
- */
-export function invalidateUser(id: string): void {
-  cache.delete(CacheKeys.userProfile(id));
-}
+// Default export
+export default cache;

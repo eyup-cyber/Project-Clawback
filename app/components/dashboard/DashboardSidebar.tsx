@@ -40,11 +40,17 @@ const sidebarSections: SidebarSection[] = [
     ],
   },
   {
+    title: 'Editorial',
+    items: [
+      { label: 'Review Queue', href: '/editor/queue', icon: '📋', roles: ['editor', 'admin', 'superadmin'] },
+    ],
+  },
+  {
     title: 'Admin',
     items: [
-      { label: 'Moderation', href: '/admin', icon: '🛡️', roles: ['admin'] },
-      { label: 'All Users', href: '/admin/users', icon: '👥', roles: ['admin'] },
-      { label: 'Applications', href: '/admin/applications', icon: '📋', roles: ['admin'] },
+      { label: 'Admin Home', href: '/admin', icon: '🛡️', roles: ['admin', 'superadmin'] },
+      { label: 'All Users', href: '/admin/users', icon: '👥', roles: ['admin', 'superadmin'] },
+      { label: 'Applications', href: '/admin/applications', icon: '📋', roles: ['admin', 'superadmin'] },
     ],
   },
 ];
@@ -156,6 +162,7 @@ export default function DashboardSidebar({ role }: { role: string }) {
     <>
       {/* Mobile toggle */}
       <button
+        type="button"
         onClick={() => setMobileOpen(!mobileOpen)}
         className="lg:hidden fixed bottom-4 right-4 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-transform duration-200 active:scale-95"
         style={{ 
@@ -163,7 +170,8 @@ export default function DashboardSidebar({ role }: { role: string }) {
           boxShadow: '0 0 20px var(--glow-primary)',
         }}
         aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-        aria-expanded={mobileOpen}
+        aria-expanded={mobileOpen ? 'true' : 'false'}
+        aria-controls="dashboard-sidebar"
       >
         <span className="text-2xl text-[var(--background)]">
           {mobileOpen ? '✕' : '☰'}
@@ -172,15 +180,18 @@ export default function DashboardSidebar({ role }: { role: string }) {
 
       {/* Mobile overlay */}
       {mobileOpen && (
-        <div
-          className="lg:hidden fixed inset-0 z-40"
+        <button
+          type="button"
+          className="lg:hidden fixed inset-0 z-40 w-full h-full cursor-default"
           style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
           onClick={() => setMobileOpen(false)}
+          aria-label="Close menu"
         />
       )}
 
       {/* Sidebar */}
       <aside
+        id="dashboard-sidebar"
         className={`
           fixed top-14 sm:top-16 bottom-0 left-0 w-64 z-40
           transform transition-transform duration-300 ease-out

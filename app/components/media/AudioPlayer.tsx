@@ -98,7 +98,7 @@ export default function AudioPlayer({ src, title, artist, coverImage }: AudioPla
           style={{ background: 'var(--background)' }}
         >
           {coverImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
+             
             <img src={coverImage} alt={title || 'Audio'} className="w-full h-full object-cover rounded-lg" />
           ) : (
             <span className="text-4xl">🎙️</span>

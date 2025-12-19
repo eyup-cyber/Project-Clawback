@@ -26,8 +26,8 @@ export default async function DashboardLayout({
     redirect('/auth/login');
   }
 
-  // Contributors and admins only
-  if (!['contributor', 'admin'].includes(profile.role)) {
+  // Contributors, editors, and admins only
+  if (!['contributor', 'editor', 'admin', 'superadmin'].includes(profile.role)) {
     redirect('/apply');
   }
 

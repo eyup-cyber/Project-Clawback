@@ -122,7 +122,7 @@ export default function ProfilePage() {
               style={{ background: 'var(--primary)', color: 'var(--background)' }}
             >
               {profile.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
+                 
                 <img
                   src={profile.avatar_url}
                   alt={profile.display_name}

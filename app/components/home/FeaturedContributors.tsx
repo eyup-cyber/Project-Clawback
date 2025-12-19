@@ -108,7 +108,7 @@ function ContributorCard({ contributor }: { contributor: Contributor }) {
             }}
           >
             {contributor.avatar_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
+               
               <img
                 src={contributor.avatar_url}
                 alt={contributor.display_name}

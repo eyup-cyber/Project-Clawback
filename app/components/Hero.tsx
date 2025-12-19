@@ -140,6 +140,21 @@ export default function Hero() {
         ease: 'sine.inOut',
         delay: 1.5,
       });
+
+      // Subtle floating animation for multimedia letters (zero-gravity effect)
+      const multimediaLetters = multimedia.querySelectorAll('.mm-letter');
+      if (multimediaLetters.length > 0) {
+        multimediaLetters.forEach((letter, i) => {
+          gsap.to(letter, {
+            y: -1.5,
+            duration: 3 + (i * 0.2), // Slightly different durations for organic feel
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut',
+            delay: 1.5 + (i * 0.15), // Stagger start after reveal
+          });
+        });
+      }
     }, containerRef);
 
     // Fallback to ensure isLoaded becomes true
@@ -290,10 +305,10 @@ export default function Hero() {
           ))}
         </h1>
 
-        {/* MULTIMEDIA - Kindergarten font */}
+        {/* MULTIMEDIA - Kindergarten font with floating letters */}
         <span
           ref={multimediaRef}
-          className="logo-multimedia block text-xl sm:text-2xl md:text-3xl mt-8 sm:mt-10 md:mt-12 lowercase"
+          className="logo-multimedia block text-xl sm:text-2xl md:text-3xl mt-1 lowercase"
           style={{
             fontFamily: 'var(--font-kindergarten)',
             color: COLORS.secondary,
@@ -301,11 +316,13 @@ export default function Hero() {
             willChange: 'transform, opacity',
             transform: 'translateZ(0)', // Force GPU layer
             letterSpacing: '0.15em',
-            position: 'relative',
-            zIndex: 10,
           }}
         >
-          multimedia
+          {'multimedia'.split('').map((char, i) => (
+            <span key={i} className="mm-letter inline-block">
+              {char}
+            </span>
+          ))}
         </span>
       </div>
     </section>

@@ -6,6 +6,7 @@
  */
 
 import { mockPost, mockUser } from '@/lib/test/fixtures';
+import { togglePostReaction, getPostReactionSummary } from '@/lib/db/reactions';
 
 // Use the global mock from setup.ts
 const mockSupabaseClient = globalThis.__mockSupabaseClient;
@@ -41,7 +42,6 @@ describe('Reactions Database Operations', () => {
       // Mock: no existing reaction of this type found
       mockChainable.single.mockResolvedValueOnce({ data: null, error: null });
 
-      const { togglePostReaction } = require('@/lib/db/reactions');
       const result = await togglePostReaction(mockPost.id, mockUser.id, 'star');
 
       expect(result.action).toBe('added');
@@ -59,7 +59,6 @@ describe('Reactions Database Operations', () => {
         error: null,
       });
 
-      const { togglePostReaction } = require('@/lib/db/reactions');
       const result = await togglePostReaction(mockPost.id, mockUser.id, 'star');
 
       expect(result.action).toBe('removed');
@@ -72,7 +71,6 @@ describe('Reactions Database Operations', () => {
       // the query for 'star' will not find existing (since it queries exact type)
       mockChainable.single.mockResolvedValueOnce({ data: null, error: null });
 
-      const { togglePostReaction } = require('@/lib/db/reactions');
       const result = await togglePostReaction(mockPost.id, mockUser.id, 'star');
 
       // Should add a new 'star' reaction (user might already have 'heart')
@@ -97,7 +95,6 @@ describe('Reactions Database Operations', () => {
         then: jest.fn((resolve) => resolve({ data: mockReactions, error: null })),
       });
 
-      const { getPostReactionSummary } = require('@/lib/db/reactions');
       const result = await getPostReactionSummary(mockPost.id);
 
       expect(result.counts.star).toBe(2);
@@ -118,7 +115,6 @@ describe('Reactions Database Operations', () => {
         then: jest.fn((resolve) => resolve({ data: mockReactions, error: null })),
       });
 
-      const { getPostReactionSummary } = require('@/lib/db/reactions');
       const result = await getPostReactionSummary(mockPost.id, mockUser.id);
 
       expect(result.userReaction).toBe('heart');
@@ -132,7 +128,6 @@ describe('Reactions Database Operations', () => {
         then: jest.fn((resolve) => resolve({ data: mockReactions, error: null })),
       });
 
-      const { getPostReactionSummary } = require('@/lib/db/reactions');
       const result = await getPostReactionSummary(mockPost.id, mockUser.id);
 
       expect(result.userReaction).toBeNull();
@@ -144,7 +139,6 @@ describe('Reactions Database Operations', () => {
         then: jest.fn((resolve) => resolve({ data: [], error: null })),
       });
 
-      const { getPostReactionSummary } = require('@/lib/db/reactions');
       const result = await getPostReactionSummary(mockPost.id);
 
       expect(result.counts.total).toBe(0);

@@ -100,7 +100,7 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
                     {/* Featured image */}
                     {post.featured_image_url && (
                       <div className="hidden md:block w-48 h-32 rounded-lg overflow-hidden flex-shrink-0">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        { }
                         <img
                           src={post.featured_image_url}
                           alt={post.title}

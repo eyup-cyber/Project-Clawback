@@ -108,6 +108,26 @@ export function useAuth() {
     return { data, error };
   };
 
+  const signInWithOAuth = async (provider: 'google' | 'twitter') => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/api/auth/callback`,
+      },
+    });
+    return { data, error };
+  };
+
+  const signInWithMagicLink = async (email: string) => {
+    const { data, error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/api/auth/callback`,
+      },
+    });
+    return { data, error };
+  };
+
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!state.user) return { data: null, error: new Error('Not authenticated') };
 
@@ -138,10 +158,13 @@ export function useAuth() {
     loading: state.loading,
     isAuthenticated: !!state.user,
     isContributor: state.profile?.role !== 'reader',
+    isEditor: ['editor', 'admin', 'superadmin'].includes(state.profile?.role || ''),
     isAdmin: ['admin', 'superadmin'].includes(state.profile?.role || ''),
     signIn,
     signUp,
     signOut,
+    signInWithOAuth,
+    signInWithMagicLink,
     resetPassword,
     updatePassword,
     updateProfile,

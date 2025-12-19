@@ -77,7 +77,7 @@ export default async function ContributorProfilePage({
               }}
             >
               {contributor.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
+                 
                 <img
                   src={contributor.avatar_url}
                   alt={contributor.display_name}
@@ -242,7 +242,7 @@ export default async function ContributorProfilePage({
                       {/* Featured image */}
                       {post.featured_image_url && (
                         <div className="hidden md:block w-32 h-24 rounded-lg overflow-hidden flex-shrink-0">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          { }
                           <img
                             src={post.featured_image_url}
                             alt={post.title}

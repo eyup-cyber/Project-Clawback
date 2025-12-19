@@ -99,7 +99,7 @@ export default function AdminHeader({ user, profile }: AdminHeaderProps) {
               style={{ background: 'var(--accent)', color: 'var(--background)' }}
             >
               {profile.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
+                 
                 <img
                   src={profile.avatar_url}
                   alt={displayName}

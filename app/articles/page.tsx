@@ -192,7 +192,7 @@ function ArticleCard({ post, viewMode }: { post: typeof mockPosts[0]; viewMode: 
       >
         {/* Featured Image */}
         {post.featured_image_url && (
-          // eslint-disable-next-line @next/next/no-img-element
+           
           <img
             src={post.featured_image_url}
             alt={post.title}

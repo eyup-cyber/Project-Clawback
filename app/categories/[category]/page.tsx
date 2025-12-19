@@ -89,7 +89,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
                   {/* Featured image */}
                   {post.featured_image_url && (
                     <div className="aspect-video overflow-hidden">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      { }
                       <img
                         src={post.featured_image_url}
                         alt={post.title}

@@ -135,7 +135,7 @@ export function FileUpload({
             >
               {item.type === 'image' ? (
                 // Using img for user-uploaded blob URLs - Next/Image doesn't support blob:// protocol
-                // eslint-disable-next-line @next/next/no-img-element
+                 
                 <img src={item.url} alt={item.name} className="h-12 w-12 rounded-md object-cover" />
               ) : (
                 <div className="flex h-12 w-12 items-center justify-center rounded-md bg-(--surface-elevated)">

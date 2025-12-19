@@ -501,6 +501,29 @@ button {
   transform: translateY(0);
 }
 
+/* ===== FLOATING ANIMATION ===== */
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1.5px);
+  }
+}
+
+.float-letter {
+  display: inline-block;
+  animation: float 4s ease-in-out infinite;
+  animation-delay: 1.5s; /* Wait for GSAP reveal to complete */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float-letter {
+    animation: none;
+  }
+}
+
 /* ===== PRINT STYLES ===== */
 
 @media print {

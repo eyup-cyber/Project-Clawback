@@ -107,7 +107,7 @@ export default async function ApplicationsPage() {
                     style={{ background: 'var(--primary)', color: 'var(--background)' }}
                   >
                     {app.user?.avatar_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
+                       
                       <img
                         src={app.user.avatar_url}
                         alt={app.user.display_name}

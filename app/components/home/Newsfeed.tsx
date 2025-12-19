@@ -166,7 +166,7 @@ function PostCard({ post, featured = false }: PostCardProps) {
       >
         {/* Featured Image */}
         {post.featured_image_url && (
-          // eslint-disable-next-line @next/next/no-img-element
+           
           <img
             src={post.featured_image_url}
             alt={post.title}
@@ -280,7 +280,7 @@ function PostCard({ post, featured = false }: PostCardProps) {
               }}
             >
               {post.author.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
+                 
                 <img
                   src={post.author.avatar_url}
                   alt={post.author.display_name}

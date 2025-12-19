@@ -64,7 +64,7 @@ export default async function ContributorsPage() {
                     style={{ background: 'var(--primary)', color: 'var(--background)' }}
                   >
                     {contributor.avatar_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
+                       
                       <img
                         src={contributor.avatar_url}
                         alt={contributor.display_name}

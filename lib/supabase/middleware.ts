@@ -49,9 +49,15 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Protected routes
-  const protectedPaths = ['/dashboard', '/admin'];
-  const adminPaths = ['/admin'];
+  const protectedPaths = ['/dashboard', '/editor', '/admin'];
   const authPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
+
+  // Role requirements for different paths
+  const roleRequirements: Record<string, string[]> = {
+    '/dashboard': ['contributor', 'editor', 'admin', 'superadmin'],
+    '/editor': ['editor', 'admin', 'superadmin'],
+    '/admin': ['admin', 'superadmin'],
+  };
 
   const pathname = request.nextUrl.pathname;
 
@@ -63,18 +69,41 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Check if accessing admin route without admin role
-  if (adminPaths.some(path => pathname.startsWith(path)) && user) {
+  // Check role-based access for protected routes
+  if (protectedPaths.some(path => pathname.startsWith(path)) && user) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single();
 
-    if (!profile || !['admin', 'superadmin'].includes(profile.role)) {
+    if (!profile) {
       const url = request.nextUrl.clone();
-      url.pathname = '/dashboard';
+      url.pathname = '/login';
       return NextResponse.redirect(url);
+    }
+
+    // Find matching route requirement
+    for (const [routePrefix, allowedRoles] of Object.entries(roleRequirements)) {
+      if (pathname.startsWith(routePrefix)) {
+        if (!allowedRoles.includes(profile.role)) {
+          const url = request.nextUrl.clone();
+          // Redirect to appropriate fallback
+          if (profile.role === 'reader') {
+            url.pathname = '/apply';
+          } else if (profile.role === 'contributor' && pathname.startsWith('/editor')) {
+            url.pathname = '/dashboard';
+          } else if (profile.role === 'contributor' && pathname.startsWith('/admin')) {
+            url.pathname = '/dashboard';
+          } else if (profile.role === 'editor' && pathname.startsWith('/admin')) {
+            url.pathname = '/editor';
+          } else {
+            url.pathname = '/';
+          }
+          return NextResponse.redirect(url);
+        }
+        break;
+      }
     }
   }
 
