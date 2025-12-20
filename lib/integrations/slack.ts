@@ -26,7 +26,7 @@ export interface SlackBlock {
 
 export interface SlackBlockElement {
   type: string;
-  text?: { type: string; text: string; emoji?: boolean };
+  text?: string | { type: string; text: string; emoji?: boolean };
   url?: string;
   action_id?: string;
   value?: string;
@@ -109,13 +109,17 @@ export async function notifyNewPost(post: {
           text: `*<${post.url}|${post.title}>*\nby ${post.author}`,
         },
       },
-      ...(post.excerpt ? [{
-        type: 'section' as const,
-        text: {
-          type: 'mrkdwn' as const,
-          text: `> ${post.excerpt.substring(0, 200)}...`,
-        },
-      }] : []),
+      ...(post.excerpt
+        ? [
+            {
+              type: 'section' as const,
+              text: {
+                type: 'mrkdwn' as const,
+                text: `> ${post.excerpt.substring(0, 200)}...`,
+              },
+            },
+          ]
+        : []),
       {
         type: 'actions',
         elements: [
@@ -175,7 +179,7 @@ export async function notifyModerationAlert(alert: {
   adminUrl: string;
 }): Promise<boolean> {
   const emoji = alert.type === 'report' ? '🚨' : alert.type === 'spam' ? '🔴' : '⚠️';
-  
+
   return sendSlackMessage({
     blocks: [
       {
@@ -208,9 +212,11 @@ export async function notifyModerationAlert(alert: {
         ],
       },
     ],
-    attachments: [{
-      color: alert.type === 'spam' ? '#ff0000' : '#ffcc00',
-    }],
+    attachments: [
+      {
+        color: alert.type === 'spam' ? '#ff0000' : '#ffcc00',
+      },
+    ],
   });
 }
 
@@ -240,13 +246,17 @@ export async function notifyError(error: {
           text: `\`\`\`${error.message}\`\`\``,
         },
       },
-      ...(error.stack ? [{
-        type: 'section' as const,
-        text: {
-          type: 'mrkdwn' as const,
-          text: `\`\`\`${error.stack.substring(0, 500)}\`\`\``,
-        },
-      }] : []),
+      ...(error.stack
+        ? [
+            {
+              type: 'section' as const,
+              text: {
+                type: 'mrkdwn' as const,
+                text: `\`\`\`${error.stack.substring(0, 500)}\`\`\``,
+              },
+            },
+          ]
+        : []),
       {
         type: 'context',
         elements: [

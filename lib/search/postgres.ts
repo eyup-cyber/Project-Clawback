@@ -10,19 +10,21 @@ export class PostgresSearch {
    * Search posts using PostgreSQL full-text search
    */
   async searchPosts(query: SearchQuery): Promise<SearchResult<SearchDocument>> {
+    const startTime = performance.now();
     const supabase = await createServiceClient();
     const { limit = 20, offset = 0 } = query.pagination || {};
-    
+
     // Build the search query
     const searchTerms = query.query
       .split(/\s+/)
-      .filter(t => t.length > 2)
-      .map(t => `${t}:*`)
+      .filter((t) => t.length > 2)
+      .map((t) => `${t}:*`)
       .join(' & ');
 
     let queryBuilder = supabase
       .from('posts')
-      .select(`
+      .select(
+        `
         id,
         title,
         slug,
@@ -32,7 +34,9 @@ export class PostgresSearch {
         published_at,
         category:categories(name, slug),
         author:profiles!author_id(display_name, username, avatar_url)
-      `, { count: 'exact' })
+      `,
+        { count: 'exact' }
+      )
       .eq('status', 'published')
       .textSearch('search_vector', searchTerms, {
         config: 'english',
@@ -56,7 +60,7 @@ export class PostgresSearch {
     // Apply sorting
     const sortField = query.sort?.field || 'relevance';
     const sortDir = query.sort?.direction || 'desc';
-    
+
     if (sortField === 'date') {
       queryBuilder = queryBuilder.order('published_at', { ascending: sortDir === 'asc' });
     } else {
@@ -70,7 +74,7 @@ export class PostgresSearch {
 
     if (error) {
       console.error('Search error:', error);
-      return { items: [], total: 0 };
+      return { items: [], total: 0, executionTimeMs: performance.now() - startTime };
     }
 
     // Transform results
@@ -82,8 +86,9 @@ export class PostgresSearch {
       excerpt: post.excerpt || undefined,
       url: `/posts/${post.slug}`,
       imageUrl: post.featured_image || undefined,
-      author: (post.author as { display_name?: string; username?: string })?.display_name || 
-              (post.author as { display_name?: string; username?: string })?.username,
+      author:
+        (post.author as { display_name?: string; username?: string })?.display_name ||
+        (post.author as { display_name?: string; username?: string })?.username,
       category: (post.category as { name?: string })?.name,
       publishedAt: post.published_at ? new Date(post.published_at) : undefined,
       highlights: query.highlight ? this.generateHighlights(post, query.query) : undefined,
@@ -92,6 +97,7 @@ export class PostgresSearch {
     return {
       items,
       total: count || 0,
+      executionTimeMs: performance.now() - startTime,
     };
   }
 
@@ -109,9 +115,9 @@ export class PostgresSearch {
    */
   async getSuggestions(query: string, limit: number = 5): Promise<string[]> {
     if (query.length < 2) return [];
-    
+
     const supabase = await createServiceClient();
-    
+
     // Search for matching titles
     const { data } = await supabase
       .from('posts')
@@ -120,7 +126,7 @@ export class PostgresSearch {
       .ilike('title', `%${query}%`)
       .limit(limit);
 
-    return (data || []).map(p => p.title);
+    return (data || []).map((p) => p.title);
   }
 
   /**
@@ -145,10 +151,9 @@ export class PostgresSearch {
    */
   async reindexAll(): Promise<{ indexed: number; errors: number }> {
     const supabase = await createServiceClient();
-    
+
     // Trigger reindex by updating the search_vector column
-    const { data, error } = await supabase
-      .rpc('reindex_search_vectors');
+    const { data, error } = await supabase.rpc('reindex_search_vectors');
 
     if (error) {
       console.error('Reindex error:', error);
@@ -165,7 +170,10 @@ export class PostgresSearch {
     post: { title: string; content_text?: string; excerpt?: string },
     query: string
   ): { title?: string; content?: string } {
-    const terms = query.toLowerCase().split(/\s+/).filter(t => t.length > 2);
+    const terms = query
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((t) => t.length > 2);
     const highlights: { title?: string; content?: string } = {};
 
     // Highlight title
@@ -188,16 +196,16 @@ export class PostgresSearch {
           const start = Math.max(0, index - 50);
           const end = Math.min(text.length, index + term.length + 100);
           let snippet = text.slice(start, end);
-          
+
           if (start > 0) snippet = '...' + snippet;
           if (end < text.length) snippet = snippet + '...';
-          
+
           // Highlight terms in snippet
           for (const t of terms) {
             const regex = new RegExp(`(${t})`, 'gi');
             snippet = snippet.replace(regex, '<mark>$1</mark>');
           }
-          
+
           highlights.content = snippet;
           break;
         }

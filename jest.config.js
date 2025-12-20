@@ -4,6 +4,7 @@ const config = {
   testEnvironment: 'node',
   roots: ['<rootDir>'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/?(*.)+(spec|test).ts'],
+  testPathIgnorePatterns: ['/node_modules/', '/e2e/', '/.next/'],
   maxWorkers: 2, // Limit workers to prevent heap exhaustion
   workerIdleMemoryLimit: '512MB', // Force worker restart when memory exceeds limit
   moduleNameMapper: {

@@ -1,0 +1,230 @@
+{
+  "common": {
+    "appName": "Scroungers Multimedia",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Try again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "submit": "Submit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "clear": "Clear",
+    "all": "All",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No",
+    "confirm": "Confirm",
+    "viewAll": "View all",
+    "learnMore": "Learn more",
+    "readMore": "Read more",
+    "showMore": "Show more",
+    "showLess": "Show less"
+  },
+  "navigation": {
+    "home": "Home",
+    "explore": "Explore",
+    "categories": "Categories",
+    "about": "About",
+    "contact": "Contact",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "settings": "Settings",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out"
+  },
+  "auth": {
+    "signIn": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to your account",
+      "email": "Email address",
+      "password": "Password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign up"
+    },
+    "signUp": {
+      "title": "Join Scroungers",
+      "subtitle": "Create your account",
+      "username": "Username",
+      "email": "Email address",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "terms": "I agree to the Terms of Service and Privacy Policy",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Sign in"
+    },
+    "forgotPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter your email to receive reset instructions",
+      "email": "Email address",
+      "sendLink": "Send reset link",
+      "backToSignIn": "Back to sign in"
+    },
+    "errors": {
+      "invalidCredentials": "Invalid email or password",
+      "emailInUse": "Email is already in use",
+      "usernameInUse": "Username is already taken",
+      "weakPassword": "Password is too weak",
+      "invalidEmail": "Invalid email address",
+      "networkError": "Network error. Please try again."
+    }
+  },
+  "dashboard": {
+    "welcome": "Welcome back, {name}",
+    "recentPosts": "Recent Posts",
+    "drafts": "Drafts",
+    "published": "Published",
+    "analytics": "Analytics",
+    "views": "Views",
+    "reactions": "Reactions",
+    "comments": "Comments",
+    "followers": "Followers"
+  },
+  "posts": {
+    "newPost": "New Post",
+    "editPost": "Edit Post",
+    "title": "Title",
+    "content": "Content",
+    "excerpt": "Excerpt",
+    "category": "Category",
+    "tags": "Tags",
+    "featuredImage": "Featured Image",
+    "publishNow": "Publish Now",
+    "saveDraft": "Save Draft",
+    "schedule": "Schedule",
+    "preview": "Preview",
+    "status": {
+      "draft": "Draft",
+      "pending": "Pending Review",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "meta": {
+      "readingTime": "{minutes} min read",
+      "views": "{count} views",
+      "publishedOn": "Published on {date}",
+      "updatedOn": "Updated on {date}",
+      "by": "by {author}"
+    },
+    "actions": {
+      "share": "Share",
+      "bookmark": "Bookmark",
+      "report": "Report"
+    },
+    "empty": {
+      "title": "No posts yet",
+      "description": "Start writing your first article"
+    }
+  },
+  "comments": {
+    "title": "Comments",
+    "placeholder": "Write a comment...",
+    "submit": "Post Comment",
+    "reply": "Reply",
+    "edit": "Edit",
+    "delete": "Delete",
+    "report": "Report",
+    "loadMore": "Load more comments",
+    "noComments": "No comments yet. Be the first to comment!",
+    "signInToComment": "Sign in to comment"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "clearAll": "Clear all",
+    "empty": "No notifications",
+    "types": {
+      "comment": "{name} commented on your post",
+      "reaction": "{name} reacted to your post",
+      "follow": "{name} started following you",
+      "mention": "{name} mentioned you",
+      "published": "Your post has been published",
+      "rejected": "Your post was not approved"
+    }
+  },
+  "profile": {
+    "editProfile": "Edit Profile",
+    "displayName": "Display Name",
+    "bio": "Bio",
+    "website": "Website",
+    "location": "Location",
+    "socialLinks": "Social Links",
+    "posts": "Posts",
+    "followers": "Followers",
+    "following": "Following",
+    "badges": "Badges",
+    "joinedOn": "Joined {date}",
+    "follow": "Follow",
+    "unfollow": "Unfollow"
+  },
+  "settings": {
+    "title": "Settings",
+    "account": "Account",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "security": "Security",
+    "appearance": "Appearance",
+    "language": "Language",
+    "theme": {
+      "title": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "email": {
+      "title": "Email Notifications",
+      "newFollower": "New follower",
+      "newComment": "New comment on your posts",
+      "newReaction": "New reaction on your posts",
+      "newsletter": "Newsletter and updates"
+    },
+    "security": {
+      "changePassword": "Change Password",
+      "twoFactor": "Two-Factor Authentication",
+      "sessions": "Active Sessions"
+    },
+    "danger": {
+      "title": "Danger Zone",
+      "deleteAccount": "Delete Account",
+      "deleteWarning": "This action cannot be undone"
+    }
+  },
+  "errors": {
+    "notFound": {
+      "title": "Page Not Found",
+      "description": "The page you're looking for doesn't exist.",
+      "goHome": "Go to Homepage"
+    },
+    "serverError": {
+      "title": "Something Went Wrong",
+      "description": "We're having trouble loading this page.",
+      "retry": "Try Again"
+    },
+    "offline": {
+      "title": "You're Offline",
+      "description": "Check your internet connection and try again."
+    }
+  },
+  "footer": {
+    "tagline": "Voices from the margins. Stories that matter.",
+    "links": {
+      "about": "About Us",
+      "contact": "Contact",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "guidelines": "Content Guidelines"
+    },
+    "copyright": "© {year} Scroungers Multimedia. All rights reserved."
+  }
+}

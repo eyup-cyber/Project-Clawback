@@ -70,6 +70,20 @@ const eslintConfig = defineConfig([
       'prefer-const': 'error',
     },
   },
+  // Allow console.log in worker files, scripts, and integrations where logging is expected
+  {
+    files: [
+      'lib/jobs/workers/**/*.ts',
+      'lib/jobs/queue.ts',
+      'lib/integrations/**/*.ts',
+      'lib/cache/**/*.ts',
+      'lib/search/**/*.ts',
+      'scripts/**/*.js',
+    ],
+    rules: {
+      'no-console': 'off',
+    },
+  },
   globalIgnores([...commonIgnores, 'next-env.d.ts']),
 ]);
 

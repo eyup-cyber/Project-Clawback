@@ -4,7 +4,8 @@
  */
 
 // Basic profanity word list (in production, use a more comprehensive list)
-const PROFANITY_LIST = new Set([
+// Type annotation required for empty Set to avoid TypeScript inferring Set<never>
+const PROFANITY_LIST: Set<string> = new Set([
   // Add actual profanity words in production
   // This is a placeholder implementation
 ]);
@@ -31,7 +32,7 @@ const LEET_MAP: Record<string, string> = {
   '7': 't',
   '8': 'b',
   '@': 'a',
-  '$': 's',
+  $: 's',
 };
 
 export interface ProfanityResult {
@@ -46,18 +47,21 @@ export interface ProfanityResult {
  */
 function normalizeText(text: string): string {
   let normalized = text.toLowerCase();
-  
+
   // Replace leet speak
   for (const [leet, char] of Object.entries(LEET_MAP)) {
-    normalized = normalized.replace(new RegExp(leet.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), char);
+    normalized = normalized.replace(
+      new RegExp(leet.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+      char
+    );
   }
-  
+
   // Remove repeated characters (e.g., "fuuuck" -> "fuck")
   normalized = normalized.replace(/(.)\1{2,}/g, '$1$1');
-  
+
   // Remove spaces between characters (e.g., "f u c k" -> "fuck")
   normalized = normalized.replace(/\s+/g, ' ');
-  
+
   return normalized;
 }
 
@@ -66,24 +70,24 @@ function normalizeText(text: string): string {
  */
 function isProfanity(word: string): boolean {
   const normalized = normalizeText(word);
-  
+
   // Check false positives first
   if (FALSE_POSITIVES.has(normalized)) {
     return false;
   }
-  
+
   // Check against profanity list
   if (PROFANITY_LIST.has(normalized)) {
     return true;
   }
-  
+
   // Check for partial matches (words containing profanity)
   for (const profanity of PROFANITY_LIST) {
     if (normalized.includes(profanity) && !FALSE_POSITIVES.has(normalized)) {
       return true;
     }
   }
-  
+
   return false;
 }
 
@@ -94,7 +98,7 @@ export function checkProfanity(text: string): ProfanityResult {
   const words = text.split(/\s+/);
   const flaggedWords: string[] = [];
   const cleanedWords: string[] = [];
-  
+
   for (const word of words) {
     if (isProfanity(word)) {
       flaggedWords.push(word);
@@ -104,10 +108,10 @@ export function checkProfanity(text: string): ProfanityResult {
       cleanedWords.push(word);
     }
   }
-  
+
   // Calculate severity based on percentage of flagged words
   const severity = words.length > 0 ? flaggedWords.length / words.length : 0;
-  
+
   return {
     hasProfanity: flaggedWords.length > 0,
     flaggedWords,
