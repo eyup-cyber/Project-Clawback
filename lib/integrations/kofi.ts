@@ -3,9 +3,9 @@
  * Phase 13: Webhook handling, supporter verification, badge assignment
  */
 
-import { createServiceClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/logger';
 import { awardBadge } from '@/lib/db/badges';
+import { logger } from '@/lib/logger';
+import { createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES

@@ -1,12 +1,15 @@
 /**
  * TipTap Bubble Menu Extension
  * Phase 3.4: Selection formatting and quick actions
+ *
+ * Note: TipTap v3 changed BubbleMenu to an extension only.
+ * This component provides a custom React implementation.
  */
 
 'use client';
 
-import { BubbleMenu as TipTapBubbleMenu, type Editor } from '@tiptap/react';
-import { useCallback, useState, type ReactNode } from 'react';
+import type { Editor } from '@tiptap/react';
+import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 
 // ============================================================================
 // TYPES
@@ -38,6 +41,7 @@ const Icons = {
       strokeWidth="2.5"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
     >
       <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" />
       <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" />
@@ -53,6 +57,7 @@ const Icons = {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
     >
       <line x1="19" y1="4" x2="10" y2="4" />
       <line x1="14" y1="20" x2="5" y2="20" />
@@ -69,6 +74,7 @@ const Icons = {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
     >
       <path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3" />
       <line x1="4" y1="21" x2="20" y2="21" />
@@ -84,6 +90,7 @@ const Icons = {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
     >
       <line x1="4" y1="12" x2="20" y2="12" />
       <path d="M17.5 7.5c-.5-1.5-2-2.5-4-2.5-2.5 0-4.5 1.5-4.5 4 0 1.5.5 2.5 2 3" />
@@ -100,6 +107,7 @@ const Icons = {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
     >
       <polyline points="16 18 22 12 16 6" />
       <polyline points="8 6 2 12 8 18" />
@@ -115,6 +123,7 @@ const Icons = {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
     >
       <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
       <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
@@ -130,6 +139,7 @@ const Icons = {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
     >
       <path d="m18.84 12.25 1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71" />
       <path d="m5.17 11.75-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71" />
@@ -137,88 +147,6 @@ const Icons = {
       <line x1="2" y1="8" x2="5" y2="8" />
       <line x1="16" y1="19" x2="16" y2="22" />
       <line x1="19" y1="16" x2="22" y2="16" />
-    </svg>
-  ),
-  highlight: (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m9 11-6 6v3h9l3-3" />
-      <path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4" />
-    </svg>
-  ),
-  textColor: (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m4 20 8-16 8 16" />
-      <path d="M6.5 16h11" />
-      <line x1="2" y1="22" x2="22" y2="22" stroke="var(--primary)" strokeWidth="3" />
-    </svg>
-  ),
-  alignLeft: (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="17" y1="10" x2="3" y2="10" />
-      <line x1="21" y1="6" x2="3" y2="6" />
-      <line x1="21" y1="14" x2="3" y2="14" />
-      <line x1="17" y1="18" x2="3" y2="18" />
-    </svg>
-  ),
-  alignCenter: (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="18" y1="10" x2="6" y2="10" />
-      <line x1="21" y1="6" x2="3" y2="6" />
-      <line x1="21" y1="14" x2="3" y2="14" />
-      <line x1="18" y1="18" x2="6" y2="18" />
-    </svg>
-  ),
-  alignRight: (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="21" y1="10" x2="7" y2="10" />
-      <line x1="21" y1="6" x2="3" y2="6" />
-      <line x1="21" y1="14" x2="3" y2="14" />
-      <line x1="21" y1="18" x2="7" y2="18" />
     </svg>
   ),
   copy: (
@@ -231,23 +159,10 @@ const Icons = {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
     >
       <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
       <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-    </svg>
-  ),
-  comment: (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
     </svg>
   ),
 };
@@ -262,6 +177,7 @@ function MenuButton({ onClick, isActive = false, children, title }: MenuButtonPr
       type="button"
       onClick={onClick}
       title={title}
+      aria-label={title}
       className={`
         p-2 rounded-md transition-all duration-150
         ${
@@ -351,6 +267,9 @@ function LinkInput({ onSubmit, onCancel, initialUrl = '' }: LinkInputProps) {
 
 export function EditorBubbleMenu({ editor }: BubbleMenuProps) {
   const [showLinkInput, setShowLinkInput] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const addLink = useCallback(
     (url: string) => {
@@ -370,30 +289,61 @@ export function EditorBubbleMenu({ editor }: BubbleMenuProps) {
     await navigator.clipboard.writeText(text);
   }, [editor]);
 
-  // Don't show bubble menu if nothing is selected or if it's an image
-  const shouldShow = useCallback(() => {
-    const { state } = editor;
-    const { from, to } = state.selection;
-    const isEmpty = from === to;
+  // Update position based on selection
+  useEffect(() => {
+    if (!editor) return;
 
-    // Check if selection is in a node that shouldn't have bubble menu
-    const node = state.selection.$head.parent;
-    const isCodeBlock = node.type.name === 'codeBlock';
+    const updatePosition = () => {
+      const { state } = editor;
+      const { selection } = state;
+      const { from, to } = selection;
+      const isEmpty = from === to;
 
-    return !isEmpty && !isCodeBlock;
+      // Check if selection is in a node that shouldn't have bubble menu
+      const node = state.selection.$head.parent;
+      const isCodeBlock = node.type.name === 'codeBlock';
+
+      if (isEmpty || isCodeBlock) {
+        setIsVisible(false);
+        return;
+      }
+
+      // Get selection coordinates
+      const { view } = editor;
+      const start = view.coordsAtPos(from);
+      const end = view.coordsAtPos(to);
+
+      // Calculate position (centered above selection)
+      const left = (start.left + end.left) / 2;
+      const top = start.top - 10;
+
+      setPosition({ top, left });
+      setIsVisible(true);
+    };
+
+    editor.on('selectionUpdate', updatePosition);
+    editor.on('transaction', updatePosition);
+
+    return () => {
+      editor.off('selectionUpdate', updatePosition);
+      editor.off('transaction', updatePosition);
+    };
   }, [editor]);
 
+  if (!isVisible) {
+    return null;
+  }
+
   return (
-    <TipTapBubbleMenu
-      editor={editor}
-      tippyOptions={{
-        duration: 150,
-        animation: 'shift-away',
-        moveTransition: 'transform 0.15s ease-out',
-      }}
-      shouldShow={shouldShow}
+    <div
+      ref={menuRef}
       className="flex items-center gap-0.5 px-2 py-1.5 rounded-lg shadow-xl"
       style={{
+        position: 'fixed',
+        top: position.top,
+        left: position.left,
+        transform: 'translate(-50%, -100%)',
+        zIndex: 50,
         background: 'var(--surface)',
         border: '1px solid var(--border)',
       }}
@@ -469,7 +419,7 @@ export function EditorBubbleMenu({ editor }: BubbleMenuProps) {
           </MenuButton>
         </>
       )}
-    </TipTapBubbleMenu>
+    </div>
   );
 }
 

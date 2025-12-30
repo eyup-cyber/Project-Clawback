@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 
 interface Template {
@@ -42,11 +42,16 @@ export default function TemplatesPage() {
   const [filter, setFilter] = useState<'all' | 'mine' | 'team' | 'public'>('all');
   const [creating, setCreating] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newTemplate, setNewTemplate] = useState({
+  const [newTemplate, setNewTemplate] = useState<{
+    name: string;
+    description: string;
+    contentType: string;
+    visibility: 'private' | 'team' | 'public';
+  }>({
     name: '',
     description: '',
     contentType: 'written',
-    visibility: 'private' as const,
+    visibility: 'private',
   });
 
   const fetchTemplates = useCallback(async () => {
@@ -226,7 +231,10 @@ export default function TemplatesPage() {
           <div
             key={template.id}
             className="p-4 rounded-xl border transition-all hover:shadow-lg"
-            style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+            style={{
+              background: 'var(--surface)',
+              borderColor: 'var(--border)',
+            }}
           >
             <div className="flex items-start justify-between mb-3">
               <div>
@@ -273,7 +281,10 @@ export default function TemplatesPage() {
               <Link
                 href={`/dashboard/templates/${template.id}/edit`}
                 className="px-3 py-2 rounded-lg text-sm border transition-all hover:bg-[var(--surface-elevated)]"
-                style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                style={{
+                  borderColor: 'var(--border)',
+                  color: 'var(--foreground)',
+                }}
               >
                 Edit
               </Link>
@@ -281,7 +292,10 @@ export default function TemplatesPage() {
                 type="button"
                 onClick={() => void handleDelete(template.id)}
                 className="px-3 py-2 rounded-lg text-sm border transition-all hover:bg-red-50 hover:border-red-300 hover:text-red-600"
-                style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                style={{
+                  borderColor: 'var(--border)',
+                  color: 'var(--foreground)',
+                }}
               >
                 🗑️
               </button>
@@ -356,7 +370,12 @@ export default function TemplatesPage() {
                 <textarea
                   id="template-description"
                   value={newTemplate.description}
-                  onChange={(e) => setNewTemplate({ ...newTemplate, description: e.target.value })}
+                  onChange={(e) =>
+                    setNewTemplate({
+                      ...newTemplate,
+                      description: e.target.value,
+                    })
+                  }
                   placeholder="What is this template for?"
                   rows={2}
                   className="w-full px-3 py-2 rounded-lg border outline-none resize-none"
@@ -379,7 +398,12 @@ export default function TemplatesPage() {
                 <select
                   id="template-type"
                   value={newTemplate.contentType}
-                  onChange={(e) => setNewTemplate({ ...newTemplate, contentType: e.target.value })}
+                  onChange={(e) =>
+                    setNewTemplate({
+                      ...newTemplate,
+                      contentType: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 rounded-lg border outline-none"
                   style={{
                     background: 'var(--background)',
@@ -430,7 +454,10 @@ export default function TemplatesPage() {
                 type="button"
                 onClick={() => setShowCreateModal(false)}
                 className="flex-1 py-2 rounded-lg border transition-all hover:bg-[var(--surface-elevated)]"
-                style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                style={{
+                  borderColor: 'var(--border)',
+                  color: 'var(--foreground)',
+                }}
               >
                 Cancel
               </button>

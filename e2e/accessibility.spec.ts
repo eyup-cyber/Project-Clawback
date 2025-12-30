@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Accessibility', () => {
   test('homepage should have correct heading structure', async ({ page }) => {

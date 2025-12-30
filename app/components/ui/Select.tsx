@@ -3,16 +3,16 @@
 import { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
+  Checkbox,
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  Checkbox,
+  DropdownMenuTrigger,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from './primitives';
 
 type Option = { label: string; value: string; disabled?: boolean };
@@ -20,7 +20,11 @@ type Option = { label: string; value: string; disabled?: boolean };
 const Spinner = () => (
   <svg className="h-4 w-4 animate-spin text-(--foreground)" viewBox="0 0 24 24" fill="none">
     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+    <path
+      className="opacity-75"
+      fill="currentColor"
+      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+    />
   </svg>
 );
 
@@ -57,7 +61,10 @@ export function SelectField({
   const [query, setQuery] = useState('');
 
   const filtered = useMemo(
-    () => (searchable ? options.filter((opt) => opt.label.toLowerCase().includes(query.toLowerCase())) : options),
+    () =>
+      searchable
+        ? options.filter((opt) => opt.label.toLowerCase().includes(query.toLowerCase()))
+        : options,
     [options, query, searchable]
   );
 
@@ -77,12 +84,8 @@ export function SelectField({
         </div>
       )}
 
-      <Select
-        value={value}
-        onValueChange={(val) => onChange?.(val)}
-        disabled={disabled || loading}
-      >
-        <SelectTrigger className={triggerStyles}>
+      <Select value={value} onValueChange={(val) => onChange?.(val)} disabled={disabled || loading}>
+        <SelectTrigger className={triggerStyles} aria-label={label || placeholder}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
@@ -112,11 +115,7 @@ export function SelectField({
           {error}
         </p>
       )}
-      {!error && hint && (
-        <p className="text-sm text-(--foreground)/70">
-          {hint}
-        </p>
-      )}
+      {!error && hint && <p className="text-sm text-(--foreground)/70">{hint}</p>}
     </div>
   );
 }
@@ -146,7 +145,10 @@ export function MultiSelectField({
   const [query, setQuery] = useState('');
 
   const filtered = useMemo(
-    () => (searchable ? options.filter((opt) => opt.label.toLowerCase().includes(query.toLowerCase())) : options),
+    () =>
+      searchable
+        ? options.filter((opt) => opt.label.toLowerCase().includes(query.toLowerCase()))
+        : options,
     [options, query, searchable]
   );
 
@@ -170,6 +172,7 @@ export function MultiSelectField({
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger
           disabled={disabled || loading}
+          aria-label={label || placeholder}
           className={cn(
             'w-full rounded-lg border border-(--border) bg-(--surface) px-3 py-2 text-left text-sm',
             'flex items-center justify-between gap-2 transition-all hover:border-(--border-hover)',
@@ -228,13 +231,7 @@ export function MultiSelectField({
           {error}
         </p>
       )}
-      {!error && hint && (
-        <p className="text-sm text-(--foreground)/70">
-          {hint}
-        </p>
-      )}
+      {!error && hint && <p className="text-sm text-(--foreground)/70">{hint}</p>}
     </div>
   );
 }
-
-

@@ -3,8 +3,8 @@
  * Processes media file operations (resize, compress, convert, thumbnails)
  */
 
-import { type Job } from 'bullmq';
-import { registerWorker, type MediaJobData, QUEUE_NAMES, addJob } from '../queue';
+import type { Job } from 'bullmq';
+import { addJob, type MediaJobData, QUEUE_NAMES, registerWorker } from '../queue';
 
 /**
  * Media processing operations
@@ -33,7 +33,7 @@ async function resizeImage(
   const quality = (options.quality as number) || 80;
 
   console.log(`🖼️ Resizing image ${mediaId} to ${width}x${height} at ${quality}% quality`);
-  
+
   // Simulate processing
   await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -62,7 +62,7 @@ async function compressImage(
   const format = (options.format as string) || 'webp';
 
   console.log(`🗜️ Compressing image ${mediaId} to ${format} at ${quality}% quality`);
-  
+
   await new Promise((resolve) => setTimeout(resolve, 300));
 
   return {
@@ -82,7 +82,7 @@ async function convertMedia(
   const targetFormat = (options.format as string) || 'webp';
 
   console.log(`🔄 Converting media ${mediaId} to ${targetFormat}`);
-  
+
   await new Promise((resolve) => setTimeout(resolve, 400));
 
   return {
@@ -102,7 +102,7 @@ async function generateThumbnail(
   const size = (options.size as number) || 150;
 
   console.log(`📷 Generating ${size}x${size} thumbnail for ${mediaId}`);
-  
+
   await new Promise((resolve) => setTimeout(resolve, 200));
 
   return {
@@ -197,15 +197,18 @@ export async function queueMediaProcessing(
 /**
  * Queue full media processing pipeline
  */
-export async function queueMediaPipeline(
-  mediaId: string,
-  userId: string
-): Promise<void> {
+export async function queueMediaPipeline(mediaId: string, userId: string): Promise<void> {
   // Queue multiple operations
   await Promise.all([
-    queueMediaProcessing(mediaId, userId, 'compress', { quality: 80, format: 'webp' }),
+    queueMediaProcessing(mediaId, userId, 'compress', {
+      quality: 80,
+      format: 'webp',
+    }),
     queueMediaProcessing(mediaId, userId, 'thumbnail', { size: 150 }),
     queueMediaProcessing(mediaId, userId, 'thumbnail', { size: 300 }),
-    queueMediaProcessing(mediaId, userId, 'resize', { width: 1200, height: 900 }),
+    queueMediaProcessing(mediaId, userId, 'resize', {
+      width: 1200,
+      height: 900,
+    }),
   ]);
 }

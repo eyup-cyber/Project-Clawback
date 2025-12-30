@@ -3,8 +3,8 @@
  * Phase 38: Track all system events, user actions, and changes
  */
 
-import { createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -179,7 +179,10 @@ export async function logAuditEvent(event: {
     .single();
 
   if (error) {
-    logger.error('[Audit] Failed to log event', { eventType: event.eventType, error });
+    logger.error('[Audit] Failed to log event', {
+      eventType: event.eventType,
+      error,
+    });
     throw error;
   }
 
@@ -335,18 +338,18 @@ export async function logSystemEvent(
 export async function queryAuditLogs(
   query: AuditQuery
 ): Promise<{ logs: AuditLog[]; total: number }> {
-  const { 
-    eventTypes, 
-    categories, 
-    actorId, 
-    actorType, 
-    targetType, 
+  const {
+    eventTypes,
+    categories,
+    actorId,
+    actorType,
+    targetType,
     targetId,
     from,
     to,
     search,
-    limit = 50, 
-    offset = 0 
+    limit = 50,
+    offset = 0,
   } = query;
 
   const supabase = await createServiceClient();
@@ -412,11 +415,7 @@ export async function queryAuditLogs(
 export async function getAuditLog(logId: string): Promise<AuditLog | null> {
   const supabase = await createServiceClient();
 
-  const { data, error } = await supabase
-    .from('audit_logs')
-    .select('*')
-    .eq('id', logId)
-    .single();
+  const { data, error } = await supabase.from('audit_logs').select('*').eq('id', logId).single();
 
   if (error) return null;
   return data as AuditLog;
@@ -461,9 +460,7 @@ export async function getUserActivity(
 /**
  * Get audit statistics
  */
-export async function getAuditStats(
-  options: { from?: Date; to?: Date } = {}
-): Promise<AuditStats> {
+export async function getAuditStats(options: { from?: Date; to?: Date } = {}): Promise<AuditStats> {
   const { from, to } = options;
   const supabase = await createServiceClient();
 
@@ -479,9 +476,7 @@ export async function getAuditStats(
   }
 
   // Get total count
-  let countQuery = supabase
-    .from('audit_logs')
-    .select('*', { count: 'exact', head: true });
+  let countQuery = supabase.from('audit_logs').select('*', { count: 'exact', head: true });
 
   if (from) countQuery = countQuery.gte('created_at', from.toISOString());
   if (to) countQuery = countQuery.lte('created_at', to.toISOString());
@@ -489,9 +484,7 @@ export async function getAuditStats(
   const { count: totalEvents } = await countQuery;
 
   // Get events by category
-  const { data: categoryData } = await supabase
-    .from('audit_logs')
-    .select('category');
+  const { data: categoryData } = await supabase.from('audit_logs').select('category');
 
   const eventsByCategory: Record<AuditCategory, number> = {
     authentication: 0,
@@ -510,9 +503,7 @@ export async function getAuditStats(
   });
 
   // Get events by type (top 10)
-  const { data: typeData } = await supabase
-    .from('audit_logs')
-    .select('event_type');
+  const { data: typeData } = await supabase.from('audit_logs').select('event_type');
 
   const typeCounts: Record<string, number> = {};
   (typeData || []).forEach((log) => {
@@ -526,9 +517,7 @@ export async function getAuditStats(
   );
 
   // Get events by actor type
-  const { data: actorTypeData } = await supabase
-    .from('audit_logs')
-    .select('actor_type');
+  const { data: actorTypeData } = await supabase.from('audit_logs').select('actor_type');
 
   const eventsByActorType: Record<ActorType, number> = {
     user: 0,

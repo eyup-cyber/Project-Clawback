@@ -3,7 +3,7 @@
  * Phase 24: Token bucket algorithm, IP/user limits, sliding window
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 
 // ============================================================================
@@ -131,11 +131,7 @@ export const RATE_LIMIT_PRESETS = {
 /**
  * Fixed window rate limiting
  */
-function checkFixedWindow(
-  key: string,
-  limit: number,
-  windowSeconds: number
-): RateLimitResult {
+function checkFixedWindow(key: string, limit: number, windowSeconds: number): RateLimitResult {
   const now = Date.now();
   const windowStart = Math.floor(now / (windowSeconds * 1000)) * (windowSeconds * 1000);
   const windowEnd = windowStart + windowSeconds * 1000;
@@ -161,11 +157,7 @@ function checkFixedWindow(
 /**
  * Sliding window rate limiting
  */
-function checkSlidingWindow(
-  key: string,
-  limit: number,
-  windowSeconds: number
-): RateLimitResult {
+function checkSlidingWindow(key: string, limit: number, windowSeconds: number): RateLimitResult {
   const now = Date.now();
   const windowMs = windowSeconds * 1000;
   const _windowStart = now - windowMs; // Used for sliding window calculation
@@ -203,11 +195,7 @@ function checkSlidingWindow(
 /**
  * Token bucket rate limiting
  */
-function checkTokenBucket(
-  key: string,
-  limit: number,
-  windowSeconds: number
-): RateLimitResult {
+function checkTokenBucket(key: string, limit: number, windowSeconds: number): RateLimitResult {
   const now = Date.now();
   const refillRate = limit / windowSeconds; // Tokens per second
   const storeKey = `bucket:${key}`;
@@ -224,7 +212,7 @@ function checkTokenBucket(
     rateLimitStore.set(storeKey, entry);
     return {
       allowed: true,
-      remaining: entry.tokens,
+      remaining: entry.tokens ?? 0,
       reset: Math.ceil(entry.resetAt / 1000),
     };
   }
@@ -264,9 +252,8 @@ function checkTokenBucket(
  * Get rate limit key from request
  */
 function getRateLimitKey(req: NextRequest, config: RateLimitConfig, userId?: string): string {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 
-             req.headers.get('x-real-ip') || 
-             'unknown';
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0] || req.headers.get('x-real-ip') || 'unknown';
   const path = new URL(req.url).pathname;
 
   switch (config.keyBy) {
@@ -274,9 +261,10 @@ function getRateLimitKey(req: NextRequest, config: RateLimitConfig, userId?: str
       return `${path}:ip:${ip}`;
     case 'user':
       return `${path}:user:${userId || ip}`;
-    case 'api_key':
+    case 'api_key': {
       const apiKey = req.headers.get('x-api-key') || 'none';
       return `${path}:key:${apiKey}`;
+    }
     case 'ip_user':
       return `${path}:${ip}:${userId || 'anon'}`;
     default:
@@ -318,9 +306,7 @@ export function checkRateLimit(
 /**
  * Rate limit middleware
  */
-export function rateLimit(
-  config: RateLimitConfig = RATE_LIMIT_PRESETS.standard
-) {
+export function rateLimit(config: RateLimitConfig = RATE_LIMIT_PRESETS.standard) {
   return (req: NextRequest, userId?: string): NextResponse | null => {
     const result = checkRateLimit(req, config, userId);
 

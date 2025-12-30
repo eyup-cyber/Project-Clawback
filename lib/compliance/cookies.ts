@@ -54,13 +54,13 @@ export function getPreferencesFromCookie(cookieString: string): CookiePreference
   try {
     const cookies = parseCookies(cookieString);
     const consent = cookies[CONSENT_COOKIE_NAME];
-    
+
     if (!consent) {
       return null;
     }
 
     const preferences = JSON.parse(decodeURIComponent(consent)) as Partial<CookiePreferences>;
-    
+
     return {
       necessary: true, // Always true
       functional: preferences.functional ?? false,
@@ -76,11 +76,13 @@ export function getPreferencesFromCookie(cookieString: string): CookiePreference
  * Create consent cookie value
  */
 export function createConsentCookie(preferences: CookiePreferences): string {
-  const value = encodeURIComponent(JSON.stringify({
-    ...preferences,
-    necessary: true, // Always true
-    timestamp: Date.now(),
-  }));
+  const value = encodeURIComponent(
+    JSON.stringify({
+      ...preferences,
+      necessary: true, // Always true
+      timestamp: Date.now(),
+    })
+  );
 
   return `${CONSENT_COOKIE_NAME}=${value}; Path=/; Max-Age=${CONSENT_COOKIE_MAX_AGE}; SameSite=Lax`;
 }
@@ -111,7 +113,7 @@ export function isCookieAllowed(
   cookieName: string
 ): boolean {
   // Necessary cookies are always allowed
-  if (COOKIE_CATEGORIES.necessary.cookies.some(c => cookieName.includes(c))) {
+  if (COOKIE_CATEGORIES.necessary.cookies.some((c) => cookieName.includes(c))) {
     return true;
   }
 
@@ -121,7 +123,7 @@ export function isCookieAllowed(
 
   // Check each category
   for (const [category, config] of Object.entries(COOKIE_CATEGORIES)) {
-    if (config.cookies.some(c => cookieName.includes(c))) {
+    if (config.cookies.some((c) => cookieName.includes(c))) {
       return preferences[category as keyof CookiePreferences];
     }
   }
@@ -150,7 +152,7 @@ export function getCookiesToDelete(preferences: CookiePreferences): string[] {
  */
 function parseCookies(cookieString: string): Record<string, string> {
   const cookies: Record<string, string> = {};
-  
+
   if (!cookieString) {
     return cookies;
   }
@@ -222,7 +224,7 @@ window.CookieConsent = {
       return null;
     }
   },
-  
+
   setPreferences: function(prefs) {
     const value = encodeURIComponent(JSON.stringify({
       ...prefs,
@@ -232,7 +234,7 @@ window.CookieConsent = {
     document.cookie = '${CONSENT_COOKIE_NAME}=' + value + '; path=/; max-age=${CONSENT_COOKIE_MAX_AGE}; samesite=lax';
     window.dispatchEvent(new CustomEvent('cookieConsentUpdated', { detail: prefs }));
   },
-  
+
   acceptAll: function() {
     this.setPreferences({
       necessary: true,
@@ -241,7 +243,7 @@ window.CookieConsent = {
       marketing: true
     });
   },
-  
+
   rejectAll: function() {
     this.setPreferences({
       necessary: true,

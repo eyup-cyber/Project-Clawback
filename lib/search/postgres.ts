@@ -3,7 +3,7 @@
  */
 
 import { createServiceClient } from '@/lib/supabase/server';
-import type { SearchQuery, SearchResult, SearchDocument } from './index';
+import type { SearchDocument, SearchQuery, SearchResult } from './index';
 
 export class PostgresSearch {
   /**
@@ -62,7 +62,9 @@ export class PostgresSearch {
     const sortDir = query.sort?.direction || 'desc';
 
     if (sortField === 'date') {
-      queryBuilder = queryBuilder.order('published_at', { ascending: sortDir === 'asc' });
+      queryBuilder = queryBuilder.order('published_at', {
+        ascending: sortDir === 'asc',
+      });
     } else {
       queryBuilder = queryBuilder.order('published_at', { ascending: false });
     }
@@ -74,7 +76,11 @@ export class PostgresSearch {
 
     if (error) {
       console.error('Search error:', error);
-      return { items: [], total: 0, executionTimeMs: performance.now() - startTime };
+      return {
+        items: [],
+        total: 0,
+        executionTimeMs: performance.now() - startTime,
+      };
     }
 
     // Transform results

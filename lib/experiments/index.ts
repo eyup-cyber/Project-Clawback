@@ -3,8 +3,8 @@
  * Experiment management and variant assignment
  */
 
-import { createServiceClient } from '@/lib/supabase/server';
 import crypto from 'node:crypto';
+import { createServiceClient } from '@/lib/supabase/server';
 
 export interface Experiment {
   id: string;
@@ -267,7 +267,11 @@ export async function getExperimentResults(experimentKey: string): Promise<{
 
   // Initialize variants
   for (const variant of experiment.variants) {
-    variantStats.set(variant.key, { participants: 0, conversions: 0, totalValue: 0 });
+    variantStats.set(variant.key, {
+      participants: 0,
+      conversions: 0,
+      totalValue: 0,
+    });
   }
 
   // Count participants

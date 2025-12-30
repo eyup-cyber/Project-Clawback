@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import DiffViewer from '@/app/components/content/DiffViewer';
 
@@ -50,7 +50,7 @@ export default function PostHistoryPage() {
 
   useEffect(() => {
     void fetchVersions();
-  }, [postId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [postId]);
 
   const fetchVersions = async () => {
     try {
@@ -176,8 +176,9 @@ export default function PostHistoryPage() {
           </h1>
           {stats && (
             <p className="text-sm mt-1" style={{ color: 'var(--foreground)', opacity: 0.6 }}>
-              {stats.totalVersions} version{stats.totalVersions !== 1 ? 's' : ''} •
-              {stats.totalEditors} editor{stats.totalEditors !== 1 ? 's' : ''}
+              {stats.totalVersions} version
+              {stats.totalVersions !== 1 ? 's' : ''} •{stats.totalEditors} editor
+              {stats.totalEditors !== 1 ? 's' : ''}
             </p>
           )}
         </div>
@@ -203,7 +204,10 @@ export default function PostHistoryPage() {
             className={`p-4 rounded-xl border transition-all ${
               selectedVersions.includes(version.versionNumber) ? 'ring-2 ring-[var(--primary)]' : ''
             }`}
-            style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+            style={{
+              background: 'var(--surface)',
+              borderColor: 'var(--border)',
+            }}
           >
             <div className="flex items-start gap-4">
               {/* Selection checkbox */}
@@ -285,7 +289,10 @@ export default function PostHistoryPage() {
                   type="button"
                   onClick={() => setViewingVersion(version)}
                   className="px-3 py-1 rounded text-sm border transition-all hover:bg-[var(--surface-elevated)]"
-                  style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                  style={{
+                    borderColor: 'var(--border)',
+                    color: 'var(--foreground)',
+                  }}
                 >
                   View
                 </button>
@@ -295,7 +302,10 @@ export default function PostHistoryPage() {
                     onClick={() => void handleRestore(version.versionNumber)}
                     disabled={restoring === version.versionNumber}
                     className="px-3 py-1 rounded text-sm border transition-all hover:bg-[var(--surface-elevated)] disabled:opacity-50"
-                    style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                    style={{
+                      borderColor: 'var(--border)',
+                      color: 'var(--foreground)',
+                    }}
                   >
                     {restoring === version.versionNumber ? 'Restoring...' : 'Restore'}
                   </button>
@@ -408,7 +418,10 @@ export default function PostHistoryPage() {
                 type="button"
                 onClick={() => setViewingVersion(null)}
                 className="px-4 py-2 rounded-lg border transition-all hover:bg-[var(--surface-elevated)]"
-                style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                style={{
+                  borderColor: 'var(--border)',
+                  color: 'var(--foreground)',
+                }}
               >
                 Close
               </button>

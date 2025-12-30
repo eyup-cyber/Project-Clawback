@@ -29,7 +29,7 @@ export const GET = withRouteHandler(async (_req: NextRequest) => {
 export const POST = withRouteHandler(async (_req: NextRequest) => {
   const { user } = await requireAuth();
 
-  const body = await req.json();
+  const body = await _req.json();
   const data = createFolderSchema.parse(body);
 
   const folder = await bookmarksDb.createBookmarkFolder(user.id, {

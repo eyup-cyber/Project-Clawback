@@ -26,33 +26,33 @@ const mockArticle = {
     "After three years on the housing waiting list, I have some thoughts on what's really happening to social housing in this country.",
   content_html: `
     <p>It starts with a number. Mine was 2,847. That was my position on the housing waiting list when I first applied, three years ago. Today, I'm at 1,203. Progress, you might think. But let me tell you what those numbers really mean.</p>
-    
+
     <h2 id="the-queue">The Queue That Never Moves</h2>
-    
+
     <p>Every month, I check the council website. Every month, I watch my number inch downwards by single digits. At this rate, I'll be eligible for a council flat sometime in the 2030s. By then, my children will have grown up in temporary accommodation, moved schools half a dozen times, and learned that home is just a word other people use.</p>
-    
+
     <blockquote>
       "The housing crisis isn't a crisis of housing. It's a crisis of political will."
     </blockquote>
-    
+
     <p>The politicians tell us there's a shortage of social housing. This is true. But they don't tell you why. They don't mention Right to Buy, which has sold off 2 million council homes since 1980. They don't mention the fact that for every council home sold, only one in seven has been replaced. They don't mention the developers who land-bank sites for decades while homelessness soars.</p>
-    
+
     <h2 id="what-i-see">What I See From Here</h2>
-    
+
     <p>From my position in the queue, I can see things the housing ministers cannot. I see the families in the B&amp;B down the road, paying £200 a night for one room with a hotplate. I see the elderly woman in the flat upstairs, choosing between heating and eating. I see the young couple who've given up on ever owning a home, given up on even renting a home, moving back in with parents they thought they'd left behind.</p>
-    
+
     <p>What I see is a system designed to fail. Not by accident, but by design. Because someone is profiting from this misery. The landlords extracting housing benefit straight from the state. The developers turning former council estates into "luxury apartments." The politicians with property portfolios that mysteriously expand each year.</p>
-    
+
     <h2 id="human-cost">The Human Cost</h2>
-    
+
     <p>Numbers are easy to ignore. So let me tell you about the people behind them. Let me tell you about Marcus, who sleeps in his car in the supermarket car park because the shelters are full. About Lisa, who works two jobs and still can't afford the deposit on a flat. About the 135,000 children in temporary accommodation right now, tonight, as you read this.</p>
-    
+
     <p>These aren't statistics. These are our neighbours. Our colleagues. Our families. And increasingly, ourselves.</p>
-    
+
     <h2 id="what-next">What Can We Do?</h2>
-    
+
     <p>The answer isn't simple, but it starts with recognition. Recognition that housing is a right, not a privilege. That the market has failed. That we need a massive programme of social housing construction, the likes of which we haven't seen since the post-war era.</p>
-    
+
     <p>Until then, I'll be here. Number 1,203 in the queue. Waiting.</p>
   `,
   content_type: 'written' as const,

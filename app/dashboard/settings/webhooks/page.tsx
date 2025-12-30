@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useCallback, useEffect, useState } from 'react';
 
 interface Webhook {
   id: string;
@@ -22,12 +22,36 @@ interface CreateWebhookInput {
 }
 
 const WEBHOOK_EVENTS = [
-  { key: 'post.created', label: 'Post Created', description: 'When a new post is created' },
-  { key: 'post.published', label: 'Post Published', description: 'When a post is published' },
-  { key: 'post.updated', label: 'Post Updated', description: 'When a post is updated' },
-  { key: 'post.deleted', label: 'Post Deleted', description: 'When a post is deleted' },
-  { key: 'comment.created', label: 'Comment Created', description: 'When a new comment is posted' },
-  { key: 'user.registered', label: 'User Registered', description: 'When a new user signs up' },
+  {
+    key: 'post.created',
+    label: 'Post Created',
+    description: 'When a new post is created',
+  },
+  {
+    key: 'post.published',
+    label: 'Post Published',
+    description: 'When a post is published',
+  },
+  {
+    key: 'post.updated',
+    label: 'Post Updated',
+    description: 'When a post is updated',
+  },
+  {
+    key: 'post.deleted',
+    label: 'Post Deleted',
+    description: 'When a post is deleted',
+  },
+  {
+    key: 'comment.created',
+    label: 'Comment Created',
+    description: 'When a new comment is posted',
+  },
+  {
+    key: 'user.registered',
+    label: 'User Registered',
+    description: 'When a new user signs up',
+  },
   {
     key: 'application.submitted',
     label: 'Application Submitted',
@@ -271,7 +295,10 @@ export default function WebhooksSettingsPage() {
           <div className="flex items-center gap-2">
             <code
               className="flex-1 p-3 rounded-lg font-mono text-sm break-all"
-              style={{ background: 'var(--background)', color: 'var(--foreground)' }}
+              style={{
+                background: 'var(--background)',
+                color: 'var(--foreground)',
+              }}
             >
               {newWebhookSecret}
             </code>
@@ -282,7 +309,10 @@ export default function WebhooksSettingsPage() {
                 alert('Secret copied to clipboard!');
               }}
               className="px-3 py-2 rounded-lg"
-              style={{ background: 'var(--primary)', color: 'var(--background)' }}
+              style={{
+                background: 'var(--primary)',
+                color: 'var(--background)',
+              }}
             >
               Copy
             </button>
@@ -303,7 +333,10 @@ export default function WebhooksSettingsPage() {
         <div className="text-center py-12">
           <div
             className="animate-spin w-8 h-8 border-4 rounded-full mx-auto"
-            style={{ borderColor: 'var(--border)', borderTopColor: 'var(--primary)' }}
+            style={{
+              borderColor: 'var(--border)',
+              borderTopColor: 'var(--primary)',
+            }}
           />
           <p className="mt-4" style={{ color: 'var(--foreground)', opacity: 0.6 }}>
             Loading webhooks...
@@ -336,7 +369,10 @@ export default function WebhooksSettingsPage() {
               className={`p-6 rounded-lg border transition-all ${
                 webhook.active ? '' : 'opacity-60'
               }`}
-              style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+              style={{
+                background: 'var(--surface)',
+                borderColor: 'var(--border)',
+              }}
             >
               <div className="flex flex-col lg:flex-row lg:items-start gap-4">
                 {/* Webhook info */}
@@ -369,7 +405,10 @@ export default function WebhooksSettingsPage() {
                       <span
                         key={event}
                         className="px-2 py-1 rounded text-xs"
-                        style={{ background: 'var(--background)', color: 'var(--foreground)' }}
+                        style={{
+                          background: 'var(--background)',
+                          color: 'var(--foreground)',
+                        }}
                       >
                         {event}
                       </span>
@@ -418,7 +457,10 @@ export default function WebhooksSettingsPage() {
                       type="button"
                       onClick={() => void handleTestWebhook(webhook)}
                       className="px-3 py-1 rounded text-sm transition-all hover:opacity-80"
-                      style={{ background: 'var(--secondary)', color: 'var(--background)' }}
+                      style={{
+                        background: 'var(--secondary)',
+                        color: 'var(--background)',
+                      }}
                     >
                       Test
                     </button>
@@ -426,7 +468,10 @@ export default function WebhooksSettingsPage() {
                       type="button"
                       onClick={() => void handleDeleteWebhook(webhook)}
                       className="px-3 py-1 rounded text-sm transition-all hover:opacity-80"
-                      style={{ border: '1px solid rgba(239, 68, 68, 0.5)', color: '#ef4444' }}
+                      style={{
+                        border: '1px solid rgba(239, 68, 68, 0.5)',
+                        color: '#ef4444',
+                      }}
                     >
                       Delete
                     </button>
@@ -470,7 +515,10 @@ export default function WebhooksSettingsPage() {
           >
             <h2
               className="text-2xl font-bold mb-6"
-              style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--foreground)' }}
+              style={{
+                fontFamily: 'var(--font-kindergarten)',
+                color: 'var(--foreground)',
+              }}
             >
               Create Webhook
             </h2>
@@ -579,7 +627,10 @@ export default function WebhooksSettingsPage() {
                   resetForm();
                 }}
                 className="px-4 py-2 rounded-lg transition-all"
-                style={{ border: '1px solid var(--border)', color: 'var(--foreground)' }}
+                style={{
+                  border: '1px solid var(--border)',
+                  color: 'var(--foreground)',
+                }}
               >
                 Cancel
               </button>
@@ -588,7 +639,10 @@ export default function WebhooksSettingsPage() {
                 onClick={() => void handleCreateWebhook()}
                 disabled={saving || !formData.name || !formData.url || formData.events.length === 0}
                 className="px-4 py-2 rounded-lg font-medium transition-all hover:opacity-90 disabled:opacity-50"
-                style={{ background: 'var(--primary)', color: 'var(--background)' }}
+                style={{
+                  background: 'var(--primary)',
+                  color: 'var(--background)',
+                }}
               >
                 {saving ? 'Creating...' : 'Create Webhook'}
               </button>

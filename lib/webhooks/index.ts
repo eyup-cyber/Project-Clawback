@@ -5,6 +5,7 @@
 
 import { createServiceClient } from '@/lib/supabase/server';
 import { signWebhookPayload } from './signing';
+
 export { verifyWebhookSignature } from './signing';
 
 export interface WebhookEvent {
@@ -48,7 +49,7 @@ export const WEBHOOK_EVENTS = {
   APPLICATION_REJECTED: 'application.rejected',
 } as const;
 
-export type WebhookEventType = typeof WEBHOOK_EVENTS[keyof typeof WEBHOOK_EVENTS];
+export type WebhookEventType = (typeof WEBHOOK_EVENTS)[keyof typeof WEBHOOK_EVENTS];
 
 /**
  * Get all webhooks for a user
@@ -179,9 +180,7 @@ export async function dispatchWebhookEvent(
   };
 
   // Send to all webhooks in parallel
-  await Promise.allSettled(
-    webhooks.map((webhook) => sendWebhook(webhook, event))
-  );
+  await Promise.allSettled(webhooks.map((webhook) => sendWebhook(webhook, event)));
 }
 
 /**
@@ -224,7 +223,12 @@ async function sendWebhook(
     console.error(`Webhook delivery failed for ${webhook.id}:`, error);
 
     // Log failed delivery
-    await logDelivery(webhook.id, event, null, error instanceof Error ? error.message : 'Unknown error');
+    await logDelivery(
+      webhook.id,
+      event,
+      null,
+      error instanceof Error ? error.message : 'Unknown error'
+    );
 
     // Retry on network errors
     if (retryCount < MAX_RETRIES) {
@@ -295,7 +299,10 @@ export async function getDeliveryHistory(
 /**
  * Test a webhook endpoint
  */
-export async function testWebhook(webhookId: string, userId: string): Promise<{
+export async function testWebhook(
+  webhookId: string,
+  userId: string
+): Promise<{
   success: boolean;
   statusCode?: number;
   error?: string;

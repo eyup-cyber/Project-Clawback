@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
-import { prefersReducedMotion } from '@/lib/animations/gsap-config';
+import { useCallback, useEffect, useRef } from 'react';
 import { frameLoop } from '@/lib/animations/frame-loop';
+import { prefersReducedMotion } from '@/lib/animations/gsap-config';
 
 interface WebGLParticlesProps {
   count?: number;
@@ -25,12 +25,12 @@ const VERTEX_SHADER = `
   attribute float a_size;
   attribute float a_opacity;
   attribute vec3 a_color;
-  
+
   uniform vec2 u_resolution;
-  
+
   varying float v_opacity;
   varying vec3 v_color;
-  
+
   void main() {
     // Convert pixel coordinates to clip space (-1 to 1)
     vec2 clipSpace = (a_position / u_resolution) * 2.0 - 1.0;
@@ -44,10 +44,10 @@ const VERTEX_SHADER = `
 // Fragment shader for circular points with soft edges
 const FRAGMENT_SHADER = `
   precision mediump float;
-  
+
   varying float v_opacity;
   varying vec3 v_color;
-  
+
   void main() {
     // Create circular point with soft edges
     vec2 center = gl_PointCoord - vec2(0.5);

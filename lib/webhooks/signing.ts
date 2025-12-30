@@ -15,11 +15,8 @@ const TOLERANCE_SECONDS = 300; // 5 minutes
 export function signWebhookPayload(payload: string, secret: string): string {
   const timestamp = Math.floor(Date.now() / 1000);
   const signedPayload = `${timestamp}.${payload}`;
-  
-  const signature = crypto
-    .createHmac('sha256', secret)
-    .update(signedPayload)
-    .digest('hex');
+
+  const signature = crypto.createHmac('sha256', secret).update(signedPayload).digest('hex');
 
   return `t=${timestamp},v1=${signature}`;
 }
@@ -64,7 +61,7 @@ export function verifyWebhookSignature(
   secret: string
 ): { valid: boolean; error?: string } {
   const parsed = parseSignature(signature);
-  
+
   if (!parsed) {
     return { valid: false, error: 'Invalid signature format' };
   }
@@ -79,10 +76,7 @@ export function verifyWebhookSignature(
 
   // Compute expected signature
   const signedPayload = `${timestamp}.${payload}`;
-  const expectedSignature = crypto
-    .createHmac('sha256', secret)
-    .update(signedPayload)
-    .digest('hex');
+  const expectedSignature = crypto.createHmac('sha256', secret).update(signedPayload).digest('hex');
 
   // Check if any signature matches (timing-safe comparison)
   for (const sig of signatures) {
@@ -112,13 +106,13 @@ export function createWebhookVerifier(getSecret: (webhookId: string) => Promise<
     webhookId: string
   ): Promise<{ valid: boolean; error?: string }> => {
     const signature = request.headers.get(SIGNATURE_HEADER);
-    
+
     if (!signature) {
       return { valid: false, error: 'Missing signature header' };
     }
 
     const secret = await getSecret(webhookId);
-    
+
     if (!secret) {
       return { valid: false, error: 'Unknown webhook' };
     }
@@ -134,7 +128,7 @@ export function createWebhookVerifier(getSecret: (webhookId: string) => Promise<
 export function webhookVerificationMiddleware(secret: string) {
   return async (request: Request): Promise<{ valid: boolean; body?: string; error?: string }> => {
     const signature = request.headers.get(SIGNATURE_HEADER);
-    
+
     if (!signature) {
       return { valid: false, error: 'Missing signature header' };
     }

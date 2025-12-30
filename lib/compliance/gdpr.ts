@@ -30,15 +30,7 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
   const supabase = await createServiceClient();
 
   // Fetch all user data in parallel
-  const [
-    profile,
-    posts,
-    comments,
-    media,
-    notifications,
-    sessions,
-    consents,
-  ] = await Promise.all([
+  const [profile, posts, comments, media, notifications, sessions, consents] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', userId).single(),
     supabase.from('posts').select('*').eq('author_id', userId),
     supabase.from('comments').select('*').eq('user_id', userId),
@@ -49,12 +41,14 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
   ]);
 
   // Sanitize sensitive data
-  const sanitizedProfile = profile.data ? {
-    ...profile.data,
-    // Remove internal fields
-    totp_secret: undefined,
-    backup_codes: undefined,
-  } : null;
+  const sanitizedProfile = profile.data
+    ? {
+        ...profile.data,
+        // Remove internal fields
+        totp_secret: undefined,
+        backup_codes: undefined,
+      }
+    : null;
 
   return {
     profile: sanitizedProfile || {},
@@ -62,7 +56,7 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
     comments: comments.data || [],
     media: media.data || [],
     notifications: notifications.data || [],
-    sessions: (sessions.data || []).map(s => ({
+    sessions: (sessions.data || []).map((s) => ({
       ...s,
       // Remove fingerprints
       device_fingerprint: '[REDACTED]',
@@ -101,11 +95,7 @@ export async function deleteUserData(userId: string): Promise<{
   ];
 
   for (const { table, field } of deleteOperations) {
-    const { data, error } = await supabase
-      .from(table)
-      .delete()
-      .eq(field, userId)
-      .select();
+    const { data, error } = await supabase.from(table).delete().eq(field, userId).select();
 
     if (error) {
       errors.push(`Failed to delete from ${table}: ${error.message}`);
@@ -115,10 +105,7 @@ export async function deleteUserData(userId: string): Promise<{
   }
 
   // Finally, delete the profile (this will cascade to auth.users via trigger)
-  const { error: profileError } = await supabase
-    .from('profiles')
-    .delete()
-    .eq('id', userId);
+  const { error: profileError } = await supabase.from('profiles').delete().eq('id', userId);
 
   if (profileError) {
     errors.push(`Failed to delete profile: ${profileError.message}`);
@@ -130,7 +117,7 @@ export async function deleteUserData(userId: string): Promise<{
   // Delete auth user (requires admin privileges)
   // This should trigger any additional cleanup
   const { error: authError } = await supabase.auth.admin.deleteUser(userId);
-  
+
   if (authError) {
     errors.push(`Failed to delete auth user: ${authError.message}`);
   }
@@ -195,15 +182,13 @@ export async function recordConsent(
 ): Promise<boolean> {
   const supabase = await createServiceClient();
 
-  const { error } = await supabase
-    .from('user_consents')
-    .insert({
-      user_id: userId,
-      consent_type: consentType,
-      granted,
-      ip_address: ipAddress,
-      document_id: documentId,
-    });
+  const { error } = await supabase.from('user_consents').insert({
+    user_id: userId,
+    consent_type: consentType,
+    granted,
+    ip_address: ipAddress,
+    document_id: documentId,
+  });
 
   return !error;
 }

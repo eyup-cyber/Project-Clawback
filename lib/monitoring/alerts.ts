@@ -2,9 +2,9 @@
  * Alerting system for monitoring critical events
  */
 
-import { logger } from '@/lib/logger';
-import { sendEmail } from '@/lib/email/client';
 import { config } from '@/lib/config';
+import { sendEmail } from '@/lib/email/client';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // TYPES
@@ -49,7 +49,7 @@ function generateAlertId(): string {
 
 function storeAlert(alert: Alert): void {
   alerts.set(alert.id, alert);
-  
+
   // Keep only recent alerts
   if (alerts.size > MAX_STORED_ALERTS) {
     const oldestKey = alerts.keys().next().value;
@@ -94,11 +94,15 @@ export const emailChannel: AlertChannel = {
             <p style="color: #888888; font-size: 14px;">
               Time: ${alert.timestamp.toISOString()}
             </p>
-            ${alert.metadata ? `
+            ${
+              alert.metadata
+                ? `
               <pre style="background-color: #252525; padding: 15px; border-radius: 4px; overflow-x: auto; font-size: 12px;">
 ${JSON.stringify(alert.metadata, null, 2)}
               </pre>
-            ` : ''}
+            `
+                : ''
+            }
           </div>
         </div>
       `;
@@ -155,19 +159,20 @@ export function createWebhookChannel(webhookUrl: string): AlertChannel {
 const logChannel: AlertChannel = {
   name: 'log',
   send: async (alert) => {
-    const logFn = alert.severity === 'critical' 
-      ? logger.error 
-      : alert.severity === 'warning' 
-        ? logger.warn 
-        : logger.info;
+    const logFn =
+      alert.severity === 'critical'
+        ? logger.error
+        : alert.severity === 'warning'
+          ? logger.warn
+          : logger.info;
 
-    logFn(`Alert: ${alert.name}`, { 
+    logFn(`Alert: ${alert.name}`, {
       alertId: alert.id,
       severity: alert.severity,
       message: alert.message,
       ...alert.metadata,
     });
-    
+
     return true;
   },
 };
@@ -249,17 +254,12 @@ export async function checkConditions(): Promise<Alert[]> {
       }
 
       const shouldAlert = await condition.check();
-      
-      if (shouldAlert) {
-        const message = typeof condition.message === 'function' 
-          ? condition.message() 
-          : condition.message;
 
-        const alert = await triggerAlert(
-          condition.name,
-          condition.severity,
-          message
-        );
+      if (shouldAlert) {
+        const message =
+          typeof condition.message === 'function' ? condition.message() : condition.message;
+
+        const alert = await triggerAlert(condition.name, condition.severity, message);
 
         lastAlertTime.set(condition.name, Date.now());
         triggeredAlerts.push(alert);
@@ -412,4 +412,3 @@ export function initializeAlerts(): void {
     channels: channels.length + 1, // +1 for log channel
   });
 }
-

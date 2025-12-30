@@ -28,7 +28,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     // Check admin role
@@ -39,7 +39,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
       .single();
 
     if (profile?.role !== 'admin') {
-      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN', 403));
+      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN'));
     }
 
     // Find experiment by ID or key
@@ -55,7 +55,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
         .single();
 
       if (!experiment) {
-        return applySecurityHeaders(apiError('Experiment not found', 'NOT_FOUND', 404));
+        return applySecurityHeaders(apiError('Experiment not found', 'NOT_FOUND'));
       }
       experimentKey = experiment.key;
     }
@@ -69,6 +69,6 @@ export async function GET(_request: NextRequest, context: RouteContext) {
       'Experiment results GET error',
       err instanceof Error ? err : new Error(String(err))
     );
-    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR'));
   }
 }

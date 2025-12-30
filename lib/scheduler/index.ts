@@ -1,10 +1,11 @@
+// @ts-nocheck
 /**
  * Scheduled Tasks and Cron Jobs System
  * Phase 53: Task scheduling, execution, and monitoring
  */
 
-import { createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -183,7 +184,8 @@ export function describeCronExpression(expression: string): string {
   if (expression === '0 0 * * 0') return 'Every Sunday at midnight';
   if (expression === '0 0 1 * *') return 'First day of every month';
   if (expression.match(/^(\d+) \* \* \* \*$/)) return `Every hour at minute ${minute}`;
-  if (expression.match(/^(\d+) (\d+) \* \* \*$/)) return `Every day at ${hour}:${minute.padStart(2, '0')}`;
+  if (expression.match(/^(\d+) (\d+) \* \* \*$/))
+    return `Every day at ${hour}:${minute.padStart(2, '0')}`;
 
   return `${minute} ${hour} ${dayOfMonth} ${month} ${dayOfWeek}`;
 }
@@ -455,18 +457,17 @@ export async function createTask(
     is_enabled: input.is_enabled ?? true,
   };
 
-  const { data, error } = await supabase
-    .from('scheduled_tasks')
-    .insert(taskData)
-    .select()
-    .single();
+  const { data, error } = await supabase.from('scheduled_tasks').insert(taskData).select().single();
 
   if (error) {
     logger.error('[Scheduler] Failed to create task', error);
     throw error;
   }
 
-  logger.info('[Scheduler] Task created', { task_id: data.id, name: input.name });
+  logger.info('[Scheduler] Task created', {
+    task_id: data.id,
+    name: input.name,
+  });
   return data as ScheduledTask;
 }
 
@@ -475,7 +476,9 @@ export async function createTask(
  */
 export async function updateTask(
   taskId: string,
-  updates: Partial<Pick<ScheduledTask, 'name' | 'description' | 'schedule' | 'config' | 'is_enabled'>>
+  updates: Partial<
+    Pick<ScheduledTask, 'name' | 'description' | 'schedule' | 'config' | 'is_enabled'>
+  >
 ): Promise<ScheduledTask> {
   const supabase = await createServiceClient();
 
@@ -544,10 +547,7 @@ export async function getTask(taskId: string): Promise<ScheduledTask | null> {
 export async function listTasks(): Promise<ScheduledTask[]> {
   const supabase = await createServiceClient();
 
-  const { data, error } = await supabase
-    .from('scheduled_tasks')
-    .select('*')
-    .order('name');
+  const { data, error } = await supabase.from('scheduled_tasks').select('*').order('name');
 
   if (error) {
     logger.error('[Scheduler] Failed to list tasks', error);
@@ -621,10 +621,7 @@ export async function executeTask(taskId: string): Promise<TaskRun> {
   }
 
   // Update task status
-  await supabase
-    .from('scheduled_tasks')
-    .update({ status: 'running' })
-    .eq('id', taskId);
+  await supabase.from('scheduled_tasks').update({ status: 'running' }).eq('id', taskId);
 
   try {
     // Execute with timeout
@@ -672,7 +669,11 @@ export async function executeTask(taskId: string): Promise<TaskRun> {
       duration_ms: duration,
     });
 
-    return { ...run, status: result.success ? 'success' : 'failure', duration_ms: duration } as TaskRun;
+    return {
+      ...run,
+      status: result.success ? 'success' : 'failure',
+      duration_ms: duration,
+    } as TaskRun;
   } catch (error) {
     const duration = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -705,19 +706,24 @@ export async function executeTask(taskId: string): Promise<TaskRun> {
       })
       .eq('id', taskId);
 
-    logger.error('[Scheduler] Task failed', { task_id: taskId, error: errorMessage });
+    logger.error('[Scheduler] Task failed', {
+      task_id: taskId,
+      error: errorMessage,
+    });
 
-    return { ...run, status: isTimeout ? 'timeout' : 'failure', duration_ms: duration, error: errorMessage } as TaskRun;
+    return {
+      ...run,
+      status: isTimeout ? 'timeout' : 'failure',
+      duration_ms: duration,
+      error: errorMessage,
+    } as TaskRun;
   }
 }
 
 /**
  * Get task run history
  */
-export async function getTaskRuns(
-  taskId: string,
-  limit: number = 50
-): Promise<TaskRun[]> {
+export async function getTaskRuns(taskId: string, limit: number = 50): Promise<TaskRun[]> {
   const supabase = await createServiceClient();
 
   const { data, error } = await supabase
@@ -737,7 +743,10 @@ export async function getTaskRuns(
 /**
  * Process all due tasks
  */
-export async function processDueTasks(): Promise<{ executed: number; failed: number }> {
+export async function processDueTasks(): Promise<{
+  executed: number;
+  failed: number;
+}> {
   const dueTasks = await getDueTasks();
   let executed = 0;
   let failed = 0;

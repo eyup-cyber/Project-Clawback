@@ -3,11 +3,14 @@
  * Processes email sending jobs
  */
 
-import { type Job } from 'bullmq';
-import { registerWorker, type EmailJobData, QUEUE_NAMES } from '../queue';
+import type { Job } from 'bullmq';
+import { type EmailJobData, QUEUE_NAMES, registerWorker } from '../queue';
 
 // Email templates (would typically be in a separate file)
-const emailTemplates: Record<string, (data: Record<string, unknown>) => { html: string; text: string }> = {
+const emailTemplates: Record<
+  string,
+  (data: Record<string, unknown>) => { html: string; text: string }
+> = {
   welcome: (data) => ({
     html: `
       <h1>Welcome to Scroungers Multimedia!</h1>
@@ -17,7 +20,7 @@ const emailTemplates: Record<string, (data: Record<string, unknown>) => { html: 
     `,
     text: `Welcome to Scroungers Multimedia!\n\nHi ${data.name},\n\nThank you for joining our community of creative storytellers.\n\nGet started by visiting: ${data.dashboardUrl}`,
   }),
-  
+
   postPublished: (data) => ({
     html: `
       <h1>Your Post Has Been Published!</h1>
@@ -27,7 +30,7 @@ const emailTemplates: Record<string, (data: Record<string, unknown>) => { html: 
     `,
     text: `Your Post Has Been Published!\n\nHi ${data.authorName},\n\nGreat news! Your post "${data.postTitle}" has been published.\n\nView it here: ${data.postUrl}`,
   }),
-  
+
   newComment: (data) => ({
     html: `
       <h1>New Comment on Your Post</h1>
@@ -38,7 +41,7 @@ const emailTemplates: Record<string, (data: Record<string, unknown>) => { html: 
     `,
     text: `New Comment on Your Post\n\nHi ${data.authorName},\n\n${data.commenterName} commented on "${data.postTitle}":\n\n"${data.commentPreview}"\n\nView it here: ${data.postUrl}`,
   }),
-  
+
   passwordReset: (data) => ({
     html: `
       <h1>Password Reset Request</h1>
@@ -50,7 +53,7 @@ const emailTemplates: Record<string, (data: Record<string, unknown>) => { html: 
     `,
     text: `Password Reset Request\n\nHi ${data.name},\n\nWe received a request to reset your password.\n\nReset your password: ${data.resetUrl}\n\nThis link will expire in 1 hour.\n\nIf you didn't request this, please ignore this email.`,
   }),
-  
+
   weeklyDigest: (data) => ({
     html: `
       <h1>Your Weekly Digest</h1>
@@ -79,14 +82,14 @@ async function sendEmail(
 ): Promise<void> {
   // In production, integrate with SendGrid, Postmark, AWS SES, etc.
   const recipients = Array.isArray(to) ? to : [to];
-  
+
   console.log(`📧 Sending email to: ${recipients.join(', ')}`);
   console.log(`   Subject: ${subject}`);
   console.log(`   Reply-To: ${replyTo || 'default'}`);
-  
+
   // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 100));
-  
+
   // In production:
   // await emailService.send({
   //   to: recipients,
@@ -95,7 +98,7 @@ async function sendEmail(
   //   text,
   //   replyTo,
   // });
-  
+
   console.log(`✅ Email sent successfully`);
 }
 
@@ -151,7 +154,7 @@ export async function queueEmail(
   }
 ): Promise<void> {
   const { addJob } = await import('../queue');
-  
+
   const defaultSubjects: Record<string, string> = {
     welcome: 'Welcome to Scroungers Multimedia!',
     postPublished: 'Your post has been published!',

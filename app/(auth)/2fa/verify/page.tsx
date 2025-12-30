@@ -9,14 +9,14 @@ export default function TwoFactorVerifyPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirect') || '/dashboard';
-  
+
   const [code, setCode] = useState('');
   const [isBackupCode, setIsBackupCode] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!isBackupCode && code.length !== 6) {
       toast.error('Please enter a 6-digit code');
       return;
@@ -49,10 +49,16 @@ export default function TwoFactorVerifyPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12" style={{ background: 'var(--background)' }}>
+    <div
+      className="min-h-screen flex items-center justify-center px-4 py-12"
+      style={{ background: 'var(--background)' }}
+    >
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--primary)' }}>
+          <h1
+            className="text-3xl font-bold mb-2"
+            style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--primary)' }}
+          >
             Two-Factor Verification
           </h1>
           <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.7 }}>
@@ -60,10 +66,16 @@ export default function TwoFactorVerifyPage() {
           </p>
         </div>
 
-        <div className="rounded-2xl p-8" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+        <div
+          className="rounded-2xl p-8"
+          style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+        >
           <form onSubmit={(e) => void handleVerify(e)} className="space-y-6">
             {/* Code Type Toggle */}
-            <div className="flex rounded-xl overflow-hidden" style={{ background: 'var(--background)' }}>
+            <div
+              className="flex rounded-xl overflow-hidden"
+              style={{ background: 'var(--background)' }}
+            >
               <button
                 type="button"
                 onClick={() => {
@@ -91,7 +103,11 @@ export default function TwoFactorVerifyPage() {
             {/* Code Input */}
             {!isBackupCode ? (
               <div>
-                <label htmlFor="totp-code" className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground)' }}>
+                <label
+                  htmlFor="totp-code"
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: 'var(--foreground)' }}
+                >
                   6-Digit Code
                 </label>
                 <input
@@ -104,12 +120,20 @@ export default function TwoFactorVerifyPage() {
                   onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
                   placeholder="000000"
                   className="w-full py-4 text-center text-2xl tracking-widest rounded-xl border outline-none focus:border-[var(--primary)]"
-                  style={{ background: 'var(--background)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                  style={{
+                    background: 'var(--background)',
+                    borderColor: 'var(--border)',
+                    color: 'var(--foreground)',
+                  }}
                 />
               </div>
             ) : (
               <div>
-                <label htmlFor="backup-code" className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground)' }}>
+                <label
+                  htmlFor="backup-code"
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: 'var(--foreground)' }}
+                >
                   Backup Code
                 </label>
                 <input
@@ -119,7 +143,11 @@ export default function TwoFactorVerifyPage() {
                   onChange={(e) => setCode(e.target.value.toUpperCase())}
                   placeholder="XXXX-XXXX"
                   className="w-full py-4 text-center text-xl tracking-wider rounded-xl border outline-none focus:border-[var(--primary)]"
-                  style={{ background: 'var(--background)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                  style={{
+                    background: 'var(--background)',
+                    borderColor: 'var(--border)',
+                    color: 'var(--foreground)',
+                  }}
                 />
                 <p className="text-xs mt-2" style={{ color: 'var(--foreground)', opacity: 0.5 }}>
                   Enter one of your backup codes (with or without the hyphen)
@@ -129,7 +157,9 @@ export default function TwoFactorVerifyPage() {
 
             <button
               type="submit"
-              disabled={loading || (!isBackupCode && code.length !== 6) || (isBackupCode && code.length < 8)}
+              disabled={
+                loading || (!isBackupCode && code.length !== 6) || (isBackupCode && code.length < 8)
+              }
               className="w-full py-3 rounded-xl font-bold transition-all hover:scale-[1.02] disabled:opacity-50"
               style={{ background: 'var(--primary)', color: 'var(--background)' }}
             >
@@ -151,7 +181,10 @@ export default function TwoFactorVerifyPage() {
           </div>
         </div>
 
-        <p className="text-center text-sm mt-6" style={{ color: 'var(--foreground)', opacity: 0.5 }}>
+        <p
+          className="text-center text-sm mt-6"
+          style={{ color: 'var(--foreground)', opacity: 0.5 }}
+        >
           <Link href="/login" className="hover:underline">
             Back to Login
           </Link>

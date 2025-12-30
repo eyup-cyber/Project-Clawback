@@ -3,7 +3,6 @@
  * Provides efficient pagination for large datasets
  */
 
-
 export interface PaginationParams {
   cursor?: string;
   limit?: number;
@@ -54,13 +53,9 @@ export function createCursor<T extends { id: string; created_at?: string; [key: 
   item: T,
   sortField: string = 'created_at'
 ): string {
-  const timestamp = item.created_at 
-    ? new Date(item.created_at).getTime() 
-    : Date.now();
-  
-  const sortValue = sortField !== 'created_at' 
-    ? item[sortField] as string | number 
-    : undefined;
+  const timestamp = item.created_at ? new Date(item.created_at).getTime() : Date.now();
+
+  const sortValue = sortField !== 'created_at' ? (item[sortField] as string | number) : undefined;
 
   return encodeCursor({
     id: item.id,
@@ -77,11 +72,11 @@ export function parsePaginationParams(
   defaults: { limit?: number; maxLimit?: number } = {}
 ): PaginationParams {
   const { limit: defaultLimit = 20, maxLimit = 100 } = defaults;
-  
+
   const cursor = searchParams.get('cursor') || undefined;
   const direction = (searchParams.get('direction') || 'forward') as 'forward' | 'backward';
   let limit = parseInt(searchParams.get('limit') || String(defaultLimit), 10);
-  
+
   // Clamp limit
   limit = Math.max(1, Math.min(limit, maxLimit));
 
@@ -108,22 +103,15 @@ export function buildPaginatedResponse<T extends { id: string; created_at?: stri
   const actualItems = hasExtraItem ? items.slice(0, limit) : items;
 
   // Calculate page info
-  const hasNextPage = direction === 'forward' 
-    ? (hasMore ?? hasExtraItem) 
-    : !!params.cursor;
-  
-  const hasPreviousPage = direction === 'forward' 
-    ? !!params.cursor 
-    : (hasMore ?? hasExtraItem);
+  const hasNextPage = direction === 'forward' ? (hasMore ?? hasExtraItem) : !!params.cursor;
+
+  const hasPreviousPage = direction === 'forward' ? !!params.cursor : (hasMore ?? hasExtraItem);
 
   // Generate cursors
-  const startCursor = actualItems.length > 0 
-    ? createCursor(actualItems[0], sortField) 
-    : null;
-  
-  const endCursor = actualItems.length > 0 
-    ? createCursor(actualItems[actualItems.length - 1], sortField) 
-    : null;
+  const startCursor = actualItems.length > 0 ? createCursor(actualItems[0], sortField) : null;
+
+  const endCursor =
+    actualItems.length > 0 ? createCursor(actualItems[actualItems.length - 1], sortField) : null;
 
   return {
     items: actualItems,
@@ -206,10 +194,10 @@ export function parseOffsetPaginationParams(
   defaults: { limit?: number; maxLimit?: number } = {}
 ): OffsetPaginationParams {
   const { limit: defaultLimit = 20, maxLimit = 100 } = defaults;
-  
+
   let page = parseInt(searchParams.get('page') || '1', 10);
   let limit = parseInt(searchParams.get('limit') || String(defaultLimit), 10);
-  
+
   page = Math.max(1, page);
   limit = Math.max(1, Math.min(limit, maxLimit));
 

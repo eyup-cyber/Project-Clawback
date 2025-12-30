@@ -78,7 +78,7 @@ export function formatBytes(bytes: number): string {
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+  return `${parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`;
 }
 
 /**
@@ -90,7 +90,7 @@ export async function analyzeBuildOutput(buildDir: string = '.next'): Promise<Bu
   const bundles: BundleStats[] = [];
 
   const staticDir = path.join(buildDir, 'static');
-  
+
   if (!fs.existsSync(staticDir)) {
     return {
       timestamp: new Date().toISOString(),
@@ -105,13 +105,15 @@ export async function analyzeBuildOutput(buildDir: string = '.next'): Promise<Bu
   // Analyze chunks directory
   const chunksDir = path.join(staticDir, 'chunks');
   if (fs.existsSync(chunksDir)) {
-    const chunkFiles = fs.readdirSync(chunksDir, { recursive: true }) as string[];
+    const chunkFiles = fs.readdirSync(chunksDir, {
+      recursive: true,
+    }) as string[];
     const assets: AssetStats[] = [];
 
     for (const file of chunkFiles) {
       const filePath = path.join(chunksDir, file);
       const stat = fs.statSync(filePath);
-      
+
       if (stat.isFile()) {
         const asset: AssetStats = {
           name: file,
@@ -135,7 +137,7 @@ export async function analyzeBuildOutput(buildDir: string = '.next'): Promise<Bu
     bundles.push({
       name: 'chunks',
       size: assets.reduce((sum, a) => sum + a.size, 0),
-      chunks: assets.filter(a => a.type === 'js').map(a => a.name),
+      chunks: assets.filter((a) => a.type === 'js').map((a) => a.name),
       assets,
     });
   }
@@ -180,7 +182,7 @@ export async function analyzeBuildOutput(buildDir: string = '.next'): Promise<Bu
   }
 
   // Add general recommendations
-  if (bundles.some(b => b.assets.some(a => a.type === 'js' && a.size > 100 * 1024))) {
+  if (bundles.some((b) => b.assets.some((a) => a.type === 'js' && a.size > 100 * 1024))) {
     recommendations.push('Large JavaScript chunks detected - consider route-based code splitting');
   }
 
@@ -225,17 +227,15 @@ export async function trackBundleSize(
   let diff: { totalSizeDiff: number; percentChange: number } | undefined;
   if (previous) {
     const totalSizeDiff = current.totalSize - previous.totalSize;
-    const percentChange = previous.totalSize > 0 
-      ? (totalSizeDiff / previous.totalSize) * 100 
-      : 0;
+    const percentChange = previous.totalSize > 0 ? (totalSizeDiff / previous.totalSize) * 100 : 0;
     diff = { totalSizeDiff, percentChange };
   }
 
   // Save to history
-  const history: BundleReport[] = previous 
+  const history: BundleReport[] = previous
     ? [previous, current].slice(-10) // Keep last 10 entries
     : [current];
-  
+
   fs.writeFileSync(historyFile, JSON.stringify(history, null, 2));
 
   return { current, previous, diff };
@@ -261,22 +261,24 @@ export function checkPerformanceBudget(
   const violations: string[] = [];
 
   const jsSize = report.bundles
-    .flatMap(b => b.assets)
-    .filter(a => a.type === 'js')
+    .flatMap((b) => b.assets)
+    .filter((a) => a.type === 'js')
     .reduce((sum, a) => sum + a.size, 0);
 
   const cssSize = report.bundles
-    .flatMap(b => b.assets)
-    .filter(a => a.type === 'css')
+    .flatMap((b) => b.assets)
+    .filter((a) => a.type === 'css')
     .reduce((sum, a) => sum + a.size, 0);
 
   const imageSize = report.bundles
-    .flatMap(b => b.assets)
-    .filter(a => a.type === 'image')
+    .flatMap((b) => b.assets)
+    .filter((a) => a.type === 'image')
     .reduce((sum, a) => sum + a.size, 0);
 
   if (jsSize > budget.js) {
-    violations.push(`JavaScript (${formatBytes(jsSize)}) exceeds budget (${formatBytes(budget.js)})`);
+    violations.push(
+      `JavaScript (${formatBytes(jsSize)}) exceeds budget (${formatBytes(budget.js)})`
+    );
   }
 
   if (cssSize > budget.css) {
@@ -284,11 +286,15 @@ export function checkPerformanceBudget(
   }
 
   if (imageSize > budget.images) {
-    violations.push(`Images (${formatBytes(imageSize)}) exceeds budget (${formatBytes(budget.images)})`);
+    violations.push(
+      `Images (${formatBytes(imageSize)}) exceeds budget (${formatBytes(budget.images)})`
+    );
   }
 
   if (report.totalSize > budget.total) {
-    violations.push(`Total (${formatBytes(report.totalSize)}) exceeds budget (${formatBytes(budget.total)})`);
+    violations.push(
+      `Total (${formatBytes(report.totalSize)}) exceeds budget (${formatBytes(budget.total)})`
+    );
   }
 
   return {
@@ -336,7 +342,7 @@ export function generateReportMarkdown(report: BundleReport): string {
   for (const bundle of report.bundles) {
     lines.push(`### ${bundle.name}`, '');
     lines.push(`Size: ${formatBytes(bundle.size)}`, '');
-    
+
     if (bundle.assets.length > 0) {
       lines.push('| Asset | Size | Type |');
       lines.push('| ----- | ---- | ---- |');

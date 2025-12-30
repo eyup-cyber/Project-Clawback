@@ -5,7 +5,7 @@
  * Phase 41: Video player with chapters, captions, quality selector
  */
 
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { type KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 
 // ============================================================================
 // TYPES
@@ -524,10 +524,7 @@ export default function VideoPlayer({
           onClick={handleProgressClick}
         >
           {/* Buffered */}
-          <div
-            className="absolute h-full bg-white/50 rounded"
-            style={{ width: `${buffered}%` }}
-          />
+          <div className="absolute h-full bg-white/50 rounded" style={{ width: `${buffered}%` }} />
           {/* Progress */}
           <div
             className="absolute h-full bg-blue-500 rounded"

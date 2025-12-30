@@ -3,7 +3,7 @@
  * Full-text search with filters, facets, and suggestions
  */
 
-import { type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSearchService, type SearchQuery } from '@/lib/search';
 import { success, error as apiError, applySecurityHeaders } from '@/lib/api';
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
 
     if (!parseResult.success) {
       return applySecurityHeaders(
-        apiError('Invalid search parameters', 'VALIDATION_ERROR', 400, {
+        apiError('Invalid search parameters', 'VALIDATION_ERROR', {
           errors: parseResult.error.flatten().fieldErrors,
         })
       );
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
     return applySecurityHeaders(success(response));
   } catch (err) {
     logger.error('Advanced search error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Search failed', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Search failed', 'INTERNAL_ERROR'));
   }
 }
 
@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
 
     if (!parseResult.success) {
       return applySecurityHeaders(
-        apiError('Invalid search request', 'VALIDATION_ERROR', 400, {
+        apiError('Invalid search request', 'VALIDATION_ERROR', {
           errors: parseResult.error.flatten().fieldErrors,
         })
       );
@@ -247,14 +247,14 @@ export async function POST(request: NextRequest) {
     return applySecurityHeaders(success(response));
   } catch (err) {
     if (err instanceof SyntaxError) {
-      return applySecurityHeaders(apiError('Invalid JSON in request body', 'PARSE_ERROR', 400));
+      return applySecurityHeaders(apiError('Invalid JSON in request body', 'PARSE_ERROR'));
     }
 
     logger.error(
       'Advanced search (POST) error',
       err instanceof Error ? err : new Error(String(err))
     );
-    return applySecurityHeaders(apiError('Search failed', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Search failed', 'INTERNAL_ERROR'));
   }
 }
 

@@ -1,9 +1,9 @@
+'use client';
+
 /**
  * Image Editor Component
- * Phase 4.3: Crop, rotate, flip, filters, brightness/contrast
+ * Phase 4.3: Crop, resize, rotate, filters
  */
-
-'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -13,23 +13,22 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface ImageEditorProps {
   src: string;
-  onSave: (blob: Blob, metadata: ImageMetadata) => void;
+  onSave: (editedImageBlob: Blob, metadata: ImageMetadata) => void;
   onCancel: () => void;
   aspectRatios?: AspectRatio[];
-  maxWidth?: number;
-  maxHeight?: number;
+}
+
+interface AspectRatio {
+  label: string;
+  value: number | null; // null = free
 }
 
 interface ImageMetadata {
   width: number;
   height: number;
   rotation: number;
-  flipX: boolean;
-  flipY: boolean;
-  brightness: number;
-  contrast: number;
-  saturation: number;
-  cropArea: CropArea | null;
+  filters: FilterSettings;
+  crop: CropArea | null;
 }
 
 interface CropArea {
@@ -39,541 +38,359 @@ interface CropArea {
   height: number;
 }
 
-interface AspectRatio {
-  name: string;
-  value: number | null; // null means free form
+interface FilterSettings {
+  brightness: number;
+  contrast: number;
+  saturation: number;
+  blur: number;
+  grayscale: number;
+  sepia: number;
 }
 
+type EditorTool = 'crop' | 'rotate' | 'resize' | 'filters';
+
 // ============================================================================
-// DEFAULT ASPECT RATIOS
+// DEFAULT VALUES
 // ============================================================================
 
-const defaultAspectRatios: AspectRatio[] = [
-  { name: 'Free', value: null },
-  { name: '1:1', value: 1 },
-  { name: '4:3', value: 4 / 3 },
-  { name: '16:9', value: 16 / 9 },
-  { name: '3:2', value: 3 / 2 },
-  { name: '2:1', value: 2 },
+const DEFAULT_ASPECT_RATIOS: AspectRatio[] = [
+  { label: 'Free', value: null },
+  { label: '1:1', value: 1 },
+  { label: '4:3', value: 4 / 3 },
+  { label: '16:9', value: 16 / 9 },
+  { label: '9:16', value: 9 / 16 },
+  { label: '3:2', value: 3 / 2 },
 ];
 
-// ============================================================================
-// ICONS
-// ============================================================================
-
-const Icons = {
-  crop: (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M6.13 1L6 16a2 2 0 0 0 2 2h15" />
-      <path d="M1 6.13L16 6a2 2 0 0 1 2 2v15" />
-    </svg>
-  ),
-  rotateCw: (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="23 4 23 10 17 10" />
-      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-    </svg>
-  ),
-  rotateCcw: (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="1 4 1 10 7 10" />
-      <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-    </svg>
-  ),
-  flipH: (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M8 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h3" />
-      <path d="M16 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3" />
-      <line x1="12" y1="20" x2="12" y2="4" />
-    </svg>
-  ),
-  flipV: (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 8V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3" />
-      <path d="M3 16v3a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3" />
-      <line x1="4" y1="12" x2="20" y2="12" />
-    </svg>
-  ),
-  sun: (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="5" />
-      <line x1="12" y1="1" x2="12" y2="3" />
-      <line x1="12" y1="21" x2="12" y2="23" />
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-      <line x1="1" y1="12" x2="3" y2="12" />
-      <line x1="21" y1="12" x2="23" y2="12" />
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-    </svg>
-  ),
-  contrast: (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor" />
-    </svg>
-  ),
-  droplet: (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
-    </svg>
-  ),
-  reset: (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-      <path d="M21 3v5h-5" />
-      <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
-      <path d="M8 16H3v5" />
-    </svg>
-  ),
-  check: (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  ),
-  x: (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
-  ),
+const DEFAULT_FILTERS: FilterSettings = {
+  brightness: 100,
+  contrast: 100,
+  saturation: 100,
+  blur: 0,
+  grayscale: 0,
+  sepia: 0,
 };
-
-// ============================================================================
-// TOOLBAR BUTTON
-// ============================================================================
-
-function ToolbarButton({
-  onClick,
-  isActive,
-  children,
-  title,
-}: {
-  onClick: () => void;
-  isActive?: boolean;
-  children: React.ReactNode;
-  title: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      title={title}
-      className={`
-        p-2 rounded-lg transition-all
-        ${
-          isActive
-            ? 'bg-[var(--primary)] text-[var(--background)]'
-            : 'hover:bg-[var(--surface-elevated)] text-[var(--foreground)]'
-        }
-      `}
-    >
-      {children}
-    </button>
-  );
-}
-
-// ============================================================================
-// SLIDER COMPONENT
-// ============================================================================
-
-function Slider({
-  label,
-  value,
-  min,
-  max,
-  step,
-  onChange,
-  icon,
-}: {
-  label: string;
-  value: number;
-  min: number;
-  max: number;
-  step: number;
-  onChange: (value: number) => void;
-  icon: React.ReactNode;
-}) {
-  return (
-    <div className="flex items-center gap-3">
-      <div className="flex items-center gap-2 w-24" style={{ color: 'var(--foreground)' }}>
-        {icon}
-        <span className="text-sm">{label}</span>
-      </div>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="flex-1 h-2 rounded-full appearance-none cursor-pointer"
-        style={{
-          background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${((value - min) / (max - min)) * 100}%, var(--border) ${((value - min) / (max - min)) * 100}%, var(--border) 100%)`,
-        }}
-      />
-      <span
-        className="w-12 text-right text-sm"
-        style={{ color: 'var(--foreground)', opacity: 0.7 }}
-      >
-        {value}
-      </span>
-    </div>
-  );
-}
 
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
-export default function ImageEditor({
+export function ImageEditor({
   src,
   onSave,
   onCancel,
-  aspectRatios = defaultAspectRatios,
-  maxWidth = 1920,
-  maxHeight = 1080,
+  aspectRatios = DEFAULT_ASPECT_RATIOS,
 }: ImageEditorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'transform' | 'adjust'>('transform');
-
-  // Image state
+  const [activeTool, setActiveTool] = useState<EditorTool>('crop');
+  const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
   const [rotation, setRotation] = useState(0);
-  const [flipX, setFlipX] = useState(false);
-  const [flipY, setFlipY] = useState(false);
-  const [brightness, setBrightness] = useState(100);
-  const [contrast, setContrast] = useState(100);
-  const [saturation, setSaturation] = useState(100);
-  const [selectedAspectRatio, setSelectedAspectRatio] = useState<AspectRatio>(aspectRatios[0]);
-
-  // Crop state
-  const [cropMode, setCropMode] = useState(false);
+  const [filters, setFilters] = useState<FilterSettings>(DEFAULT_FILTERS);
   const [cropArea, setCropArea] = useState<CropArea | null>(null);
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [resizeWidth, setResizeWidth] = useState(0);
+  const [resizeHeight, setResizeHeight] = useState(0);
+  const [maintainRatio, setMaintainRatio] = useState(true);
 
-  // Draw canvas (declared first to be accessible in load effect)
-  const drawCanvasRef = useRef<() => void>(() => {});
+  // ============================================================================
+  // ============================================================================
+  // RENDERING HELPERS (must be defined before use)
+  // ============================================================================
 
-  const drawCanvas = useCallback(() => {
+  const getFilterString = useCallback((f: FilterSettings): string => {
+    return `
+      brightness(${f.brightness}%)
+      contrast(${f.contrast}%)
+      saturate(${f.saturation}%)
+      blur(${f.blur}px)
+      grayscale(${f.grayscale}%)
+      sepia(${f.sepia}%)
+    `.trim();
+  }, []);
+
+  const drawCropOverlay = useCallback(
+    (ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number, crop: CropArea) => {
+      // Semi-transparent overlay outside crop area
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+      ctx.clearRect(crop.x, crop.y, crop.width, crop.height);
+
+      // Crop border
+      ctx.strokeStyle = '#3b82f6';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(crop.x, crop.y, crop.width, crop.height);
+
+      // Grid lines (rule of thirds)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = 1;
+      const thirdW = crop.width / 3;
+      const thirdH = crop.height / 3;
+      for (let i = 1; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(crop.x + thirdW * i, crop.y);
+        ctx.lineTo(crop.x + thirdW * i, crop.y + crop.height);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(crop.x, crop.y + thirdH * i);
+        ctx.lineTo(crop.x + crop.width, crop.y + thirdH * i);
+        ctx.stroke();
+      }
+
+      // Corner handles
+      const handleSize = 10;
+      ctx.fillStyle = '#3b82f6';
+      const corners = [
+        [crop.x, crop.y],
+        [crop.x + crop.width, crop.y],
+        [crop.x, crop.y + crop.height],
+        [crop.x + crop.width, crop.y + crop.height],
+      ];
+      corners.forEach(([x, y]) => {
+        ctx.fillRect(x - handleSize / 2, y - handleSize / 2, handleSize, handleSize);
+      });
+    },
+    []
+  );
+
+  // ============================================================================
+  // RENDERING
+  // ============================================================================
+
+  const renderImage = useCallback(() => {
     const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
     const img = imageRef.current;
-    if (!canvas || !img) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!canvas || !ctx || !img) return;
 
-    // Calculate dimensions
-    let width = img.width;
-    let height = img.height;
+    // Calculate rotated dimensions
+    const radians = (rotation * Math.PI) / 180;
+    const sin = Math.abs(Math.sin(radians));
+    const cos = Math.abs(Math.cos(radians));
+    const newWidth = img.width * cos + img.height * sin;
+    const newHeight = img.width * sin + img.height * cos;
 
-    // Swap dimensions for 90/270 degree rotations
-    if (rotation % 180 === 90) {
-      [width, height] = [height, width];
-    }
+    canvas.width = newWidth;
+    canvas.height = newHeight;
 
-    // Scale to fit maxWidth/maxHeight
-    const scale = Math.min(1, maxWidth / width, maxHeight / height);
-    width *= scale;
-    height *= scale;
-
-    canvas.width = width;
-    canvas.height = height;
-
-    // Clear canvas
-    ctx.clearRect(0, 0, width, height);
-
-    // Apply transforms
+    // Clear and apply transformations
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
-    ctx.translate(width / 2, height / 2);
-    ctx.rotate((rotation * Math.PI) / 180);
-    ctx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate(radians);
 
     // Apply filters
-    ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+    ctx.filter = getFilterString(filters);
 
     // Draw image centered
-    const drawWidth = rotation % 180 === 90 ? height : width;
-    const drawHeight = rotation % 180 === 90 ? width : height;
-    ctx.drawImage(img, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
-
+    ctx.drawImage(img, -img.width / 2, -img.height / 2);
     ctx.restore();
 
     // Draw crop overlay
-    if (cropMode && cropArea) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-      ctx.fillRect(0, 0, width, height);
-      ctx.clearRect(cropArea.x, cropArea.y, cropArea.width, cropArea.height);
-      ctx.strokeStyle = 'var(--primary)';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(cropArea.x, cropArea.y, cropArea.width, cropArea.height);
-
-      // Draw grid
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-      ctx.lineWidth = 1;
-      const thirdW = cropArea.width / 3;
-      const thirdH = cropArea.height / 3;
-      for (let i = 1; i < 3; i++) {
-        ctx.beginPath();
-        ctx.moveTo(cropArea.x + thirdW * i, cropArea.y);
-        ctx.lineTo(cropArea.x + thirdW * i, cropArea.y + cropArea.height);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(cropArea.x, cropArea.y + thirdH * i);
-        ctx.lineTo(cropArea.x + cropArea.width, cropArea.y + thirdH * i);
-        ctx.stroke();
-      }
+    if (cropArea && activeTool === 'crop') {
+      drawCropOverlay(ctx, canvas.width, canvas.height, cropArea);
     }
-  }, [
-    rotation,
-    flipX,
-    flipY,
-    brightness,
-    contrast,
-    saturation,
-    cropMode,
-    cropArea,
-    maxWidth,
-    maxHeight,
-  ]);
+  }, [rotation, filters, cropArea, activeTool, getFilterString, drawCropOverlay]);
 
-  // Update ref so it's accessible in load effect
-  useEffect(() => {
-    drawCanvasRef.current = drawCanvas;
-  }, [drawCanvas]);
+  // ============================================================================
+  // IMAGE LOADING
+  // ============================================================================
 
-  // Load image
   useEffect(() => {
-    const img = document.createElement('img');
+    const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
       imageRef.current = img;
+      setImageSize({ width: img.width, height: img.height });
+      setResizeWidth(img.width);
+      setResizeHeight(img.height);
       setLoading(false);
-      // Use ref to get current drawCanvas
-      drawCanvasRef.current();
-    };
-    img.onerror = () => {
-      setLoading(false);
-      console.error('Failed to load image');
+      renderImage();
     };
     img.src = src;
-  }, [src]);
+  }, [src, renderImage]);
 
-  // Redraw on state change
   useEffect(() => {
     if (!loading) {
-      drawCanvas();
+      renderImage();
     }
-  }, [loading, drawCanvas]);
+  }, [loading, renderImage]);
 
-  // Handlers
-  const handleRotateCW = () => setRotation((r) => (r + 90) % 360);
-  const handleRotateCCW = () => setRotation((r) => (r - 90 + 360) % 360);
-  const handleFlipX = () => setFlipX((f) => !f);
-  const handleFlipY = () => setFlipY((f) => !f);
+  // ============================================================================
+  // CROP HANDLERS
+  // ============================================================================
 
-  const handleReset = () => {
-    setRotation(0);
-    setFlipX(false);
-    setFlipY(false);
-    setBrightness(100);
-    setContrast(100);
-    setSaturation(100);
-    setCropArea(null);
-    setCropMode(false);
-  };
-
-  const handleCropToggle = () => {
-    if (!cropMode) {
-      // Initialize crop area to full image
-      const canvas = canvasRef.current;
-      if (canvas) {
-        setCropArea({
-          x: canvas.width * 0.1,
-          y: canvas.height * 0.1,
-          width: canvas.width * 0.8,
-          height: canvas.height * 0.8,
-        });
-      }
-    }
-    setCropMode((m) => !m);
-  };
-
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!cropMode || !cropArea) return;
-
+  const initCrop = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const rect = canvas.getBoundingClientRect();
+    let cropW = canvas.width * 0.8;
+    let cropH = canvas.height * 0.8;
+
+    if (selectedAspectRatio) {
+      // Constrain to aspect ratio
+      if (cropW / cropH > selectedAspectRatio) {
+        cropW = cropH * selectedAspectRatio;
+      } else {
+        cropH = cropW / selectedAspectRatio;
+      }
+    }
+
+    setCropArea({
+      x: (canvas.width - cropW) / 2,
+      y: (canvas.height - cropH) / 2,
+      width: cropW,
+      height: cropH,
+    });
+  }, [selectedAspectRatio]);
+
+  useEffect(() => {
+    if (activeTool === 'crop' && !loading) {
+      initCrop();
+    }
+  }, [activeTool, loading, initCrop]);
+
+  const handleCropMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (activeTool !== 'crop' || !cropArea) return;
+
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    setIsDragging(true);
-    setDragStart({ x: x - cropArea.x, y: y - cropArea.y });
+    if (
+      x >= cropArea.x &&
+      x <= cropArea.x + cropArea.width &&
+      y >= cropArea.y &&
+      y <= cropArea.y + cropArea.height
+    ) {
+      setIsDragging(true);
+      setDragStart({ x: x - cropArea.x, y: y - cropArea.y });
+    }
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleCropMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDragging || !cropArea) return;
 
+    const rect = canvasRef.current?.getBoundingClientRect();
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!rect || !canvas) return;
 
-    const rect = canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left - dragStart.x;
-    let y = e.clientY - rect.top - dragStart.y;
-
-    // Constrain to canvas bounds
-    x = Math.max(0, Math.min(x, canvas.width - cropArea.width));
-    y = Math.max(0, Math.min(y, canvas.height - cropArea.height));
+    const x = Math.max(
+      0,
+      Math.min(canvas.width - cropArea.width, e.clientX - rect.left - dragStart.x)
+    );
+    const y = Math.max(
+      0,
+      Math.min(canvas.height - cropArea.height, e.clientY - rect.top - dragStart.y)
+    );
 
     setCropArea({ ...cropArea, x, y });
   };
 
-  const handleMouseUp = () => {
+  const handleCropMouseUp = () => {
     setIsDragging(false);
   };
 
+  // ============================================================================
+  // ROTATION
+  // ============================================================================
+
+  const rotateLeft = () => setRotation((r) => (r - 90 + 360) % 360);
+  const rotateRight = () => setRotation((r) => (r + 90) % 360);
+  const flipHorizontal = () => {
+    // Would need to track flip state separately
+  };
+  const flipVertical = () => {
+    // Would need to track flip state separately
+  };
+
+  // ============================================================================
+  // RESIZE
+  // ============================================================================
+
+  const handleResizeWidthChange = (value: number) => {
+    setResizeWidth(value);
+    if (maintainRatio && imageSize.width > 0) {
+      setResizeHeight(Math.round(value * (imageSize.height / imageSize.width)));
+    }
+  };
+
+  const handleResizeHeightChange = (value: number) => {
+    setResizeHeight(value);
+    if (maintainRatio && imageSize.height > 0) {
+      setResizeWidth(Math.round(value * (imageSize.width / imageSize.height)));
+    }
+  };
+
+  // ============================================================================
+  // SAVE
+  // ============================================================================
+
   const handleSave = async () => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const img = imageRef.current;
+    if (!canvas || !img) return;
 
-    // If cropping, create a new canvas with just the cropped area
-    let finalCanvas = canvas;
+    // Create final canvas with crop and resize applied
+    const finalCanvas = document.createElement('canvas');
+    const finalCtx = finalCanvas.getContext('2d');
+    if (!finalCtx) return;
+
+    // Determine final dimensions
+    let finalWidth = resizeWidth;
+    let finalHeight = resizeHeight;
+
     if (cropArea) {
-      finalCanvas = document.createElement('canvas');
-      finalCanvas.width = cropArea.width;
-      finalCanvas.height = cropArea.height;
-      const ctx = finalCanvas.getContext('2d');
-      if (ctx) {
-        ctx.drawImage(
-          canvas,
-          cropArea.x,
-          cropArea.y,
-          cropArea.width,
-          cropArea.height,
-          0,
-          0,
-          cropArea.width,
-          cropArea.height
-        );
+      const cropRatio = cropArea.width / cropArea.height;
+      if (finalWidth / finalHeight !== cropRatio) {
+        // Adjust to match crop ratio
+        if (finalWidth / finalHeight > cropRatio) {
+          finalWidth = finalHeight * cropRatio;
+        } else {
+          finalHeight = finalWidth / cropRatio;
+        }
       }
     }
 
+    finalCanvas.width = finalWidth;
+    finalCanvas.height = finalHeight;
+
+    // Apply filters
+    finalCtx.filter = getFilterString(filters);
+
+    // Draw cropped or full image
+    if (cropArea) {
+      finalCtx.drawImage(
+        canvas,
+        cropArea.x,
+        cropArea.y,
+        cropArea.width,
+        cropArea.height,
+        0,
+        0,
+        finalWidth,
+        finalHeight
+      );
+    } else {
+      finalCtx.drawImage(canvas, 0, 0, finalWidth, finalHeight);
+    }
+
+    // Convert to blob
     finalCanvas.toBlob(
       (blob) => {
         if (blob) {
           onSave(blob, {
-            width: finalCanvas.width,
-            height: finalCanvas.height,
+            width: finalWidth,
+            height: finalHeight,
             rotation,
-            flipX,
-            flipY,
-            brightness,
-            contrast,
-            saturation,
-            cropArea,
+            filters,
+            crop: cropArea,
           });
         }
       },
@@ -582,258 +399,410 @@ export default function ImageEditor({
     );
   };
 
+  const handleReset = () => {
+    setRotation(0);
+    setFilters(DEFAULT_FILTERS);
+    setCropArea(null);
+    setResizeWidth(imageSize.width);
+    setResizeHeight(imageSize.height);
+  };
+
+  // ============================================================================
+  // RENDER
+  // ============================================================================
+
+  if (loading) {
+    return (
+      <div className="image-editor loading">
+        <div className="loader">Loading image...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: 'var(--background)' }}>
-      {/* Header */}
-      <div
-        className="flex items-center justify-between px-6 py-4 border-b"
-        style={{ borderColor: 'var(--border)' }}
-      >
-        <div className="flex items-center gap-4">
-          <button
-            onClick={onCancel}
-            className="p-2 rounded-lg transition-colors hover:bg-[var(--surface)]"
-            style={{ color: 'var(--foreground)' }}
-          >
-            {Icons.x}
-          </button>
-          <h2
-            className="text-xl font-bold"
-            style={{
-              color: 'var(--foreground)',
-              fontFamily: 'var(--font-kindergarten)',
-            }}
-          >
-            Edit Image
-          </h2>
+    <div className="image-editor">
+      {/* Toolbar */}
+      <div className="editor-toolbar">
+        <div className="tool-tabs">
+          {(['crop', 'rotate', 'resize', 'filters'] as EditorTool[]).map((tool) => (
+            <button
+              key={tool}
+              className={activeTool === tool ? 'active' : ''}
+              onClick={() => setActiveTool(tool)}
+            >
+              {tool === 'crop' && '✂️ Crop'}
+              {tool === 'rotate' && '🔄 Rotate'}
+              {tool === 'resize' && '📐 Resize'}
+              {tool === 'filters' && '🎨 Filters'}
+            </button>
+          ))}
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleReset}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
-            style={{
-              border: '1px solid var(--border)',
-              color: 'var(--foreground)',
-            }}
-          >
-            {Icons.reset}
-            <span>Reset</span>
+        <div className="tool-actions">
+          <button onClick={handleReset} className="reset-btn">
+            Reset
           </button>
-          <button
-            onClick={() => void handleSave()}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
-            style={{
-              background: 'var(--primary)',
-              color: 'var(--background)',
-            }}
-          >
-            {Icons.check}
-            <span>Save</span>
+          <button onClick={onCancel} className="cancel-btn">
+            Cancel
+          </button>
+          <button onClick={handleSave} className="save-btn">
+            Save
           </button>
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Canvas area */}
-        <div className="flex-1 flex items-center justify-center p-8 overflow-auto">
-          {loading ? (
-            <div
-              className="animate-pulse rounded-lg"
-              style={{
-                width: 400,
-                height: 300,
-                background: 'var(--surface)',
-              }}
-            />
-          ) : (
-            <canvas
-              ref={canvasRef}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              className="max-w-full max-h-full rounded-lg shadow-xl"
-              style={{
-                cursor: cropMode ? 'move' : 'default',
-              }}
-            />
-          )}
+      <div className="editor-content">
+        {/* Canvas */}
+        <div className="canvas-container">
+          <canvas
+            ref={canvasRef}
+            onMouseDown={handleCropMouseDown}
+            onMouseMove={handleCropMouseMove}
+            onMouseUp={handleCropMouseUp}
+            onMouseLeave={handleCropMouseUp}
+          />
         </div>
 
-        {/* Sidebar */}
-        <div
-          className="w-80 border-l overflow-y-auto"
-          style={{
-            borderColor: 'var(--border)',
-            background: 'var(--surface)',
-          }}
-        >
-          {/* Tabs */}
-          <div className="flex border-b" style={{ borderColor: 'var(--border)' }}>
-            <button
-              onClick={() => setActiveTab('transform')}
-              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                activeTab === 'transform'
-                  ? 'border-b-2 border-[var(--primary)]'
-                  : 'opacity-60 hover:opacity-100'
-              }`}
-              style={{ color: 'var(--foreground)' }}
-            >
-              Transform
-            </button>
-            <button
-              onClick={() => setActiveTab('adjust')}
-              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                activeTab === 'adjust'
-                  ? 'border-b-2 border-[var(--primary)]'
-                  : 'opacity-60 hover:opacity-100'
-              }`}
-              style={{ color: 'var(--foreground)' }}
-            >
-              Adjust
-            </button>
-          </div>
+        {/* Tool Panel */}
+        <div className="tool-panel">
+          {activeTool === 'crop' && (
+            <div className="crop-controls">
+              <h3>Aspect Ratio</h3>
+              <div className="aspect-buttons">
+                {aspectRatios.map((ratio) => (
+                  <button
+                    key={ratio.label}
+                    className={selectedAspectRatio === ratio.value ? 'active' : ''}
+                    onClick={() => {
+                      setSelectedAspectRatio(ratio.value);
+                      initCrop();
+                    }}
+                  >
+                    {ratio.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
-          {/* Transform controls */}
-          {activeTab === 'transform' && (
-            <div className="p-4 space-y-6">
-              {/* Rotation & Flip */}
-              <div>
-                <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--foreground)' }}>
-                  Rotate & Flip
-                </h3>
-                <div className="flex items-center gap-2">
-                  <ToolbarButton onClick={handleRotateCCW} title="Rotate Left">
-                    {Icons.rotateCcw}
-                  </ToolbarButton>
-                  <ToolbarButton onClick={handleRotateCW} title="Rotate Right">
-                    {Icons.rotateCw}
-                  </ToolbarButton>
-                  <ToolbarButton onClick={handleFlipX} isActive={flipX} title="Flip Horizontal">
-                    {Icons.flipH}
-                  </ToolbarButton>
-                  <ToolbarButton onClick={handleFlipY} isActive={flipY} title="Flip Vertical">
-                    {Icons.flipV}
-                  </ToolbarButton>
+          {activeTool === 'rotate' && (
+            <div className="rotate-controls">
+              <h3>Rotation</h3>
+              <div className="rotate-buttons">
+                <button onClick={rotateLeft}>↶ Rotate Left</button>
+                <button onClick={rotateRight}>↷ Rotate Right</button>
+                <button onClick={flipHorizontal}>↔ Flip Horizontal</button>
+                <button onClick={flipVertical}>↕ Flip Vertical</button>
+              </div>
+              <div className="rotation-slider">
+                <label>Fine Adjustment</label>
+                <input
+                  type="range"
+                  min={-180}
+                  max={180}
+                  value={rotation}
+                  onChange={(e) => setRotation(parseInt(e.target.value))}
+                />
+                <span>{rotation}°</span>
+              </div>
+            </div>
+          )}
+
+          {activeTool === 'resize' && (
+            <div className="resize-controls">
+              <h3>Dimensions</h3>
+              <div className="dimension-inputs">
+                <div className="input-group">
+                  <label>Width</label>
+                  <input
+                    type="number"
+                    value={resizeWidth}
+                    onChange={(e) => handleResizeWidthChange(parseInt(e.target.value) || 0)}
+                  />
+                  <span>px</span>
                 </div>
-                <p className="mt-2 text-xs" style={{ color: 'var(--foreground)', opacity: 0.6 }}>
-                  Rotation: {rotation}°
-                </p>
+                <div className="input-group">
+                  <label>Height</label>
+                  <input
+                    type="number"
+                    value={resizeHeight}
+                    onChange={(e) => handleResizeHeightChange(parseInt(e.target.value) || 0)}
+                  />
+                  <span>px</span>
+                </div>
               </div>
-
-              {/* Crop */}
-              <div>
-                <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--foreground)' }}>
-                  Crop
-                </h3>
-                <button
-                  onClick={handleCropToggle}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors w-full justify-center ${
-                    cropMode ? 'bg-[var(--primary)] text-[var(--background)]' : ''
-                  }`}
-                  style={{
-                    border: cropMode ? 'none' : '1px solid var(--border)',
-                    color: cropMode ? 'var(--background)' : 'var(--foreground)',
-                  }}
-                >
-                  {Icons.crop}
-                  <span>{cropMode ? 'Cropping...' : 'Start Crop'}</span>
-                </button>
-
-                {cropMode && (
-                  <div className="mt-3">
-                    <p
-                      className="text-xs mb-2"
-                      style={{ color: 'var(--foreground)', opacity: 0.6 }}
-                    >
-                      Aspect Ratio
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {aspectRatios.map((ratio) => (
-                        <button
-                          key={ratio.name}
-                          onClick={() => setSelectedAspectRatio(ratio)}
-                          className={`px-3 py-1 rounded text-sm transition-colors ${
-                            selectedAspectRatio.name === ratio.name
-                              ? 'bg-[var(--primary)] text-[var(--background)]'
-                              : 'bg-[var(--background)]'
-                          }`}
-                          style={{
-                            color:
-                              selectedAspectRatio.name === ratio.name
-                                ? 'var(--background)'
-                                : 'var(--foreground)',
-                          }}
-                        >
-                          {ratio.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+              <label className="checkbox">
+                <input
+                  type="checkbox"
+                  checked={maintainRatio}
+                  onChange={(e) => setMaintainRatio(e.target.checked)}
+                />
+                Maintain aspect ratio
+              </label>
             </div>
           )}
 
-          {/* Adjust controls */}
-          {activeTab === 'adjust' && (
-            <div className="p-4 space-y-4">
-              <Slider
-                label="Brightness"
-                value={brightness}
-                min={0}
-                max={200}
-                step={1}
-                onChange={setBrightness}
-                icon={Icons.sun}
-              />
-              <Slider
-                label="Contrast"
-                value={contrast}
-                min={0}
-                max={200}
-                step={1}
-                onChange={setContrast}
-                icon={Icons.contrast}
-              />
-              <Slider
-                label="Saturation"
-                value={saturation}
-                min={0}
-                max={200}
-                step={1}
-                onChange={setSaturation}
-                icon={Icons.droplet}
-              />
+          {activeTool === 'filters' && (
+            <div className="filter-controls">
+              <h3>Adjustments</h3>
+              {Object.entries(filters).map(([key, value]) => (
+                <div key={key} className="filter-slider">
+                  <label>{key.charAt(0).toUpperCase() + key.slice(1)}</label>
+                  <input
+                    type="range"
+                    min={key === 'blur' ? 0 : 0}
+                    max={
+                      key === 'blur'
+                        ? 20
+                        : key === 'brightness' || key === 'contrast' || key === 'saturation'
+                          ? 200
+                          : 100
+                    }
+                    value={value}
+                    onChange={(e) =>
+                      setFilters({
+                        ...filters,
+                        [key]: parseInt(e.target.value),
+                      })
+                    }
+                  />
+                  <span>
+                    {value}
+                    {key === 'blur' ? 'px' : '%'}
+                  </span>
+                </div>
+              ))}
+              <button className="reset-filters" onClick={() => setFilters(DEFAULT_FILTERS)}>
+                Reset Filters
+              </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Styles */}
       <style jsx>{`
-        input[type='range']::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 16px;
-          height: 16px;
-          border-radius: 50%;
-          background: var(--primary);
-          cursor: pointer;
-          border: 2px solid var(--background);
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        .image-editor {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          background: #1f2937;
+          color: white;
         }
 
-        input[type='range']::-moz-range-thumb {
-          width: 16px;
-          height: 16px;
-          border-radius: 50%;
-          background: var(--primary);
+        .image-editor.loading {
+          align-items: center;
+          justify-content: center;
+        }
+
+        .loader {
+          color: #9ca3af;
+        }
+
+        .editor-toolbar {
+          display: flex;
+          justify-content: space-between;
+          padding: 0.75rem;
+          background: #111827;
+          border-bottom: 1px solid #374151;
+        }
+
+        .tool-tabs {
+          display: flex;
+          gap: 0.25rem;
+        }
+
+        .tool-tabs button {
+          padding: 0.5rem 1rem;
+          border: none;
+          background: transparent;
+          color: #9ca3af;
           cursor: pointer;
-          border: 2px solid var(--background);
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+          border-radius: 6px;
+        }
+
+        .tool-tabs button:hover {
+          background: #374151;
+        }
+
+        .tool-tabs button.active {
+          background: #3b82f6;
+          color: white;
+        }
+
+        .tool-actions {
+          display: flex;
+          gap: 0.5rem;
+        }
+
+        .tool-actions button {
+          padding: 0.5rem 1rem;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+        }
+
+        .reset-btn {
+          background: transparent;
+          color: #9ca3af;
+        }
+
+        .cancel-btn {
+          background: #374151;
+          color: white;
+        }
+
+        .save-btn {
+          background: #10b981;
+          color: white;
+        }
+
+        .editor-content {
+          display: flex;
+          flex: 1;
+          overflow: hidden;
+        }
+
+        .canvas-container {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1rem;
+          overflow: auto;
+        }
+
+        .canvas-container canvas {
+          max-width: 100%;
+          max-height: 100%;
+          object-fit: contain;
+        }
+
+        .tool-panel {
+          width: 280px;
+          background: #111827;
+          border-left: 1px solid #374151;
+          padding: 1rem;
+          overflow-y: auto;
+        }
+
+        .tool-panel h3 {
+          margin: 0 0 1rem;
+          font-size: 0.875rem;
+          color: #9ca3af;
+          text-transform: uppercase;
+        }
+
+        .aspect-buttons,
+        .rotate-buttons {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 0.5rem;
+        }
+
+        .aspect-buttons button,
+        .rotate-buttons button {
+          padding: 0.5rem;
+          border: 1px solid #374151;
+          background: transparent;
+          color: white;
+          border-radius: 6px;
+          cursor: pointer;
+        }
+
+        .aspect-buttons button:hover,
+        .rotate-buttons button:hover {
+          border-color: #3b82f6;
+        }
+
+        .aspect-buttons button.active {
+          background: #3b82f6;
+          border-color: #3b82f6;
+        }
+
+        .rotation-slider,
+        .filter-slider {
+          margin-top: 1rem;
+        }
+
+        .rotation-slider label,
+        .filter-slider label {
+          display: block;
+          font-size: 0.75rem;
+          color: #9ca3af;
+          margin-bottom: 0.25rem;
+        }
+
+        .rotation-slider input,
+        .filter-slider input {
+          width: 100%;
+        }
+
+        .rotation-slider span,
+        .filter-slider span {
+          font-size: 0.75rem;
+          color: #9ca3af;
+        }
+
+        .dimension-inputs {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+        }
+
+        .input-group {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .input-group label {
+          width: 50px;
+          font-size: 0.875rem;
+        }
+
+        .input-group input {
+          flex: 1;
+          padding: 0.375rem;
+          background: #374151;
+          border: 1px solid #4b5563;
+          color: white;
+          border-radius: 4px;
+        }
+
+        .input-group span {
+          font-size: 0.75rem;
+          color: #9ca3af;
+        }
+
+        .checkbox {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-top: 1rem;
+          font-size: 0.875rem;
+          cursor: pointer;
+        }
+
+        .reset-filters {
+          margin-top: 1rem;
+          width: 100%;
+          padding: 0.5rem;
+          border: 1px solid #374151;
+          background: transparent;
+          color: #9ca3af;
+          border-radius: 6px;
+          cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+          .editor-content {
+            flex-direction: column;
+          }
+
+          .tool-panel {
+            width: 100%;
+            max-height: 200px;
+          }
         }
       `}</style>
     </div>

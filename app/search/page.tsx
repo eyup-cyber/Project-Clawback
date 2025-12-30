@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
 import gsap from 'gsap';
-import Nav from '@/app/components/Nav';
-import Footer from '@/app/components/layout/Footer';
-import { getContentTypeIcon, formatRelativeTime } from '@/lib/utils';
 import debounce from 'lodash.debounce';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import Footer from '@/app/components/layout/Footer';
+import Nav from '@/app/components/Nav';
+import { formatRelativeTime, getContentTypeIcon } from '@/lib/utils';
 
 interface SearchResult {
   id: string;
@@ -121,7 +121,7 @@ export default function SearchPage() {
     if (initialQuery) {
       void performSearch(initialQuery, 1);
     }
-  }, [initialQuery]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [initialQuery]);
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -135,7 +135,7 @@ export default function SearchPage() {
   }, []);
 
   // Debounced suggestion fetcher
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   const fetchSuggestions = useCallback(
     debounce(async (q: string) => {
       if (q.length < 2) {
@@ -346,7 +346,10 @@ export default function SearchPage() {
                   {loading ? (
                     <div
                       className="w-6 h-6 border-2 rounded-full animate-spin"
-                      style={{ borderColor: '#000', borderTopColor: 'transparent' }}
+                      style={{
+                        borderColor: '#000',
+                        borderTopColor: 'transparent',
+                      }}
                     />
                   ) : (
                     <svg
@@ -369,7 +372,10 @@ export default function SearchPage() {
                   <div
                     id="search-suggestions"
                     className="absolute z-50 w-full mt-2 rounded-xl border shadow-lg overflow-hidden"
-                    style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+                    style={{
+                      background: 'var(--surface)',
+                      borderColor: 'var(--border)',
+                    }}
                     role="listbox"
                   >
                     {suggestions.map((suggestion, index) => (
@@ -415,7 +421,10 @@ export default function SearchPage() {
                 type="button"
                 onClick={() => setShowFilters(!showFilters)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg border transition-all hover:bg-[var(--surface-elevated)]"
-                style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                style={{
+                  borderColor: 'var(--border)',
+                  color: 'var(--foreground)',
+                }}
               >
                 <svg
                   width="16"
@@ -460,7 +469,10 @@ export default function SearchPage() {
             {showFilters && (
               <div
                 className="mt-4 p-4 rounded-xl border grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
-                style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+                style={{
+                  background: 'var(--surface)',
+                  borderColor: 'var(--border)',
+                }}
               >
                 {/* Category filter */}
                 <div>
@@ -599,7 +611,10 @@ export default function SearchPage() {
                     key={result.id}
                     href={result.url || `/articles/${result.id}`}
                     className="block p-6 rounded-lg border transition-all hover:border-opacity-50 hover:shadow-lg"
-                    style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+                    style={{
+                      background: 'var(--surface)',
+                      borderColor: 'var(--border)',
+                    }}
                   >
                     <div className="flex items-start gap-4">
                       {result.imageUrl && (
@@ -611,7 +626,13 @@ export default function SearchPage() {
                       )}
                       {!result.imageUrl && (
                         <span className="text-3xl" aria-hidden="true">
-                          {getContentTypeIcon(result.type === 'post' ? 'written' : result.type)}
+                          {getContentTypeIcon(
+                            result.type === 'post'
+                              ? 'written'
+                              : result.type === 'page'
+                                ? 'written'
+                                : 'written'
+                          )}
                         </span>
                       )}
                       <div className="flex-1 min-w-0">
@@ -644,7 +665,11 @@ export default function SearchPage() {
                           {result.score !== undefined && result.score > 0 && (
                             <span
                               className="text-xs px-2 py-0.5 rounded"
-                              style={{ background: 'var(--primary)', color: '#000', opacity: 0.7 }}
+                              style={{
+                                background: 'var(--primary)',
+                                color: '#000',
+                                opacity: 0.7,
+                              }}
                             >
                               {Math.round(result.score * 100)}% match
                             </span>
@@ -681,7 +706,10 @@ export default function SearchPage() {
                     onClick={() => void performSearch(query, page - 1)}
                     disabled={page === 1 || loading}
                     className="px-4 py-2 rounded-lg border transition-all disabled:opacity-50"
-                    style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                    style={{
+                      borderColor: 'var(--border)',
+                      color: 'var(--foreground)',
+                    }}
                   >
                     Previous
                   </button>
@@ -693,7 +721,10 @@ export default function SearchPage() {
                     onClick={() => void performSearch(query, page + 1)}
                     disabled={page === totalPages || loading}
                     className="px-4 py-2 rounded-lg border transition-all disabled:opacity-50"
-                    style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                    style={{
+                      borderColor: 'var(--border)',
+                      color: 'var(--foreground)',
+                    }}
                   >
                     Next
                   </button>
@@ -747,7 +778,10 @@ export default function SearchPage() {
                       void performSearch(term, 1);
                     }}
                     className="px-3 py-1 rounded-full text-sm border transition-all hover:bg-[var(--surface-elevated)]"
-                    style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                    style={{
+                      borderColor: 'var(--border)',
+                      color: 'var(--foreground)',
+                    }}
                   >
                     {term}
                   </button>

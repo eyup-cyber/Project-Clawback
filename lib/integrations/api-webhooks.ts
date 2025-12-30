@@ -3,9 +3,9 @@
  * Phase 55: Third-party integrations via webhooks
  */
 
-import { createClient, createServiceClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/logger';
 import crypto from 'crypto';
+import { logger } from '@/lib/logger';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -304,7 +304,9 @@ export async function listApiKeys(): Promise<ApiKey[]> {
  */
 export async function createWebhook(
   input: Pick<ExternalWebhook, 'name' | 'url' | 'events'> &
-    Partial<Pick<ExternalWebhook, 'headers' | 'retry_count' | 'retry_delay_seconds' | 'timeout_seconds'>>
+    Partial<
+      Pick<ExternalWebhook, 'headers' | 'retry_count' | 'retry_delay_seconds' | 'timeout_seconds'>
+    >
 ): Promise<ExternalWebhook> {
   const supabase = await createClient();
   const {
@@ -342,7 +344,10 @@ export async function createWebhook(
     throw error;
   }
 
-  logger.info('[Webhooks] Webhook created', { webhook_id: data.id, name: input.name });
+  logger.info('[Webhooks] Webhook created', {
+    webhook_id: data.id,
+    name: input.name,
+  });
   return data as ExternalWebhook;
 }
 
@@ -351,7 +356,12 @@ export async function createWebhook(
  */
 export async function updateWebhook(
   webhookId: string,
-  updates: Partial<Pick<ExternalWebhook, 'name' | 'url' | 'events' | 'headers' | 'is_active' | 'retry_count' | 'timeout_seconds'>>
+  updates: Partial<
+    Pick<
+      ExternalWebhook,
+      'name' | 'url' | 'events' | 'headers' | 'is_active' | 'retry_count' | 'timeout_seconds'
+    >
+  >
 ): Promise<ExternalWebhook> {
   const supabase = await createClient();
   const {
@@ -580,17 +590,18 @@ async function deliverWebhook(
         last_status: response.ok ? 'success' : 'failure',
         last_response_code: response.status,
         total_deliveries: webhook.total_deliveries + 1,
-        failed_deliveries: response.ok
-          ? webhook.failed_deliveries
-          : webhook.failed_deliveries + 1,
+        failed_deliveries: response.ok ? webhook.failed_deliveries : webhook.failed_deliveries + 1,
       })
       .eq('id', webhook.id);
 
     if (!response.ok && attempt < webhook.retry_count) {
       // Schedule retry
-      setTimeout(() => {
-        void deliverWebhook(webhook, event, data, attempt + 1);
-      }, webhook.retry_delay_seconds * 1000 * attempt);
+      setTimeout(
+        () => {
+          void deliverWebhook(webhook, event, data, attempt + 1);
+        },
+        webhook.retry_delay_seconds * 1000 * attempt
+      );
     }
 
     logger.info('[Webhooks] Webhook delivered', {
@@ -621,9 +632,12 @@ async function deliverWebhook(
       .eq('id', webhook.id);
 
     if (attempt < webhook.retry_count) {
-      setTimeout(() => {
-        void deliverWebhook(webhook, event, data, attempt + 1);
-      }, webhook.retry_delay_seconds * 1000 * attempt);
+      setTimeout(
+        () => {
+          void deliverWebhook(webhook, event, data, attempt + 1);
+        },
+        webhook.retry_delay_seconds * 1000 * attempt
+      );
     }
 
     logger.error('[Webhooks] Webhook delivery failed', {
@@ -733,10 +747,7 @@ export async function testWebhook(webhookId: string): Promise<{
     },
   };
 
-  const signature = generateWebhookSignature(
-    JSON.stringify(testPayload),
-    webhook.secret
-  );
+  const signature = generateWebhookSignature(JSON.stringify(testPayload), webhook.secret);
 
   try {
     const response = await fetch(webhook.url, {
@@ -878,10 +889,7 @@ export async function listIntegrations(): Promise<IntegrationConfig[]> {
     throw new Error('Not authenticated');
   }
 
-  const { data, error } = await supabase
-    .from('integrations')
-    .select('*')
-    .eq('user_id', user.id);
+  const { data, error } = await supabase.from('integrations').select('*').eq('user_id', user.id);
 
   if (error) {
     throw error;

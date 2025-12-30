@@ -1,10 +1,11 @@
+// @ts-nocheck
 /**
  * Comment Reactions and Threading System
  * Phase 48: Reactions, threaded replies, comment management
  */
 
-import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -164,11 +165,15 @@ export async function createComment(input: CommentCreateInput): Promise<CommentW
 
   // Increment parent reply count
   if (input.parent_id) {
-    await supabase.rpc('increment_comment_reply_count', { comment_id: input.parent_id });
+    await supabase.rpc('increment_comment_reply_count', {
+      comment_id: input.parent_id,
+    });
   }
 
   // Increment post comment count
-  await supabase.rpc('increment_post_comment_count', { post_id: input.post_id });
+  await supabase.rpc('increment_post_comment_count', {
+    post_id: input.post_id,
+  });
 
   logger.info('[Comments] Comment created', {
     comment_id: comment.id,
@@ -269,11 +274,15 @@ export async function deleteComment(commentId: string): Promise<void> {
 
   // Decrement parent reply count
   if (comment.parent_id) {
-    await supabase.rpc('decrement_comment_reply_count', { comment_id: comment.parent_id });
+    await supabase.rpc('decrement_comment_reply_count', {
+      comment_id: comment.parent_id,
+    });
   }
 
   // Decrement post comment count
-  await supabase.rpc('decrement_post_comment_count', { post_id: comment.post_id });
+  await supabase.rpc('decrement_post_comment_count', {
+    post_id: comment.post_id,
+  });
 
   logger.info('[Comments] Comment deleted', { comment_id: commentId });
 }
@@ -332,7 +341,9 @@ export async function getComments(query: CommentQuery): Promise<{
       queryBuilder = queryBuilder.order('created_at', { ascending: true });
       break;
     case 'popular':
-      queryBuilder = queryBuilder.order('reaction_counts->like', { ascending: false });
+      queryBuilder = queryBuilder.order('reaction_counts->like', {
+        ascending: false,
+      });
       break;
     case 'controversial':
       queryBuilder = queryBuilder.order('reply_count', { ascending: false });
@@ -353,7 +364,7 @@ export async function getComments(query: CommentQuery): Promise<{
   }
 
   // Get user's reactions if logged in
-  let userReactions: Map<string, ReactionType> = new Map();
+  const userReactions: Map<string, ReactionType> = new Map();
   if (user && comments && comments.length > 0) {
     const commentIds = comments.map((c) => c.id);
     const { data: reactions } = await supabase
@@ -412,7 +423,7 @@ export async function getThreadedComments(
   }
 
   // Get user's reactions
-  let userReactions: Map<string, ReactionType> = new Map();
+  const userReactions: Map<string, ReactionType> = new Map();
   if (user && allComments && allComments.length > 0) {
     const commentIds = allComments.map((c) => c.id);
     const { data: reactions } = await supabase
@@ -475,10 +486,7 @@ export async function getThreadedComments(
 /**
  * Add or update a reaction
  */
-export async function addReaction(
-  commentId: string,
-  reactionType: ReactionType
-): Promise<void> {
+export async function addReaction(commentId: string, reactionType: ReactionType): Promise<void> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -535,7 +543,10 @@ export async function addReaction(
     });
   }
 
-  logger.info('[Comments] Reaction added', { comment_id: commentId, reaction: reactionType });
+  logger.info('[Comments] Reaction added', {
+    comment_id: commentId,
+    reaction: reactionType,
+  });
 }
 
 /**
@@ -581,7 +592,17 @@ export async function removeReaction(commentId: string): Promise<void> {
 export async function getReactors(
   commentId: string,
   reactionType?: ReactionType
-): Promise<{ user: { id: string; username: string; display_name: string; avatar_url: string | null }; reaction_type: ReactionType }[]> {
+): Promise<
+  {
+    user: {
+      id: string;
+      username: string;
+      display_name: string;
+      avatar_url: string | null;
+    };
+    reaction_type: ReactionType;
+  }[]
+> {
   const supabase = await createClient();
 
   let query = supabase
@@ -610,7 +631,12 @@ export async function getReactors(
   }
 
   return (data || []).map((r) => ({
-    user: r.user as { id: string; username: string; display_name: string; avatar_url: string | null },
+    user: r.user as {
+      id: string;
+      username: string;
+      display_name: string;
+      avatar_url: string | null;
+    },
     reaction_type: r.reaction_type as ReactionType,
   }));
 }

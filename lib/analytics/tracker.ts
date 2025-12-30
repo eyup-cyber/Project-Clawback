@@ -194,7 +194,7 @@ export const clientTrackingScript = `
       pageTitle: document.title,
       referrer: document.referrer,
     };
-    
+
     navigator.sendBeacon('/api/analytics/track', JSON.stringify({
       type: 'page_view',
       data

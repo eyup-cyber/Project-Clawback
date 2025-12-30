@@ -5,9 +5,9 @@
  * Phase 2.4: Table, moderate actions, feature toggle, archive
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
+import Link from 'next/link';
+import { useCallback, useEffect, useState } from 'react';
 
 // ============================================================================
 // TYPES
@@ -57,7 +57,15 @@ interface PostFilters {
 }
 
 interface ModerationAction {
-  type: 'publish' | 'unpublish' | 'reject' | 'archive' | 'restore' | 'delete' | 'feature' | 'unfeature';
+  type:
+    | 'publish'
+    | 'unpublish'
+    | 'reject'
+    | 'archive'
+    | 'restore'
+    | 'delete'
+    | 'feature'
+    | 'unfeature';
   postId: string;
   reason?: string;
 }
@@ -73,7 +81,11 @@ export function PostModeration() {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showActionModal, setShowActionModal] = useState<ModerationAction | null>(null);
-  const [pagination, setPagination] = useState({ page: 1, limit: 25, total: 0 });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 25,
+    total: 0,
+  });
   const [filters, setFilters] = useState<PostFilters>({
     status: 'all',
     search: '',
@@ -234,10 +246,34 @@ export function PostModeration() {
       {selectedPosts.size > 0 && (
         <div className="bulk-actions">
           <span>{selectedPosts.size} selected</span>
-          <button onClick={() => void handleBulkAction('publish')}>Publish</button>
-          <button onClick={() => void handleBulkAction('unpublish')}>Unpublish</button>
-          <button onClick={() => void handleBulkAction('archive')}>Archive</button>
-          <button onClick={() => void handleBulkAction('feature')}>Feature</button>
+          <button
+            onClick={() => {
+              void handleBulkAction('publish');
+            }}
+          >
+            Publish
+          </button>
+          <button
+            onClick={() => {
+              void handleBulkAction('unpublish');
+            }}
+          >
+            Unpublish
+          </button>
+          <button
+            onClick={() => {
+              void handleBulkAction('archive');
+            }}
+          >
+            Archive
+          </button>
+          <button
+            onClick={() => {
+              void handleBulkAction('feature');
+            }}
+          >
+            Feature
+          </button>
           <button onClick={() => setSelectedPosts(new Set())}>Clear</button>
         </div>
       )}
@@ -321,7 +357,9 @@ export function PostModeration() {
       {showActionModal && (
         <ActionModal
           action={showActionModal}
-          onConfirm={(reason) => void handleAction({ ...showActionModal, reason })}
+          onConfirm={(reason) => {
+            void handleAction({ ...showActionModal, reason });
+          }}
           onCancel={() => setShowActionModal(null)}
         />
       )}
@@ -461,7 +499,10 @@ function PostFiltersBar({
       <select
         value={filters.featured}
         onChange={(e) =>
-          onChange({ ...filters, featured: e.target.value as PostFilters['featured'] })
+          onChange({
+            ...filters,
+            featured: e.target.value as PostFilters['featured'],
+          })
         }
       >
         <option value="all">All Posts</option>
@@ -472,7 +513,10 @@ function PostFiltersBar({
       <select
         value={`${filters.sort}-${filters.order}`}
         onChange={(e) => {
-          const [sort, order] = e.target.value.split('-') as [PostFilters['sort'], PostFilters['order']];
+          const [sort, order] = e.target.value.split('-') as [
+            PostFilters['sort'],
+            PostFilters['order'],
+          ];
           onChange({ ...filters, sort, order });
         }}
       >
@@ -571,7 +615,10 @@ function PostRow({
         {post.category ? (
           <span
             className="category-badge"
-            style={{ backgroundColor: `${post.category.color}20`, color: post.category.color }}
+            style={{
+              backgroundColor: `${post.category.color}20`,
+              color: post.category.color,
+            }}
           >
             {post.category.name}
           </span>
@@ -587,10 +634,17 @@ function PostRow({
       <td>{post.view_count.toLocaleString()}</td>
       <td>
         <div className="date-cell">
-          <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}</span>
+          <span>
+            {formatDistanceToNow(new Date(post.created_at), {
+              addSuffix: true,
+            })}
+          </span>
           {post.published_at && (
             <span className="published-date">
-              Published {formatDistanceToNow(new Date(post.published_at), { addSuffix: true })}
+              Published{' '}
+              {formatDistanceToNow(new Date(post.published_at), {
+                addSuffix: true,
+              })}
             </span>
           )}
         </div>

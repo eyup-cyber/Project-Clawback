@@ -1,9 +1,16 @@
 'use client';
 
-import { forwardRef, type InputHTMLAttributes, type ReactNode, useState, useEffect, useRef } from 'react';
-import { cn } from '@/lib/utils';
 import gsap from 'gsap';
-import { EASING, prefersReducedMotion, getDuration, DURATION } from '@/lib/animations/gsap-config';
+import {
+  forwardRef,
+  type InputHTMLAttributes,
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { DURATION, EASING, getDuration, prefersReducedMotion } from '@/lib/animations/gsap-config';
+import { cn } from '@/lib/utils';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -18,7 +25,24 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, hint, leftIcon, rightIcon, id, floatingLabel = false, showCharacterCount = false, maxLength, success = false, value, ...props }, ref) => {
+  (
+    {
+      className,
+      label,
+      error,
+      hint,
+      leftIcon,
+      rightIcon,
+      id,
+      floatingLabel = false,
+      showCharacterCount = false,
+      maxLength,
+      success = false,
+      value,
+      ...props
+    },
+    ref
+  ) => {
     const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
     const inputRef = useRef<HTMLInputElement>(null);
     const labelRef = useRef<HTMLLabelElement>(null);
@@ -38,7 +62,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
       const handleFocus = () => {
         setIsFocused(true);
-        
+
         // Animate floating label
         if (floatingLabel && labelRef.current) {
           gsap.to(labelRef.current, {
@@ -62,7 +86,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
       const handleBlur = () => {
         setIsFocused(false);
-        
+
         // Reset floating label if no value
         if (floatingLabel && labelRef.current && !hasValue) {
           gsap.to(labelRef.current, {
@@ -136,8 +160,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               htmlFor={inputId}
               className={cn(
                 'absolute left-4 pointer-events-none transition-colors',
-                (isFocused || hasValue) ? 'top-2 text-xs' : 'top-1/2 -translate-y-1/2 text-base',
-                error ? 'text-[var(--accent)]' : success ? 'text-[var(--primary)]' : 'text-[var(--foreground)] opacity-70'
+                isFocused || hasValue ? 'top-2 text-xs' : 'top-1/2 -translate-y-1/2 text-base',
+                error
+                  ? 'text-[var(--accent)]'
+                  : success
+                    ? 'text-[var(--primary)]'
+                    : 'text-[var(--foreground)] opacity-70'
               )}
               style={{ fontFamily: 'var(--font-body)' }}
             >
@@ -150,7 +178,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             <label
               htmlFor={inputId}
               className="block mb-2 font-medium"
-              style={{ color: 'var(--foreground)', fontFamily: 'var(--font-body)' }}
+              style={{
+                color: 'var(--foreground)',
+                fontFamily: 'var(--font-body)',
+              }}
             >
               {label}
               {props.required && <span style={{ color: 'var(--accent)' }}> *</span>}
@@ -181,8 +212,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 error
                   ? 'border-[var(--accent)] focus:ring-[var(--accent)]'
                   : success
-                  ? 'border-[var(--primary)] focus:ring-[var(--primary)]'
-                  : 'border-[var(--border)] focus:ring-[var(--primary)]',
+                    ? 'border-[var(--primary)] focus:ring-[var(--primary)]'
+                    : 'border-[var(--border)] focus:ring-[var(--primary)]',
                 className
               )}
               style={{
@@ -217,7 +248,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
                 style={{ color: 'var(--primary)' }}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                >
                   <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
@@ -256,7 +294,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             style={{ color: 'var(--accent)', fontFamily: 'var(--font-body)' }}
             role="alert"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -269,7 +314,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           <p
             id={`${inputId}-hint`}
             className="mt-2 text-sm"
-            style={{ color: 'var(--foreground)', opacity: 0.6, fontFamily: 'var(--font-body)' }}
+            style={{
+              color: 'var(--foreground)',
+              opacity: 0.6,
+              fontFamily: 'var(--font-body)',
+            }}
           >
             {hint}
           </p>
@@ -282,9 +331,3 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 Input.displayName = 'Input';
 
 export default Input;
-
-
-
-
-
-

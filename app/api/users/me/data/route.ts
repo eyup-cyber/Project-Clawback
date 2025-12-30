@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     // Get format preference
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     if (format !== 'json' && format !== 'csv') {
       return applySecurityHeaders(
-        apiError('Unsupported format. Use json or csv', 'VALIDATION_ERROR', 400)
+        apiError('Unsupported format. Use json or csv', 'VALIDATION_ERROR')
       );
     }
 
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     const userData = await exportUserData(user.id);
 
     if (!userData) {
-      return applySecurityHeaders(apiError('Failed to export data', 'INTERNAL_ERROR', 500));
+      return applySecurityHeaders(apiError('Failed to export data', 'INTERNAL_ERROR'));
     }
 
     // Add export metadata
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (err) {
     logger.error('Data export error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Failed to export data', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Failed to export data', 'INTERNAL_ERROR'));
   }
 }
 
@@ -93,7 +93,7 @@ export async function POST(_request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     // Check for existing pending request
@@ -106,7 +106,7 @@ export async function POST(_request: NextRequest) {
 
     if (existingRequest) {
       return applySecurityHeaders(
-        apiError('A data export request is already pending', 'CONFLICT', 409, {
+        apiError('A data export request is already pending', 'CONFLICT', {
           requestedAt: existingRequest.created_at,
         })
       );
@@ -152,7 +152,7 @@ export async function POST(_request: NextRequest) {
     );
   } catch (err) {
     logger.error('Data export request error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Failed to request data export', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Failed to request data export', 'INTERNAL_ERROR'));
   }
 }
 

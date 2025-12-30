@@ -1,6 +1,6 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { EASING, DURATION, SCROLL_TRIGGER, prefersReducedMotion, getDuration } from './gsap-config';
+import { DURATION, EASING, getDuration, prefersReducedMotion, SCROLL_TRIGGER } from './gsap-config';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);

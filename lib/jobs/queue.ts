@@ -3,7 +3,7 @@
  * Provides robust background job processing
  */
 
-import { Queue, Worker, type Job, QueueEvents, type ConnectionOptions } from 'bullmq';
+import { type ConnectionOptions, type Job, Queue, QueueEvents, Worker } from 'bullmq';
 
 // Redis connection for BullMQ
 const connection: ConnectionOptions = {
@@ -23,7 +23,7 @@ export const QUEUE_NAMES = {
   SCHEDULED: 'scheduled',
 } as const;
 
-export type QueueName = typeof QUEUE_NAMES[keyof typeof QUEUE_NAMES];
+export type QueueName = (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];
 
 // Job data types
 export interface EmailJobData {
@@ -64,11 +64,11 @@ export interface ScheduledJobData {
   payload: Record<string, unknown>;
 }
 
-export type JobData = 
-  | EmailJobData 
-  | MediaJobData 
-  | AnalyticsJobData 
-  | CleanupJobData 
+export type JobData =
+  | EmailJobData
+  | MediaJobData
+  | AnalyticsJobData
+  | CleanupJobData
   | NotificationJobData
   | ScheduledJobData;
 
@@ -134,7 +134,7 @@ export async function addJob<T extends JobData>(
   }
 ): Promise<Job<T>> {
   const queue = getQueue<T>(queueName);
-  
+
   const jobOptions: Parameters<Queue<T>['add']>[2] = {
     ...(options?.priority && { priority: options.priority }),
     ...(options?.delay && { delay: options.delay }),
@@ -142,7 +142,6 @@ export async function addJob<T extends JobData>(
     ...(options?.repeat && { repeat: options.repeat }),
   };
 
-   
   return (queue as Queue<any>).add(queueName, data, jobOptions) as Promise<Job<T>>;
 }
 
@@ -225,13 +224,15 @@ export async function getQueueStats(queueName: QueueName): Promise<{
 /**
  * Get all queue statistics
  */
-export async function getAllQueueStats(): Promise<Record<QueueName, Awaited<ReturnType<typeof getQueueStats>>>> {
+export async function getAllQueueStats(): Promise<
+  Record<QueueName, Awaited<ReturnType<typeof getQueueStats>>>
+> {
   const stats: Record<string, Awaited<ReturnType<typeof getQueueStats>>> = {};
-  
+
   for (const name of Object.values(QUEUE_NAMES)) {
     stats[name] = await getQueueStats(name);
   }
-  
+
   return stats as Record<QueueName, Awaited<ReturnType<typeof getQueueStats>>>;
 }
 
@@ -257,13 +258,13 @@ export async function resumeQueue(queueName: QueueName): Promise<void> {
 export async function retryFailedJobs(queueName: QueueName): Promise<number> {
   const queue = getQueue(queueName);
   const failedJobs = await queue.getFailed();
-  
+
   let retried = 0;
   for (const job of failedJobs) {
     await job.retry();
     retried++;
   }
-  
+
   return retried;
 }
 
@@ -280,19 +281,19 @@ export async function cleanJobs(
 ): Promise<number> {
   const queue = getQueue(queueName);
   const grace = options.olderThanMs || 24 * 60 * 60 * 1000; // Default 24 hours
-  
+
   let cleaned = 0;
-  
+
   if (options.completed) {
     const removedCompleted = await queue.clean(grace, 1000, 'completed');
     cleaned += removedCompleted.length;
   }
-  
+
   if (options.failed) {
     const removedFailed = await queue.clean(grace, 1000, 'failed');
     cleaned += removedFailed.length;
   }
-  
+
   return cleaned;
 }
 

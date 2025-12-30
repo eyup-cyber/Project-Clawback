@@ -1,7 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { COOKIE_CATEGORIES, DEFAULT_PREFERENCES, type CookiePreferences } from '@/lib/compliance/cookies';
+import {
+  COOKIE_CATEGORIES,
+  DEFAULT_PREFERENCES,
+  type CookiePreferences,
+} from '@/lib/compliance/cookies';
 
 interface CookieConsentProps {
   onAcceptAll?: () => void;
@@ -16,10 +20,8 @@ export default function CookieConsent({ onAcceptAll, onRejectAll, onSave }: Cook
 
   useEffect(() => {
     // Check if user has already made a choice
-    const consent = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('cookie_consent='));
-    
+    const consent = document.cookie.split('; ').find((row) => row.startsWith('cookie_consent='));
+
     if (!consent) {
       // Show banner after a short delay
       const timer = setTimeout(() => setIsVisible(true), 1000);
@@ -28,11 +30,13 @@ export default function CookieConsent({ onAcceptAll, onRejectAll, onSave }: Cook
   }, []);
 
   const savePreferences = (prefs: CookiePreferences) => {
-    const value = encodeURIComponent(JSON.stringify({
-      ...prefs,
-      necessary: true,
-      timestamp: Date.now(),
-    }));
+    const value = encodeURIComponent(
+      JSON.stringify({
+        ...prefs,
+        necessary: true,
+        timestamp: Date.now(),
+      })
+    );
     document.cookie = `cookie_consent=${value}; path=/; max-age=${365 * 24 * 60 * 60}; samesite=lax`;
     setIsVisible(false);
     onSave?.(prefs);
@@ -61,8 +65,11 @@ export default function CookieConsent({ onAcceptAll, onRejectAll, onSave }: Cook
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4" style={{ background: 'rgba(0,0,0,0.5)' }}>
-      <div 
+    <div
+      className="fixed bottom-0 left-0 right-0 z-50 p-4"
+      style={{ background: 'rgba(0,0,0,0.5)' }}
+    >
+      <div
         className="max-w-4xl mx-auto rounded-2xl p-6 shadow-2xl"
         style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
       >
@@ -74,22 +81,31 @@ export default function CookieConsent({ onAcceptAll, onRejectAll, onSave }: Cook
                 🍪 Cookie Preferences
               </h3>
               <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.8 }}>
-                We use cookies to enhance your experience. Some cookies are essential for the site to work, 
-                while others help us improve your experience and understand how you use our site.
+                We use cookies to enhance your experience. Some cookies are essential for the site
+                to work, while others help us improve your experience and understand how you use our
+                site.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setShowDetails(true)}
                 className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
-                style={{ background: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)' }}
+                style={{
+                  background: 'var(--background)',
+                  color: 'var(--foreground)',
+                  border: '1px solid var(--border)',
+                }}
               >
                 Customize
               </button>
               <button
                 onClick={handleRejectAll}
                 className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
-                style={{ background: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)' }}
+                style={{
+                  background: 'var(--background)',
+                  color: 'var(--foreground)',
+                  border: '1px solid var(--border)',
+                }}
               >
                 Reject All
               </button>
@@ -132,7 +148,7 @@ export default function CookieConsent({ onAcceptAll, onRejectAll, onSave }: Cook
                           {category.name}
                         </h4>
                         {category.required && (
-                          <span 
+                          <span
                             className="text-xs px-2 py-0.5 rounded"
                             style={{ background: 'var(--primary)', color: 'var(--background)' }}
                           >
@@ -140,7 +156,10 @@ export default function CookieConsent({ onAcceptAll, onRejectAll, onSave }: Cook
                           </span>
                         )}
                       </div>
-                      <p className="text-sm mt-1" style={{ color: 'var(--foreground)', opacity: 0.7 }}>
+                      <p
+                        className="text-sm mt-1"
+                        style={{ color: 'var(--foreground)', opacity: 0.7 }}
+                      >
                         {category.description}
                       </p>
                     </div>
@@ -159,12 +178,13 @@ export default function CookieConsent({ onAcceptAll, onRejectAll, onSave }: Cook
                         }}
                         className="sr-only peer"
                       />
-                      <div 
+                      <div
                         className="w-11 h-6 rounded-full peer peer-focus:ring-2 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"
                         style={{
-                          background: category.required || preferences[key as keyof CookiePreferences]
-                            ? 'var(--primary)'
-                            : 'var(--border)',
+                          background:
+                            category.required || preferences[key as keyof CookiePreferences]
+                              ? 'var(--primary)'
+                              : 'var(--border)',
                         }}
                       />
                     </label>
@@ -177,7 +197,11 @@ export default function CookieConsent({ onAcceptAll, onRejectAll, onSave }: Cook
               <button
                 onClick={handleRejectAll}
                 className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
-                style={{ background: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)' }}
+                style={{
+                  background: 'var(--background)',
+                  color: 'var(--foreground)',
+                  border: '1px solid var(--border)',
+                }}
               >
                 Reject All
               </button>
@@ -192,10 +216,19 @@ export default function CookieConsent({ onAcceptAll, onRejectAll, onSave }: Cook
           </div>
         )}
 
-        <p className="text-xs mt-4 text-center" style={{ color: 'var(--foreground)', opacity: 0.5 }}>
+        <p
+          className="text-xs mt-4 text-center"
+          style={{ color: 'var(--foreground)', opacity: 0.5 }}
+        >
           By continuing to use our site, you agree to our{' '}
-          <a href="/privacy" className="underline">Privacy Policy</a> and{' '}
-          <a href="/terms" className="underline">Terms of Service</a>.
+          <a href="/privacy" className="underline">
+            Privacy Policy
+          </a>{' '}
+          and{' '}
+          <a href="/terms" className="underline">
+            Terms of Service
+          </a>
+          .
         </p>
       </div>
     </div>

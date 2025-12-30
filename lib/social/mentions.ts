@@ -3,8 +3,8 @@
  * Phase 37: Parse, store, and notify mentions in posts and comments
  */
 
-import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -165,15 +165,12 @@ export async function processMentions(
   }
 
   // Remove duplicates (same user mentioned multiple times)
-  const uniqueMentions = mentions.filter((m, i, arr) =>
-    arr.findIndex((x) => x.mentioned_user_id === m.mentioned_user_id) === i
+  const uniqueMentions = mentions.filter(
+    (m, i, arr) => arr.findIndex((x) => x.mentioned_user_id === m.mentioned_user_id) === i
   );
 
   // Insert mentions
-  const { data, error } = await supabase
-    .from('mentions')
-    .insert(uniqueMentions)
-    .select();
+  const { data, error } = await supabase.from('mentions').insert(uniqueMentions).select();
 
   if (error) {
     logger.error('[Mentions] Failed to store mentions', error);
@@ -242,7 +239,7 @@ async function createMentionNotifications(
   let contextDetails: { title?: string; url?: string } = {};
 
   switch (contextType) {
-    case 'post':
+    case 'post': {
       const { data: post } = await supabase
         .from('posts')
         .select('title, slug')
@@ -255,8 +252,9 @@ async function createMentionNotifications(
         };
       }
       break;
+    }
 
-    case 'comment':
+    case 'comment': {
       const { data: comment } = await supabase
         .from('comments')
         .select('post:posts(title, slug)')
@@ -264,11 +262,18 @@ async function createMentionNotifications(
         .single();
       if (comment?.post) {
         contextDetails = {
-          title: (comment.post as { title: string }).title,
-          url: `/posts/${(comment.post as { slug: string }).slug}#comment-${contextId}`,
+          title: (() => {
+            const post = Array.isArray(comment.post) ? comment.post[0] : comment.post;
+            return (post as { title: string } | undefined)?.title || '';
+          })(),
+          url: (() => {
+            const post = Array.isArray(comment.post) ? comment.post[0] : comment.post;
+            return `/posts/${(post as { slug: string } | undefined)?.slug || ''}#comment-${contextId}`;
+          })(),
         };
       }
       break;
+    }
   }
 
   // Create notifications
@@ -308,11 +313,14 @@ export async function getUserMentions(
 
   let query = supabase
     .from('mentions')
-    .select(`
+    .select(
+      `
       *,
       mentioned_user:profiles!mentioned_user_id(id, username, display_name, avatar_url),
       mentioner:profiles!mentioner_id(id, username, display_name, avatar_url)
-    `, { count: 'exact' })
+    `,
+      { count: 'exact' }
+    )
     .eq('mentioned_user_id', userId)
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
@@ -355,7 +363,7 @@ async function getMentionContext(
   const supabase = await createServiceClient();
 
   switch (contextType) {
-    case 'post':
+    case 'post': {
       const { data: post } = await supabase
         .from('posts')
         .select('title, excerpt, slug')
@@ -369,8 +377,9 @@ async function getMentionContext(
         };
       }
       break;
+    }
 
-    case 'comment':
+    case 'comment': {
       const { data: comment } = await supabase
         .from('comments')
         .select('content, post:posts(title, slug)')
@@ -378,12 +387,19 @@ async function getMentionContext(
         .single();
       if (comment) {
         return {
-          title: (comment.post as { title: string })?.title,
+          title: (() => {
+            const post = Array.isArray(comment.post) ? comment.post[0] : comment.post;
+            return (post as { title: string } | undefined)?.title || '';
+          })(),
           content_preview: comment.content?.substring(0, 100),
-          url: `/posts/${(comment.post as { slug: string })?.slug}#comment-${contextId}`,
+          url: (() => {
+            const post = Array.isArray(comment.post) ? comment.post[0] : comment.post;
+            return `/posts/${(post as { slug: string } | undefined)?.slug || ''}#comment-${contextId}`;
+          })(),
         };
       }
       break;
+    }
 
     case 'message':
       return {
@@ -481,7 +497,10 @@ export async function getMentionSuggestions(
       .select('following_id')
       .eq('follower_id', currentUserId)
       .eq('following_type', 'user')
-      .in('following_id', suggestions.map((s) => s.id));
+      .in(
+        'following_id',
+        suggestions.map((s) => s.id)
+      );
 
     const followingIds = new Set((follows || []).map((f) => f.following_id));
 

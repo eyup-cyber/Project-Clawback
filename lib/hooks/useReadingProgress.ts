@@ -3,7 +3,7 @@
  * Phase 3.3.1: Client-side reading progress tracking
  */
 
-import { useEffect, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 export interface ReadingProgress {
   progress: number;

@@ -783,10 +783,7 @@ export class ShortcutManager {
     // Check for conflicts
     for (const other of this.shortcuts.values()) {
       if (other.id === id) continue;
-      if (
-        other.context === shortcut.context &&
-        this.keyComboEquals(other.keys, keys)
-      ) {
+      if (other.context === shortcut.context && this.keyComboEquals(other.keys, keys)) {
         return false; // Conflict
       }
     }
@@ -799,9 +796,7 @@ export class ShortcutManager {
    * Reset shortcut to default
    */
   resetShortcut(id: string): void {
-    const defaultShortcut = DEFAULT_SHORTCUTS
-      .flatMap((g) => g.shortcuts)
-      .find((s) => s.id === id);
+    const defaultShortcut = DEFAULT_SHORTCUTS.flatMap((g) => g.shortcuts).find((s) => s.id === id);
 
     if (defaultShortcut) {
       const shortcut = this.shortcuts.get(id);

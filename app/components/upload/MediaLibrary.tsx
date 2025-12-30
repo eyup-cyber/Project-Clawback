@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { formatFileSize } from '@/lib/utils';
 import { useMediaLibrary } from './hooks/useMediaLibrary';
 import { useUpload } from './hooks/useUpload';
-import { formatFileSize } from '@/lib/utils';
-import { toast } from 'react-hot-toast';
 
 interface MediaLibraryProps {
   mediaType?: 'image' | 'video' | 'audio';
@@ -23,33 +23,39 @@ export default function MediaLibrary({
   });
   const { upload, uploading, progress } = useUpload();
 
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleFileSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
 
-    void (async () => {
+      void (async () => {
+        try {
+          const result = await upload(file);
+          toast.success('Upload complete!');
+          onSelect(result.url, { id: result.id });
+          refresh();
+          setTab('library');
+        } catch {
+          toast.error('Upload failed');
+        }
+      })();
+    },
+    [upload, onSelect, refresh]
+  );
+
+  const handleDelete = useCallback(
+    async (id: string) => {
+      if (!confirm('Are you sure you want to delete this file?')) return;
+
       try {
-        const result = await upload(file);
-        toast.success('Upload complete!');
-        onSelect(result.url, { id: result.id });
-        refresh();
-        setTab('library');
+        await deleteItem(id);
+        toast.success('Deleted');
       } catch {
-        toast.error('Upload failed');
+        toast.error('Failed to delete');
       }
-    })();
-  }, [upload, onSelect, refresh]);
-
-  const handleDelete = useCallback(async (id: string) => {
-    if (!confirm('Are you sure you want to delete this file?')) return;
-    
-    try {
-      await deleteItem(id);
-      toast.success('Deleted');
-    } catch {
-      toast.error('Failed to delete');
-    }
-  }, [deleteItem]);
+    },
+    [deleteItem]
+  );
 
   return (
     <div className="space-y-4">
@@ -88,7 +94,10 @@ export default function MediaLibrary({
             <div className="flex items-center justify-center py-12">
               <div
                 className="w-8 h-8 border-2 rounded-full animate-spin"
-                style={{ borderColor: 'var(--border)', borderTopColor: 'var(--primary)' }}
+                style={{
+                  borderColor: 'var(--border)',
+                  borderTopColor: 'var(--primary)',
+                }}
               />
             </div>
           ) : items.length === 0 ? (
@@ -99,7 +108,10 @@ export default function MediaLibrary({
               <button
                 onClick={() => setTab('upload')}
                 className="mt-4 px-4 py-2 rounded-lg text-sm"
-                style={{ background: 'var(--primary)', color: 'var(--background)' }}
+                style={{
+                  background: 'var(--primary)',
+                  color: 'var(--background)',
+                }}
               >
                 Upload Now
               </button>
@@ -113,7 +125,12 @@ export default function MediaLibrary({
                     className={`relative group aspect-square rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
                       selectedUrl === item.url ? 'border-[var(--primary)]' : 'border-transparent'
                     }`}
-                    onClick={() => onSelect(item.url, { id: item.id, alt_text: item.alt_text })}
+                    onClick={() =>
+                      onSelect(item.url, {
+                        id: item.id,
+                        alt_text: item.alt_text,
+                      })
+                    }
                   >
                     {item.media_type === 'image' && (
                       <img
@@ -136,15 +153,13 @@ export default function MediaLibrary({
                     {/* Overlay */}
                     <div
                       className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2"
-                      style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0.7))' }}
+                      style={{
+                        background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+                      }}
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-white truncate">
-                          {item.original_filename}
-                        </p>
-                        <p className="text-xs text-white/60">
-                          {formatFileSize(item.file_size)}
-                        </p>
+                        <p className="text-xs text-white truncate">{item.original_filename}</p>
+                        <p className="text-xs text-white/60">{formatFileSize(item.file_size)}</p>
                       </div>
                     </div>
 
@@ -180,7 +195,10 @@ export default function MediaLibrary({
                     onClick={loadMore}
                     disabled={loading}
                     className="px-4 py-2 text-sm rounded-lg border hover:bg-[var(--surface-elevated)] disabled:opacity-50"
-                    style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                    style={{
+                      borderColor: 'var(--border)',
+                      color: 'var(--foreground)',
+                    }}
                   >
                     {loading ? 'Loading...' : 'Load More'}
                   </button>
@@ -205,9 +223,13 @@ export default function MediaLibrary({
             <input
               type="file"
               accept={
-                mediaType === 'image' ? 'image/*' :
-                mediaType === 'video' ? 'video/*' :
-                mediaType === 'audio' ? 'audio/*' : '*/*'
+                mediaType === 'image'
+                  ? 'image/*'
+                  : mediaType === 'video'
+                    ? 'video/*'
+                    : mediaType === 'audio'
+                      ? 'audio/*'
+                      : '*/*'
               }
               onChange={handleFileSelect}
               className="hidden"
@@ -227,13 +249,22 @@ export default function MediaLibrary({
           {/* Progress */}
           {uploading && (
             <div className="space-y-2">
-              <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+              <div
+                className="h-2 rounded-full overflow-hidden"
+                style={{ background: 'var(--border)' }}
+              >
                 <div
                   className="h-full transition-all duration-300"
-                  style={{ width: `${progress}%`, background: 'var(--primary)' }}
+                  style={{
+                    width: `${progress}%`,
+                    background: 'var(--primary)',
+                  }}
                 />
               </div>
-              <p className="text-sm text-center" style={{ color: 'var(--foreground)', opacity: 0.6 }}>
+              <p
+                className="text-sm text-center"
+                style={{ color: 'var(--foreground)', opacity: 0.6 }}
+              >
                 Uploading... {progress}%
               </p>
             </div>

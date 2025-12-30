@@ -197,7 +197,7 @@ export function useEditorAutosave(options: AutosaveOptions) {
     }
 
     // Save to server - setState is called async after server responds, not synchronously
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+
     void saveToServer(debouncedContent, debouncedTitle);
   }, [debouncedContent, debouncedTitle, saveToServer, saveLocalBackup, enableLocalBackup]);
 

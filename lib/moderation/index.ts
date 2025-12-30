@@ -6,6 +6,7 @@
 import { createServiceClient } from '@/lib/supabase/server';
 import { checkProfanity } from './profanity';
 import { checkSpam } from './spam';
+
 export type { SpamCheckResult } from './spam';
 
 export interface ModerationResult {
@@ -77,7 +78,8 @@ export async function moderateContent(
   // Determine approval
   const approved = averageScore < THRESHOLDS.autoApprove;
   const flagged = averageScore >= THRESHOLDS.requireReview;
-  const requiresReview = averageScore >= THRESHOLDS.requireReview && averageScore < THRESHOLDS.autoReject;
+  const requiresReview =
+    averageScore >= THRESHOLDS.requireReview && averageScore < THRESHOLDS.autoReject;
 
   return {
     approved,
@@ -203,7 +205,9 @@ export async function getModerationStats(): Promise<{
 
   const [pending, resolved, flagged] = await Promise.all([
     supabase.from('content_reports').select('id', { count: 'exact' }).eq('status', 'pending'),
-    supabase.from('content_reports').select('id', { count: 'exact' })
+    supabase
+      .from('content_reports')
+      .select('id', { count: 'exact' })
       .eq('status', 'resolved')
       .gte('reviewed_at', today.toISOString()),
     supabase.from('posts').select('id', { count: 'exact' }).eq('status', 'flagged'),
@@ -254,7 +258,13 @@ export async function autoModerate(
     }
 
     // Create internal report
-    await submitReport(contentType, contentId, 'system', 'auto-moderation', result.reasons.join('; '));
+    await submitReport(
+      contentType,
+      contentId,
+      'system',
+      'auto-moderation',
+      result.reasons.join('; ')
+    );
   } else if (result.requiresReview) {
     // Flag for review
     if (contentType === 'post') {

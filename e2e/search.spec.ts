@@ -3,7 +3,7 @@
  * Test search functionality end-to-end
  */
 
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Search Functionality', () => {
   test.beforeEach(async ({ page }) => {

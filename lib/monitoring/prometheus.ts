@@ -310,15 +310,25 @@ createGauge('active_users', 'Number of active users', ['period']);
 // Export convenience functions for common metrics
 export const httpMetrics = {
   recordRequest: (method: string, path: string, status: number, duration: number) => {
-    incrementCounter('http_requests_total', { method, path, status: String(status) });
-    observeHistogram('http_request_duration_seconds', duration, { method, path });
+    incrementCounter('http_requests_total', {
+      method,
+      path,
+      status: String(status),
+    });
+    observeHistogram('http_request_duration_seconds', duration, {
+      method,
+      path,
+    });
   },
 };
 
 export const dbMetrics = {
   recordQuery: (operation: string, table: string, duration: number) => {
     incrementCounter('db_queries_total', { operation, table });
-    observeHistogram('db_query_duration_seconds', duration, { operation, table });
+    observeHistogram('db_query_duration_seconds', duration, {
+      operation,
+      table,
+    });
   },
   setActiveConnections: (count: number) => {
     setGauge('db_connections_active', count);
@@ -334,10 +344,15 @@ export const cacheMetrics = {
 
 export const authMetrics = {
   recordLogin: (success: boolean, method: string) => {
-    incrementCounter('auth_logins_total', { status: success ? 'success' : 'failure', method });
+    incrementCounter('auth_logins_total', {
+      status: success ? 'success' : 'failure',
+      method,
+    });
   },
   record2FA: (success: boolean) => {
-    incrementCounter('auth_2fa_verifications_total', { status: success ? 'success' : 'failure' });
+    incrementCounter('auth_2fa_verifications_total', {
+      status: success ? 'success' : 'failure',
+    });
   },
 };
 
@@ -353,7 +368,10 @@ export const jobMetrics = {
     setGauge('job_queue_size', size, { queue, status });
   },
   recordJob: (queue: string, success: boolean, duration: number) => {
-    incrementCounter('jobs_processed_total', { queue, status: success ? 'success' : 'failure' });
+    incrementCounter('jobs_processed_total', {
+      queue,
+      status: success ? 'success' : 'failure',
+    });
     observeHistogram('job_duration_seconds', duration, { queue });
   },
 };

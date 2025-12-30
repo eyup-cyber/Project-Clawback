@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Site Navigation', () => {
   test('should load homepage', async ({ page }) => {
@@ -8,7 +8,10 @@ test.describe('Site Navigation', () => {
 
   test('should navigate to articles', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('link', { name: /articles|content/i }).first().click();
+    await page
+      .getByRole('link', { name: /articles|content/i })
+      .first()
+      .click();
     await expect(page).toHaveURL(/articles|categories/);
   });
 

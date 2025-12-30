@@ -14,9 +14,12 @@ const ENCRYPTION_KEY = process.env.TOTP_ENCRYPTION_KEY || process.env.JWT_SECRET
 export async function POST(_request: NextRequest) {
   try {
     const supabase = await createClient();
-    
+
     // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
     if (authError || !user) {
       return applySecurityHeaders(unauthorized('Authentication required'));
     }
@@ -33,7 +36,9 @@ export async function POST(_request: NextRequest) {
     }
 
     if (profile.totp_enabled) {
-      return applySecurityHeaders(badRequest('2FA is already enabled. Disable it first to set up again.'));
+      return applySecurityHeaders(
+        badRequest('2FA is already enabled. Disable it first to set up again.')
+      );
     }
 
     // Generate TOTP setup data
@@ -42,7 +47,7 @@ export async function POST(_request: NextRequest) {
 
     // Encrypt secret for storage
     const encryptedSecret = encryptSecret(totpSetup.secret, ENCRYPTION_KEY);
-    
+
     // Hash backup codes for storage
     const hashedBackupCodes = hashBackupCodes(totpSetup.backupCodes);
 
@@ -61,12 +66,15 @@ export async function POST(_request: NextRequest) {
     }
 
     // Return setup data (secret is also returned for manual entry option)
-    return applySecurityHeaders(success({
-      qrCode: totpSetup.qrCodeDataUrl,
-      secret: totpSetup.secret, // For manual entry
-      backupCodes: totpSetup.backupCodes, // Show once, user must save
-      message: 'Scan the QR code with your authenticator app, then verify with a code to complete setup.',
-    }));
+    return applySecurityHeaders(
+      success({
+        qrCode: totpSetup.qrCodeDataUrl,
+        secret: totpSetup.secret, // For manual entry
+        backupCodes: totpSetup.backupCodes, // Show once, user must save
+        message:
+          'Scan the QR code with your authenticator app, then verify with a code to complete setup.',
+      })
+    );
   } catch (error) {
     return applySecurityHeaders(handleApiError(error));
   }
@@ -79,8 +87,11 @@ export async function POST(_request: NextRequest) {
 export async function GET(_request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
     if (authError || !user) {
       return applySecurityHeaders(unauthorized('Authentication required'));
     }
@@ -95,10 +106,12 @@ export async function GET(_request: NextRequest) {
       return applySecurityHeaders(handleApiError(profileError));
     }
 
-    return applySecurityHeaders(success({
-      enabled: profile.totp_enabled || false,
-      verifiedAt: profile.totp_verified_at,
-    }));
+    return applySecurityHeaders(
+      success({
+        enabled: profile.totp_enabled || false,
+        verifiedAt: profile.totp_verified_at,
+      })
+    );
   } catch (error) {
     return applySecurityHeaders(handleApiError(error));
   }

@@ -28,9 +28,7 @@ const sidebarSections: SidebarSection[] = [
   },
   {
     title: 'Insights',
-    items: [
-      { label: 'Analytics', href: '/dashboard/analytics', icon: '📈' },
-    ],
+    items: [{ label: 'Analytics', href: '/dashboard/analytics', icon: '📈' }],
   },
   {
     title: 'Account',
@@ -42,25 +40,45 @@ const sidebarSections: SidebarSection[] = [
   {
     title: 'Editorial',
     items: [
-      { label: 'Review Queue', href: '/editor/queue', icon: '📋', roles: ['editor', 'admin', 'superadmin'] },
+      {
+        label: 'Review Queue',
+        href: '/editor/queue',
+        icon: '📋',
+        roles: ['editor', 'admin', 'superadmin'],
+      },
     ],
   },
   {
     title: 'Admin',
     items: [
-      { label: 'Admin Home', href: '/admin', icon: '🛡️', roles: ['admin', 'superadmin'] },
-      { label: 'All Users', href: '/admin/users', icon: '👥', roles: ['admin', 'superadmin'] },
-      { label: 'Applications', href: '/admin/applications', icon: '📋', roles: ['admin', 'superadmin'] },
+      {
+        label: 'Admin Home',
+        href: '/admin',
+        icon: '🛡️',
+        roles: ['admin', 'superadmin'],
+      },
+      {
+        label: 'All Users',
+        href: '/admin/users',
+        icon: '👥',
+        roles: ['admin', 'superadmin'],
+      },
+      {
+        label: 'Applications',
+        href: '/admin/applications',
+        icon: '📋',
+        roles: ['admin', 'superadmin'],
+      },
     ],
   },
 ];
 
-function SidebarContent({ 
-  sections, 
-  pathname, 
+function SidebarContent({
+  sections,
+  pathname,
   role,
-  onItemClick 
-}: { 
+  onItemClick,
+}: {
   sections: SidebarSection[];
   pathname: string;
   role: string;
@@ -72,15 +90,15 @@ function SidebarContent({
         const filteredItems = section.items.filter(
           (item) => !item.roles || item.roles.includes(role)
         );
-        
+
         if (filteredItems.length === 0) return null;
-        
+
         return (
           <div key={section.title}>
-            <p 
+            <p
               className="text-[10px] sm:text-xs uppercase tracking-wider mb-2 px-3"
-              style={{ 
-                color: 'var(--foreground)', 
+              style={{
+                color: 'var(--foreground)',
                 opacity: 0.5,
                 fontFamily: 'var(--font-body)',
                 fontWeight: 500,
@@ -90,8 +108,11 @@ function SidebarContent({
             </p>
             <div className="space-y-1">
               {filteredItems.map((item) => {
-                const isActive = pathname === item.href || 
-                  (item.href !== '/dashboard' && item.href !== '/admin' && pathname.startsWith(item.href));
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== '/dashboard' &&
+                    item.href !== '/admin' &&
+                    pathname.startsWith(item.href));
 
                 return (
                   <Link
@@ -101,29 +122,33 @@ function SidebarContent({
                     className={`
                       flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg transition-all duration-200
                       min-h-[44px] relative overflow-hidden
-                      ${isActive 
-                        ? 'text-[var(--background)] font-medium' 
-                        : 'text-[var(--foreground)] hover:bg-[var(--surface-elevated)]'
+                      ${
+                        isActive
+                          ? 'text-[var(--background)] font-medium'
+                          : 'text-[var(--foreground)] hover:bg-[var(--surface-elevated)]'
                       }
                     `}
                     style={{
-                      background: isActive 
-                        ? 'linear-gradient(90deg, var(--primary), var(--primary))' 
+                      background: isActive
+                        ? 'linear-gradient(90deg, var(--primary), var(--primary))'
                         : undefined,
                       boxShadow: isActive ? '0 0 20px var(--glow-primary)' : undefined,
                     }}
                   >
                     {/* Active indicator bar */}
                     {isActive && (
-                      <span 
+                      <span
                         className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full"
                         style={{ background: 'var(--accent)' }}
                       />
                     )}
                     <span className="text-lg sm:text-xl">{item.icon}</span>
-                    <span 
+                    <span
                       className="text-sm"
-                      style={{ fontFamily: 'var(--font-body)', letterSpacing: '-0.02em' }}
+                      style={{
+                        fontFamily: 'var(--font-body)',
+                        letterSpacing: '-0.02em',
+                      }}
                     >
                       {item.label}
                     </span>
@@ -142,7 +167,7 @@ function SidebarContent({
           className="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-[var(--foreground)] hover:bg-[var(--surface-elevated)] transition-all duration-200 min-h-[44px]"
         >
           <span className="text-lg sm:text-xl">🏠</span>
-          <span 
+          <span
             className="text-sm"
             style={{ fontFamily: 'var(--font-body)', letterSpacing: '-0.02em' }}
           >
@@ -165,7 +190,7 @@ export default function DashboardSidebar({ role }: { role: string }) {
         type="button"
         onClick={() => setMobileOpen(!mobileOpen)}
         className="lg:hidden fixed bottom-4 right-4 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-transform duration-200 active:scale-95"
-        style={{ 
+        style={{
           background: 'var(--primary)',
           boxShadow: '0 0 20px var(--glow-primary)',
         }}
@@ -173,9 +198,7 @@ export default function DashboardSidebar({ role }: { role: string }) {
         aria-expanded={mobileOpen ? 'true' : 'false'}
         aria-controls="dashboard-sidebar"
       >
-        <span className="text-2xl text-[var(--background)]">
-          {mobileOpen ? '✕' : '☰'}
-        </span>
+        <span className="text-2xl text-[var(--background)]">{mobileOpen ? '✕' : '☰'}</span>
       </button>
 
       {/* Mobile overlay */}
@@ -197,18 +220,18 @@ export default function DashboardSidebar({ role }: { role: string }) {
           transform transition-transform duration-300 ease-out
           ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
-        style={{ 
-          background: 'var(--surface)', 
+        style={{
+          background: 'var(--surface)',
           borderRight: '1px solid var(--border)',
           boxShadow: mobileOpen ? '4px 0 20px rgba(0,0,0,0.2)' : undefined,
         }}
       >
         <div className="h-full overflow-y-auto">
-          <SidebarContent 
+          <SidebarContent
             sections={sidebarSections}
-            pathname={pathname} 
+            pathname={pathname}
             role={role}
-            onItemClick={() => setMobileOpen(false)} 
+            onItemClick={() => setMobileOpen(false)}
           />
         </div>
       </aside>

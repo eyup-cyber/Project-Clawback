@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 interface EmptyStateProps {
   icon?: string;
@@ -10,23 +10,18 @@ interface EmptyStateProps {
   };
 }
 
-export default function EmptyState({
-  icon = "📭",
-  title,
-  description,
-  action,
-}: EmptyStateProps) {
+export default function EmptyState({ icon = '📭', title, description, action }: EmptyStateProps) {
   return (
     <div
       className="p-8 sm:p-12 rounded-xl border text-center"
-      style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+      style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
     >
       <span className="text-5xl sm:text-6xl block mb-4">{icon}</span>
       <h3
         className="text-lg sm:text-xl font-bold mb-2"
         style={{
-          fontFamily: "var(--font-kindergarten)",
-          color: "var(--foreground)",
+          fontFamily: 'var(--font-kindergarten)',
+          color: 'var(--foreground)',
         }}
       >
         {title}
@@ -35,9 +30,9 @@ export default function EmptyState({
         <p
           className="text-sm sm:text-base mb-6 max-w-md mx-auto"
           style={{
-            color: "var(--foreground)",
+            color: 'var(--foreground)',
             opacity: 0.6,
-            fontFamily: "var(--font-body)",
+            fontFamily: 'var(--font-body)',
           }}
         >
           {description}
@@ -48,10 +43,10 @@ export default function EmptyState({
           href={action.href}
           className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all hover:scale-[1.02] active:scale-[0.98]"
           style={{
-            background: "var(--primary)",
-            color: "var(--background)",
-            fontFamily: "var(--font-body)",
-            boxShadow: "0 0 20px var(--glow-primary)",
+            background: 'var(--primary)',
+            color: 'var(--background)',
+            fontFamily: 'var(--font-body)',
+            boxShadow: '0 0 20px var(--glow-primary)',
           }}
         >
           {action.label}

@@ -20,9 +20,12 @@ const disableSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
+
     // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
     if (authError || !user) {
       return applySecurityHeaders(unauthorized('Authentication required'));
     }
@@ -75,15 +78,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Clear any pending 2FA challenges
-    await supabase
-      .from('two_factor_challenges')
-      .delete()
-      .eq('user_id', user.id);
+    await supabase.from('two_factor_challenges').delete().eq('user_id', user.id);
 
-    return applySecurityHeaders(success({
-      disabled: true,
-      message: '2FA has been successfully disabled',
-    }));
+    return applySecurityHeaders(
+      success({
+        disabled: true,
+        message: '2FA has been successfully disabled',
+      })
+    );
   } catch (error) {
     return applySecurityHeaders(handleApiError(error));
   }

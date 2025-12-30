@@ -88,7 +88,10 @@ async function getRedisClient(): Promise<RedisClientType | null> {
     logger.info('[Cache] Redis connected');
     return redisClient;
   } catch (error) {
-    logger.warn('[Cache] Redis unavailable, using in-memory cache', error);
+    logger.warn(
+      '[Cache] Redis unavailable, using in-memory cache',
+      error as Record<string, unknown>
+    );
     return null;
   }
 }
@@ -296,7 +299,10 @@ export async function cacheInvalidateByPattern(namespace: string, pattern: strin
 
     logger.info('[Cache] Invalidated by pattern', { namespace, pattern });
   } catch (error) {
-    logger.error('[Cache] Invalidate by pattern error', error, { namespace, pattern });
+    logger.error('[Cache] Invalidate by pattern error', error, {
+      namespace,
+      pattern,
+    });
   }
 }
 
@@ -348,7 +354,10 @@ export async function cacheAside<T>(
           void cacheSet(namespace, key, data, options);
         })
         .catch((error) => {
-          logger.error('[Cache] Background refresh failed', error, { namespace, key });
+          logger.error('[Cache] Background refresh failed', error, {
+            namespace,
+            key,
+          });
         });
     }
 
@@ -376,12 +385,11 @@ export function cached<T extends (...args: unknown[]) => Promise<unknown>>(
   keyGenerator: (...args: Parameters<T>) => string,
   options: CacheOptions = {}
 ) {
-  return function (target: T): T {
-    return (async (...args: Parameters<T>) => {
+  return (target: T): T =>
+    (async (...args: Parameters<T>) => {
       const key = keyGenerator(...args);
       return cacheAside(namespace, key, () => target(...args) as Promise<unknown>, options);
     }) as T;
-  };
 }
 
 // ============================================================================

@@ -5,8 +5,8 @@
  * Phase 2.2: Table, filters, detail view, role changes, suspend/ban/reactivate
  */
 
-import { useState, useEffect, useCallback } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { useCallback, useEffect, useState } from 'react';
 
 // ============================================================================
 // TYPES
@@ -47,7 +47,15 @@ export interface UserFilters {
 }
 
 interface UserAction {
-  type: 'change_role' | 'suspend' | 'unsuspend' | 'ban' | 'unban' | 'delete' | 'verify' | 'unverify';
+  type:
+    | 'change_role'
+    | 'suspend'
+    | 'unsuspend'
+    | 'ban'
+    | 'unban'
+    | 'delete'
+    | 'verify'
+    | 'unverify';
   userId: string;
   payload?: Record<string, unknown>;
 }
@@ -63,7 +71,11 @@ export function UserManagement() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showActionModal, setShowActionModal] = useState<UserAction | null>(null);
-  const [pagination, setPagination] = useState({ page: 1, limit: 25, total: 0 });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 25,
+    total: 0,
+  });
   const [filters, setFilters] = useState<UserFilters>({
     search: '',
     role: 'all',
@@ -178,8 +190,20 @@ export function UserManagement() {
       {selectedUsers.size > 0 && (
         <div className="bulk-actions">
           <span>{selectedUsers.size} selected</span>
-          <button onClick={() => void handleBulkAction('suspend')}>Suspend Selected</button>
-          <button onClick={() => void handleBulkAction('unsuspend')}>Unsuspend Selected</button>
+          <button
+            onClick={() => {
+              void handleBulkAction('suspend');
+            }}
+          >
+            Suspend Selected
+          </button>
+          <button
+            onClick={() => {
+              void handleBulkAction('unsuspend');
+            }}
+          >
+            Unsuspend Selected
+          </button>
           <button onClick={() => setSelectedUsers(new Set())}>Clear Selection</button>
         </div>
       )}
@@ -256,7 +280,9 @@ export function UserManagement() {
             setShowDetailModal(false);
             setSelectedUser(null);
           }}
-          onAction={(type, payload) => setShowActionModal({ type, userId: selectedUser.id, payload })}
+          onAction={(type, payload) =>
+            setShowActionModal({ type, userId: selectedUser.id, payload })
+          }
         />
       )}
 
@@ -264,7 +290,9 @@ export function UserManagement() {
       {showActionModal && (
         <ActionConfirmModal
           action={showActionModal}
-          onConfirm={(payload) => void handleUserAction({ ...showActionModal, payload })}
+          onConfirm={(payload) => {
+            void handleUserAction({ ...showActionModal, payload });
+          }}
           onCancel={() => setShowActionModal(null)}
         />
       )}
@@ -391,7 +419,12 @@ function UserFiltersBar({
 
       <select
         value={filters.status}
-        onChange={(e) => onChange({ ...filters, status: e.target.value as UserFilters['status'] })}
+        onChange={(e) =>
+          onChange({
+            ...filters,
+            status: e.target.value as UserFilters['status'],
+          })
+        }
       >
         <option value="all">All Status</option>
         <option value="active">Active</option>
@@ -403,7 +436,10 @@ function UserFiltersBar({
       <select
         value={`${filters.sort}-${filters.order}`}
         onChange={(e) => {
-          const [sort, order] = e.target.value.split('-') as [UserFilters['sort'], UserFilters['order']];
+          const [sort, order] = e.target.value.split('-') as [
+            UserFilters['sort'],
+            UserFilters['order'],
+          ];
           onChange({ ...filters, sort, order });
         }}
       >
@@ -513,7 +549,9 @@ function UserRow({
       <td>{formatDistanceToNow(new Date(user.created_at), { addSuffix: true })}</td>
       <td>
         {user.last_sign_in_at
-          ? formatDistanceToNow(new Date(user.last_sign_in_at), { addSuffix: true })
+          ? formatDistanceToNow(new Date(user.last_sign_in_at), {
+              addSuffix: true,
+            })
           : 'Never'}
       </td>
       <td>
@@ -958,7 +996,7 @@ function ActionConfirmModal({
   onCancel,
 }: {
   action: UserAction;
-  onConfirm: () => void;
+  onConfirm: (payload: { reason: string; duration: string; newRole?: string }) => void;
   onCancel: () => void;
 }) {
   const [reason, setReason] = useState('');

@@ -31,7 +31,7 @@ export async function DELETE(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     // Parse body
@@ -40,7 +40,7 @@ export async function DELETE(request: NextRequest) {
 
     if (!parseResult.success) {
       return applySecurityHeaders(
-        apiError('Invalid request', 'VALIDATION_ERROR', 400, {
+        apiError('Invalid request', 'VALIDATION_ERROR', {
           errors: parseResult.error.flatten().fieldErrors,
         })
       );
@@ -51,7 +51,7 @@ export async function DELETE(request: NextRequest) {
     // Verify email matches
     if (confirmEmail.toLowerCase() !== user.email?.toLowerCase()) {
       return applySecurityHeaders(
-        apiError('Email does not match your account', 'VALIDATION_ERROR', 400)
+        apiError('Email does not match your account', 'VALIDATION_ERROR')
       );
     }
 
@@ -75,17 +75,20 @@ export async function DELETE(request: NextRequest) {
       })
       .single();
 
-    let success_result = false;
+    let success_result:
+      | boolean
+      | { success: boolean; deletedItems: Record<string, number>; errors: string[] } = false;
 
     if (mode === 'anonymize') {
       // Anonymize user data but keep content
       success_result = await anonymizeUserData(user.id);
     } else {
       // Full deletion
-      success_result = await deleteUserData(user.id, keepContent);
+      success_result = await deleteUserData(user.id);
     }
 
-    if (!success_result) {
+    const isSuccess = typeof success_result === 'boolean' ? success_result : success_result.success;
+    if (!isSuccess) {
       // Update request status
       await supabase
         .from('account_deletion_requests')
@@ -93,9 +96,7 @@ export async function DELETE(request: NextRequest) {
         .eq('user_id', user.id)
         .eq('status', 'processing');
 
-      return applySecurityHeaders(
-        apiError('Failed to process account deletion', 'INTERNAL_ERROR', 500)
-      );
+      return applySecurityHeaders(apiError('Failed to process account deletion', 'INTERNAL_ERROR'));
     }
 
     // Update request status
@@ -118,7 +119,7 @@ export async function DELETE(request: NextRequest) {
     );
   } catch (err) {
     logger.error('Account deletion error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Failed to delete account', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Failed to delete account', 'INTERNAL_ERROR'));
   }
 }
 
@@ -136,7 +137,7 @@ export async function GET(_request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     // Get any pending deletion requests
@@ -158,7 +159,7 @@ export async function GET(_request: NextRequest) {
       'Deletion status check error',
       err instanceof Error ? err : new Error(String(err))
     );
-    return applySecurityHeaders(apiError('Failed to check deletion status', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Failed to check deletion status', 'INTERNAL_ERROR'));
   }
 }
 
@@ -176,7 +177,7 @@ export async function POST(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     const body = await request.json();
@@ -198,7 +199,7 @@ export async function POST(request: NextRequest) {
 
       if (error) {
         return applySecurityHeaders(
-          apiError('Failed to cancel deletion request', 'INTERNAL_ERROR', 500)
+          apiError('Failed to cancel deletion request', 'INTERNAL_ERROR')
         );
       }
 
@@ -211,12 +212,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return applySecurityHeaders(apiError('Invalid action', 'VALIDATION_ERROR', 400));
+    return applySecurityHeaders(apiError('Invalid action', 'VALIDATION_ERROR'));
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return applySecurityHeaders(apiError('Invalid request', 'VALIDATION_ERROR', 400));
+      return applySecurityHeaders(apiError('Invalid request', 'VALIDATION_ERROR'));
     }
     logger.error('Deletion action error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Failed to process request', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Failed to process request', 'INTERNAL_ERROR'));
   }
 }

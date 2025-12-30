@@ -345,7 +345,7 @@ export function generateShareUrls(config: ShareConfig): ShareUrls {
 
   const encodedUrl = encodeURIComponent(url);
   const encodedTitle = encodeURIComponent(title);
-  const _encodedDesc = encodeURIComponent(description || ''); // Reserved for future use
+  const encodedDesc = encodeURIComponent(description || '');
   const _hashtagString = hashtags?.length ? hashtags.join(',') : ''; // Used in buildTwitterShareUrl
 
   return {
@@ -532,9 +532,10 @@ export function validateOGImage(
 /**
  * Get optimal OG image size for platform
  */
-export function getOptimalImageSize(
-  platform: 'facebook' | 'twitter' | 'linkedin'
-): { width: number; height: number } {
+export function getOptimalImageSize(platform: 'facebook' | 'twitter' | 'linkedin'): {
+  width: number;
+  height: number;
+} {
   switch (platform) {
     case 'facebook':
       return { width: 1200, height: 630 };
@@ -675,10 +676,7 @@ export function createMetadataObject(
 /**
  * Generate all social meta tags
  */
-export function generateAllSocialTags(
-  og: OpenGraphData,
-  twitter?: TwitterCardData
-): string {
+export function generateAllSocialTags(og: OpenGraphData, twitter?: TwitterCardData): string {
   let tags = generateOpenGraphTags(og);
 
   if (twitter) {

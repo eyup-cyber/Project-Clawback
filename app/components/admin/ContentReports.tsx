@@ -5,9 +5,9 @@
  * Phase 2.6: Queue, review, resolve, appeal handling
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
+import Link from 'next/link';
+import { useCallback, useEffect, useState } from 'react';
 
 // ============================================================================
 // TYPES
@@ -77,7 +77,13 @@ interface ReportFilters {
   order: 'asc' | 'desc';
 }
 
-type ResolveAction = 'remove_content' | 'warn_user' | 'suspend_user' | 'ban_user' | 'dismiss' | 'no_action';
+type ResolveAction =
+  | 'remove_content'
+  | 'warn_user'
+  | 'suspend_user'
+  | 'ban_user'
+  | 'dismiss'
+  | 'no_action';
 
 // ============================================================================
 // MAIN COMPONENT
@@ -88,7 +94,11 @@ export function ContentReports() {
   const [loading, setLoading] = useState(true);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [showResolveModal, setShowResolveModal] = useState(false);
-  const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0 });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+  });
   const [filters, setFilters] = useState<ReportFilters>({
     status: 'pending',
     type: 'all',
@@ -139,11 +149,7 @@ export function ContentReports() {
     void fetchReports();
   }, [fetchReports]);
 
-  const handleResolve = async (
-    reportId: string,
-    action: ResolveAction,
-    notes: string
-  ) => {
+  const handleResolve = async (reportId: string, action: ResolveAction, notes: string) => {
     try {
       const response = await fetch(`/api/admin/reports/${reportId}/resolve`, {
         method: 'POST',
@@ -161,11 +167,7 @@ export function ContentReports() {
     }
   };
 
-  const handleAppealDecision = async (
-    reportId: string,
-    approved: boolean,
-    notes: string
-  ) => {
+  const handleAppealDecision = async (reportId: string, approved: boolean, notes: string) => {
     try {
       const response = await fetch(`/api/admin/reports/${reportId}/appeal`, {
         method: 'POST',
@@ -196,9 +198,7 @@ export function ContentReports() {
       {/* Header */}
       <div className="header">
         <h1>Content Reports</h1>
-        {stats.urgent > 0 && (
-          <div className="urgent-badge">🚨 {stats.urgent} urgent reports</div>
-        )}
+        {stats.urgent > 0 && <div className="urgent-badge">🚨 {stats.urgent} urgent reports</div>}
       </div>
 
       {/* Stats Bar */}
@@ -239,7 +239,12 @@ export function ContentReports() {
       <div className="filters-bar">
         <select
           value={filters.type}
-          onChange={(e) => setFilters((f) => ({ ...f, type: e.target.value as ReportFilters['type'] }))}
+          onChange={(e) =>
+            setFilters((f) => ({
+              ...f,
+              type: e.target.value as ReportFilters['type'],
+            }))
+          }
         >
           <option value="all">All Types</option>
           <option value="post">Posts</option>
@@ -250,7 +255,10 @@ export function ContentReports() {
         <select
           value={filters.reason}
           onChange={(e) =>
-            setFilters((f) => ({ ...f, reason: e.target.value as ReportFilters['reason'] }))
+            setFilters((f) => ({
+              ...f,
+              reason: e.target.value as ReportFilters['reason'],
+            }))
           }
         >
           <option value="all">All Reasons</option>
@@ -266,7 +274,10 @@ export function ContentReports() {
         <select
           value={filters.priority}
           onChange={(e) =>
-            setFilters((f) => ({ ...f, priority: e.target.value as ReportFilters['priority'] }))
+            setFilters((f) => ({
+              ...f,
+              priority: e.target.value as ReportFilters['priority'],
+            }))
           }
         >
           <option value="all">All Priorities</option>
@@ -279,7 +290,7 @@ export function ContentReports() {
           onChange={(e) => {
             const [sort, order] = e.target.value.split('-') as [
               ReportFilters['sort'],
-              ReportFilters['order']
+              ReportFilters['order'],
             ];
             setFilters((f) => ({ ...f, sort, order }));
           }}
@@ -298,9 +309,7 @@ export function ContentReports() {
         ) : reports.length === 0 ? (
           <div className="empty-state">
             <p>No reports found</p>
-            {filters.status === 'pending' && (
-              <p className="empty-hint">All caught up! 🎉</p>
-            )}
+            {filters.status === 'pending' && <p className="empty-hint">All caught up! 🎉</p>}
           </div>
         ) : (
           reports.map((report) => (
@@ -311,7 +320,9 @@ export function ContentReports() {
                 setSelectedReport(report);
                 setShowResolveModal(true);
               }}
-              onClaim={() => void handleClaimReport(report.id)}
+              onClaim={() => {
+                void handleClaimReport(report.id);
+              }}
             />
           ))
         )}
@@ -335,8 +346,12 @@ export function ContentReports() {
             setShowResolveModal(false);
             setSelectedReport(null);
           }}
-          onResolve={(reportId, action, notes) => void handleResolve(reportId, action, notes)}
-          onAppealDecision={(reportId, approved, notes) => void handleAppealDecision(reportId, approved, notes)}
+          onResolve={(reportId, action, notes) => {
+            void handleResolve(reportId, action, notes);
+          }}
+          onAppealDecision={(reportId, approved, notes) => {
+            void handleAppealDecision(reportId, approved, notes);
+          }}
         />
       )}
 
@@ -496,7 +511,9 @@ function ReportCard({
         </div>
         <div className="header-right">
           <span className="date">
-            {formatDistanceToNow(new Date(report.created_at), { addSuffix: true })}
+            {formatDistanceToNow(new Date(report.created_at), {
+              addSuffix: true,
+            })}
           </span>
         </div>
       </div>
@@ -536,9 +553,7 @@ function ReportCard({
       </div>
 
       <div className="card-footer">
-        <div className="reporter-info">
-          Reported by {report.reporter.display_name}
-        </div>
+        <div className="reporter-info">Reported by {report.reporter.display_name}</div>
         {report.status === 'pending' && (
           <button
             className="claim-btn"
@@ -560,7 +575,9 @@ function ReportCard({
           padding: 1.25rem;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
           cursor: pointer;
-          transition: box-shadow 0.2s, transform 0.2s;
+          transition:
+            box-shadow 0.2s,
+            transform 0.2s;
         }
 
         .report-card:hover {
@@ -756,7 +773,9 @@ function ResolveModal({
           <div className="section">
             <h4>Reported Content</h4>
             <div className="content-box">
-              {report.reported_content.title && <p className="title">{report.reported_content.title}</p>}
+              {report.reported_content.title && (
+                <p className="title">{report.reported_content.title}</p>
+              )}
               {report.reported_content.content && (
                 <p className="content">{report.reported_content.content}</p>
               )}
@@ -764,11 +783,7 @@ function ResolveModal({
                 <p className="author">By @{report.reported_content.author.username}</p>
               )}
               {report.reported_content.url && (
-                <Link
-                  href={report.reported_content.url}
-                  target="_blank"
-                  className="view-link"
-                >
+                <Link href={report.reported_content.url} target="_blank" className="view-link">
                   View Original →
                 </Link>
               )}
@@ -782,11 +797,10 @@ function ResolveModal({
               <strong>Reason:</strong> {report.reason.replace('_', ' ')}
             </p>
             <p>
-              <strong>Reporter:</strong> {report.reporter.display_name} (@{report.reporter.username})
+              <strong>Reporter:</strong> {report.reporter.display_name} (@
+              {report.reporter.username})
             </p>
-            {report.description && (
-              <p className="description">{report.description}</p>
-            )}
+            {report.description && <p className="description">{report.description}</p>}
           </div>
 
           {/* Appeal Info */}
@@ -795,7 +809,10 @@ function ResolveModal({
               <h4>Appeal</h4>
               <p>{report.appeal.reason}</p>
               <p className="appeal-date">
-                Submitted {formatDistanceToNow(new Date(report.appeal.submitted_at), { addSuffix: true })}
+                Submitted{' '}
+                {formatDistanceToNow(new Date(report.appeal.submitted_at), {
+                  addSuffix: true,
+                })}
               </p>
             </div>
           )}
@@ -872,7 +889,13 @@ function ResolveModal({
             <button onClick={onClose} disabled={submitting}>
               Cancel
             </button>
-            <button onClick={() => void handleSubmit()} className="primary" disabled={submitting}>
+            <button
+              onClick={() => {
+                void handleSubmit();
+              }}
+              className="primary"
+              disabled={submitting}
+            >
               {submitting ? 'Processing...' : isAppeal ? 'Submit Decision' : 'Resolve Report'}
             </button>
           </div>

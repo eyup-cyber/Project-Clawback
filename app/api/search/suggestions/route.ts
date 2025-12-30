@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { getSearchService } from '@/lib/search';
 import { success, error as apiError, applySecurityHeaders } from '@/lib/api';
 import { logger } from '@/lib/logger';
-import { cache } from '@/lib/cache';
+import { cacheGet, cacheSet } from '@/lib/cache';
 
 // Validation schema
 const suggestionsSchema = z.object({
@@ -32,22 +32,22 @@ export async function GET(request: NextRequest) {
 
     if (!parseResult.success) {
       return applySecurityHeaders(
-        apiError('Invalid parameters', 'VALIDATION_ERROR', 400, {
+        apiError('Invalid parameters', 'VALIDATION_ERROR', {
           errors: parseResult.error.flatten().fieldErrors,
         })
       );
     }
 
     const { q: query, limit, type } = parseResult.data;
-    const cacheKey = `search:suggestions:${type}:${query.toLowerCase()}:${limit}`;
+    const cacheKey = `suggestions:${type}:${query.toLowerCase()}:${limit}`;
 
     // Try cache first
-    const cached = await cache.get<string[]>(cacheKey);
+    const cached = await cacheGet<string[]>('SEARCH', cacheKey);
     if (cached) {
       return applySecurityHeaders(
         success({
           query,
-          suggestions: cached,
+          suggestions: cached.data,
           type,
           cached: true,
         })
@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Cache the results
-    await cache.set(cacheKey, suggestions, { ttl: SUGGESTIONS_CACHE_TTL });
+    await cacheSet('SEARCH', cacheKey, suggestions, { ttl: SUGGESTIONS_CACHE_TTL });
 
     return applySecurityHeaders(
       success({
@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
     );
   } catch (err) {
     logger.error('Search suggestions error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Failed to get suggestions', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Failed to get suggestions', 'INTERNAL_ERROR'));
   }
 }
 
@@ -185,8 +185,8 @@ export async function POST(request: NextRequest) {
     return applySecurityHeaders(success({ recorded: true }));
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return applySecurityHeaders(apiError('Invalid request', 'VALIDATION_ERROR', 400));
+      return applySecurityHeaders(apiError('Invalid request', 'VALIDATION_ERROR'));
     }
-    return applySecurityHeaders(apiError('Failed to record click', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Failed to record click', 'INTERNAL_ERROR'));
   }
 }

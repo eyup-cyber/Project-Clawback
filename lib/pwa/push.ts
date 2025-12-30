@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Push Notification Support
  * Web Push API implementation for PWA

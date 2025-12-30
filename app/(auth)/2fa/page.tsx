@@ -88,7 +88,7 @@ export default function TwoFactorSetupPage() {
   const downloadBackupCodes = () => {
     if (setupData?.backupCodes) {
       const content = `Scroungers Multimedia - 2FA Backup Codes\n${'='.repeat(45)}\n\nStore these codes in a safe place. Each code can only be used once.\n\n${setupData.backupCodes.map((code, i) => `${i + 1}. ${code}`).join('\n')}\n\nGenerated: ${new Date().toISOString()}`;
-      
+
       const blob = new Blob([content], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -109,10 +109,16 @@ export default function TwoFactorSetupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12" style={{ background: 'var(--background)' }}>
+    <div
+      className="min-h-screen flex items-center justify-center px-4 py-12"
+      style={{ background: 'var(--background)' }}
+    >
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--primary)' }}>
+          <h1
+            className="text-3xl font-bold mb-2"
+            style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--primary)' }}
+          >
             Two-Factor Authentication
           </h1>
           <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.7 }}>
@@ -120,11 +126,17 @@ export default function TwoFactorSetupPage() {
           </p>
         </div>
 
-        <div className="rounded-2xl p-8" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+        <div
+          className="rounded-2xl p-8"
+          style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+        >
           {/* Step: Initial */}
           {step === 'initial' && (
             <div className="text-center space-y-6">
-              <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center" style={{ background: 'var(--primary)', opacity: 0.1 }}>
+              <div
+                className="w-20 h-20 mx-auto rounded-full flex items-center justify-center"
+                style={{ background: 'var(--primary)', opacity: 0.1 }}
+              >
                 <span className="text-4xl">🔐</span>
               </div>
               <div>
@@ -132,7 +144,8 @@ export default function TwoFactorSetupPage() {
                   Secure Your Account
                 </h2>
                 <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.7 }}>
-                  Two-factor authentication adds an extra layer of security by requiring a code from your phone in addition to your password.
+                  Two-factor authentication adds an extra layer of security by requiring a code from
+                  your phone in addition to your password.
                 </p>
               </div>
               <button
@@ -169,7 +182,10 @@ export default function TwoFactorSetupPage() {
                 <p className="text-xs mb-2" style={{ color: 'var(--foreground)', opacity: 0.5 }}>
                   Can&apos;t scan? Enter this code manually:
                 </p>
-                <code className="block p-2 rounded text-sm break-all" style={{ background: 'var(--background)', color: 'var(--primary)' }}>
+                <code
+                  className="block p-2 rounded text-sm break-all"
+                  style={{ background: 'var(--background)', color: 'var(--primary)' }}
+                >
                   {setupData.secret}
                 </code>
               </div>
@@ -206,7 +222,11 @@ export default function TwoFactorSetupPage() {
                 onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
                 placeholder="000000"
                 className="w-full py-4 text-center text-2xl tracking-widest rounded-xl border outline-none focus:border-[var(--primary)]"
-                style={{ background: 'var(--background)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                style={{
+                  background: 'var(--background)',
+                  borderColor: 'var(--border)',
+                  color: 'var(--foreground)',
+                }}
               />
 
               <button
@@ -239,13 +259,21 @@ export default function TwoFactorSetupPage() {
                   Save Backup Codes
                 </h2>
                 <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.7 }}>
-                  Save these codes in a secure location. You can use them to access your account if you lose your phone.
+                  Save these codes in a secure location. You can use them to access your account if
+                  you lose your phone.
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 p-4 rounded-xl" style={{ background: 'var(--background)' }}>
+              <div
+                className="grid grid-cols-2 gap-2 p-4 rounded-xl"
+                style={{ background: 'var(--background)' }}
+              >
                 {setupData.backupCodes.map((code) => (
-                  <code key={code} className="text-sm py-1 text-center" style={{ color: 'var(--foreground)' }}>
+                  <code
+                    key={code}
+                    className="text-sm py-1 text-center"
+                    style={{ color: 'var(--foreground)' }}
+                  >
                     {code}
                   </code>
                 ))}
@@ -297,7 +325,10 @@ export default function TwoFactorSetupPage() {
           {/* Step: Complete */}
           {step === 'complete' && (
             <div className="text-center space-y-6">
-              <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center" style={{ background: 'var(--primary)' }}>
+              <div
+                className="w-20 h-20 mx-auto rounded-full flex items-center justify-center"
+                style={{ background: 'var(--primary)' }}
+              >
                 <span className="text-4xl">✓</span>
               </div>
               <div>
@@ -319,7 +350,10 @@ export default function TwoFactorSetupPage() {
           )}
         </div>
 
-        <p className="text-center text-sm mt-6" style={{ color: 'var(--foreground)', opacity: 0.5 }}>
+        <p
+          className="text-center text-sm mt-6"
+          style={{ color: 'var(--foreground)', opacity: 0.5 }}
+        >
           <Link href="/dashboard" className="hover:underline">
             Skip for now
           </Link>

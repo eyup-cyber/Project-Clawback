@@ -38,7 +38,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     // Check admin role
@@ -49,7 +49,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
       .single();
 
     if (profile?.role !== 'admin') {
-      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN', 403));
+      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN'));
     }
 
     const { data: experiment, error } = await supabase
@@ -65,7 +65,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
       .single();
 
     if (error || !experiment) {
-      return applySecurityHeaders(apiError('Experiment not found', 'NOT_FOUND', 404));
+      return applySecurityHeaders(apiError('Experiment not found', 'NOT_FOUND'));
     }
 
     return applySecurityHeaders(
@@ -92,7 +92,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
     );
   } catch (err) {
     logger.error('Experiment GET error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR'));
   }
 }
 
@@ -111,7 +111,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     // Check admin role
@@ -122,7 +122,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       .single();
 
     if (profile?.role !== 'admin') {
-      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN', 403));
+      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN'));
     }
 
     // Parse body
@@ -131,7 +131,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
     if (!parseResult.success) {
       return applySecurityHeaders(
-        apiError('Invalid request', 'VALIDATION_ERROR', 400, {
+        apiError('Invalid request', 'VALIDATION_ERROR', {
           errors: parseResult.error.flatten().fieldErrors,
         })
       );
@@ -147,7 +147,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       .single();
 
     if (!current) {
-      return applySecurityHeaders(apiError('Experiment not found', 'NOT_FOUND', 404));
+      return applySecurityHeaders(apiError('Experiment not found', 'NOT_FOUND'));
     }
 
     // Build update object
@@ -176,8 +176,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
         return applySecurityHeaders(
           apiError(
             `Cannot transition from ${current.status} to ${input.status}`,
-            'VALIDATION_ERROR',
-            400
+            'VALIDATION_ERROR'
           )
         );
       }
@@ -200,7 +199,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
     if (error) {
       logger.error('Error updating experiment', error);
-      return applySecurityHeaders(apiError('Failed to update experiment', 'INTERNAL_ERROR', 500));
+      return applySecurityHeaders(apiError('Failed to update experiment', 'INTERNAL_ERROR'));
     }
 
     logger.info('Experiment updated', { id, userId: user.id, changes: Object.keys(updateData) });
@@ -217,7 +216,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     );
   } catch (err) {
     logger.error('Experiment PATCH error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR'));
   }
 }
 
@@ -236,7 +235,7 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     // Check admin role
@@ -247,7 +246,7 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
       .single();
 
     if (profile?.role !== 'admin') {
-      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN', 403));
+      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN'));
     }
 
     // Check experiment exists and is in draft status
@@ -258,12 +257,12 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
       .single();
 
     if (!experiment) {
-      return applySecurityHeaders(apiError('Experiment not found', 'NOT_FOUND', 404));
+      return applySecurityHeaders(apiError('Experiment not found', 'NOT_FOUND'));
     }
 
     if (experiment.status !== 'draft') {
       return applySecurityHeaders(
-        apiError('Only draft experiments can be deleted', 'VALIDATION_ERROR', 400)
+        apiError('Only draft experiments can be deleted', 'VALIDATION_ERROR')
       );
     }
 
@@ -271,7 +270,7 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
 
     if (error) {
       logger.error('Error deleting experiment', error);
-      return applySecurityHeaders(apiError('Failed to delete experiment', 'INTERNAL_ERROR', 500));
+      return applySecurityHeaders(apiError('Failed to delete experiment', 'INTERNAL_ERROR'));
     }
 
     logger.info('Experiment deleted', { id, key: experiment.key, userId: user.id });
@@ -279,6 +278,6 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
     return applySecurityHeaders(success({ deleted: true }));
   } catch (err) {
     logger.error('Experiment DELETE error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR'));
   }
 }

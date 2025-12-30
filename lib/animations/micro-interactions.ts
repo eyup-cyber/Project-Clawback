@@ -1,5 +1,5 @@
 import gsap from 'gsap';
-import { EASING, DURATION, prefersReducedMotion, getDuration } from './gsap-config';
+import { DURATION, EASING, getDuration, prefersReducedMotion } from './gsap-config';
 
 // ============================================
 // HOVER STATE ANIMATIONS

@@ -3,7 +3,7 @@
  */
 
 import { logger } from '@/lib/logger';
-import { sendEmail, type EmailOptions } from './client';
+import { type EmailOptions, sendEmail } from './client';
 
 // ============================================================================
 // TYPES
@@ -88,7 +88,10 @@ class EmailQueue {
       if (result.success) {
         email.status = 'sent';
         email.sentAt = new Date();
-        logger.info('Email sent successfully', { emailId: email.id, to: email.options.to });
+        logger.info('Email sent successfully', {
+          emailId: email.id,
+          to: email.options.to,
+        });
         return true;
       } else {
         throw new Error(result.error || 'Unknown error');
@@ -121,7 +124,11 @@ class EmailQueue {
   /**
    * Process pending emails in batches
    */
-  async processBatch(): Promise<{ processed: number; succeeded: number; failed: number }> {
+  async processBatch(): Promise<{
+    processed: number;
+    succeeded: number;
+    failed: number;
+  }> {
     if (this.isProcessing) {
       return { processed: 0, succeeded: 0, failed: 0 };
     }
@@ -139,7 +146,7 @@ class EmailQueue {
           // Check retry delay
           if (email.attempts > 0 && email.lastAttempt) {
             const timeSinceLastAttempt = Date.now() - email.lastAttempt.getTime();
-            const requiredDelay = this.options.retryDelayMs * Math.pow(2, email.attempts - 1); // Exponential backoff
+            const requiredDelay = this.options.retryDelayMs * 2 ** (email.attempts - 1); // Exponential backoff
             if (timeSinceLastAttempt < requiredDelay) return false;
           }
 

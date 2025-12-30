@@ -3,7 +3,7 @@
  * Implements various caching patterns for different use cases
  */
 
-import { redis, isRedisConnected } from './redis';
+import { isRedisConnected, redis } from './redis';
 
 export interface CacheOptions {
   ttl?: number; // Time to live in seconds
@@ -33,16 +33,16 @@ export async function cacheAside<T>(
 
   // Try to get from cache
   const cached = await redis.get<CacheEntry<T>>(key);
-  
+
   if (cached) {
     const now = Date.now();
     const age = (now - cached.timestamp) / 1000;
-    
+
     // Fresh cache hit
     if (age < cached.ttl) {
       return cached.data;
     }
-    
+
     // Stale but within revalidation window
     if (cached.staleUntil && now < cached.staleUntil) {
       // Revalidate in background
@@ -53,26 +53,24 @@ export async function cacheAside<T>(
 
   // Cache miss or expired - fetch fresh data
   const data = await fetchFn();
-  
+
   // Store in cache
   const entry: CacheEntry<T> = {
     data,
     timestamp: Date.now(),
     ttl,
-    staleUntil: staleWhileRevalidate 
-      ? Date.now() + (ttl + staleWhileRevalidate) * 1000 
-      : undefined,
+    staleUntil: staleWhileRevalidate ? Date.now() + (ttl + staleWhileRevalidate) * 1000 : undefined,
   };
-  
+
   await redis.set(key, entry, ttl + staleWhileRevalidate);
-  
+
   // Store tags for invalidation
   if (options.tags) {
     for (const tag of options.tags) {
       await redis.sets.add(`cache:tag:${tag}`, key);
     }
   }
-  
+
   return data;
 }
 
@@ -85,24 +83,24 @@ async function revalidateInBackground<T>(
   options: CacheOptions
 ): Promise<void> {
   const lockKey = `lock:${key}`;
-  
+
   // Try to acquire lock to prevent thundering herd
   const acquired = await redis.set(lockKey, '1', 30);
   if (!acquired) return;
-  
+
   try {
     const data = await fetchFn();
     const { ttl = 300, staleWhileRevalidate = 60 } = options;
-    
+
     const entry: CacheEntry<T> = {
       data,
       timestamp: Date.now(),
       ttl,
-      staleUntil: staleWhileRevalidate 
-        ? Date.now() + (ttl + staleWhileRevalidate) * 1000 
+      staleUntil: staleWhileRevalidate
+        ? Date.now() + (ttl + staleWhileRevalidate) * 1000
         : undefined,
     };
-    
+
     await redis.set(key, entry, ttl + staleWhileRevalidate);
   } finally {
     await redis.del(lockKey);
@@ -124,10 +122,7 @@ export async function writeThrough<T>(
   const { ttl = 300 } = options;
 
   // Write to both cache and database
-  await Promise.all([
-    writeFn(data),
-    redis.set(key, { data, timestamp: Date.now(), ttl }, ttl),
-  ]);
+  await Promise.all([writeFn(data), redis.set(key, { data, timestamp: Date.now(), ttl }, ttl)]);
 
   // Update tags
   if (options.tags) {
@@ -165,19 +160,17 @@ export async function writeBehind<T>(
 /**
  * Process write-behind queue
  */
-async function processWriteQueue<T>(
-  writeFn: (data: T) => Promise<void>
-): Promise<void> {
+async function processWriteQueue<T>(writeFn: (data: T) => Promise<void>): Promise<void> {
   const writeQueueKey = 'cache:write-queue';
   const lockKey = 'cache:write-queue:lock';
-  
+
   // Try to acquire lock
   const acquired = await redis.set(lockKey, '1', 10);
   if (!acquired) return;
-  
+
   try {
     const items = await redis.list.range<{ key: string; data: T }>(writeQueueKey, 0, 9);
-    
+
     for (const item of items) {
       try {
         await writeFn(item.data);
@@ -185,10 +178,10 @@ async function processWriteQueue<T>(
         console.error('Write-behind failed for key:', item.key, error);
       }
     }
-    
+
     // Remove processed items
     if (items.length > 0) {
-      const client = await import('./redis').then(m => m.getRedisClient());
+      const client = await import('./redis').then((m) => m.getRedisClient());
       if (client) {
         await client.ltrim(writeQueueKey, items.length, -1);
       }
@@ -204,19 +197,19 @@ async function processWriteQueue<T>(
 export async function invalidateByTag(tag: string): Promise<number> {
   const tagKey = `cache:tag:${tag}`;
   const keys = await redis.sets.members(tagKey);
-  
+
   if (keys.length === 0) return 0;
-  
+
   // Delete all cached entries with this tag
   let deleted = 0;
   for (const key of keys) {
     const success = await redis.del(key);
     if (success) deleted++;
   }
-  
+
   // Delete the tag set
   await redis.del(tagKey);
-  
+
   return deleted;
 }
 
@@ -248,10 +241,7 @@ export function memoize<TArgs extends unknown[], TResult>(
  */
 const inflightRequests = new Map<string, Promise<unknown>>();
 
-export async function singleFlight<T>(
-  key: string,
-  fetchFn: () => Promise<T>
-): Promise<T> {
+export async function singleFlight<T>(key: string, fetchFn: () => Promise<T>): Promise<T> {
   // Check if request is already in-flight
   const existing = inflightRequests.get(key);
   if (existing) {
@@ -288,7 +278,7 @@ export async function withLock<T>(
         await redis.del(fullLockKey);
       }
     }
-    
+
     // Wait before retry
     await new Promise((resolve) => setTimeout(resolve, retryDelay * (i + 1)));
   }
@@ -303,18 +293,18 @@ export async function warmCache<T>(
   items: Array<{ key: string; data: T; ttl?: number }>
 ): Promise<number> {
   let warmed = 0;
-  
+
   for (const item of items) {
     const entry: CacheEntry<T> = {
       data: item.data,
       timestamp: Date.now(),
       ttl: item.ttl || 300,
     };
-    
+
     const success = await redis.set(item.key, entry, item.ttl || 300);
     if (success) warmed++;
   }
-  
+
   return warmed;
 }
 
@@ -326,7 +316,7 @@ export async function cacheHealthCheck(): Promise<{
   latencyMs: number | null;
 }> {
   const start = Date.now();
-  
+
   if (!isRedisConnected()) {
     return { connected: false, latencyMs: null };
   }

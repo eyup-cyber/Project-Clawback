@@ -38,7 +38,7 @@ export const GET = withRouteHandler(async (_req: NextRequest) => {
 export const PATCH = withRouteHandler(async (_req: NextRequest) => {
   const { user } = await requireAuth();
 
-  const body = await req.json();
+  const body = await _req.json();
   const data = updatePreferenceSchema.parse(body);
 
   const preference = await notificationPrefsDb.updateNotificationPreference(

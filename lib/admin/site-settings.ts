@@ -3,8 +3,8 @@
  * Phase 22: Global site configuration, feature flags, maintenance mode
  */
 
-import { createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -281,10 +281,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
 export async function getSiteSettings(): Promise<SiteSettings> {
   const supabase = await createServiceClient();
 
-  const { data, error } = await supabase
-    .from('site_settings')
-    .select('key, value')
-    .order('key');
+  const { data, error } = await supabase.from('site_settings').select('key, value').order('key');
 
   if (error) {
     logger.error('[Admin] Failed to fetch site settings', error);
@@ -292,18 +289,23 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   }
 
   // Merge stored settings with defaults
-  const storedSettings: Partial<SiteSettings> = {};
+  const storedSettings: Record<string, Record<string, unknown>> = {};
   for (const { key, value } of data || []) {
     const [category, setting] = key.split('.');
     if (category && setting) {
-      if (!storedSettings[category as keyof SiteSettings]) {
-        storedSettings[category as keyof SiteSettings] = {} as never;
+      if (!storedSettings[category]) {
+        storedSettings[category] = {};
       }
-      (storedSettings[category as keyof SiteSettings] as Record<string, unknown>)[setting] = value;
+      storedSettings[category][setting] = value;
     }
   }
 
-  return deepMerge(DEFAULT_SETTINGS, storedSettings as SiteSettings);
+  // Type assertion is safe here because we're merging with DEFAULT_SETTINGS
+  // which provides all required properties
+  return deepMerge(
+    DEFAULT_SETTINGS as unknown as Record<string, unknown>,
+    storedSettings
+  ) as unknown as SiteSettings;
 }
 
 /**
@@ -329,7 +331,7 @@ export async function updateSiteSettings(
   const keyValuePairs: { key: string; value: unknown }[] = [];
   for (const [category, settings] of Object.entries(updates)) {
     if (settings && typeof settings === 'object') {
-      for (const [key, value] of Object.entries(settings as Record<string, unknown>)) {
+      for (const [key, value] of Object.entries(settings)) {
         keyValuePairs.push({
           key: `${category}.${key}`,
           value,
@@ -340,17 +342,15 @@ export async function updateSiteSettings(
 
   // Upsert each setting
   for (const { key, value } of keyValuePairs) {
-    const { error } = await supabase
-      .from('site_settings')
-      .upsert(
-        {
-          key,
-          value,
-          updated_by: adminId,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'key' }
-      );
+    const { error } = await supabase.from('site_settings').upsert(
+      {
+        key,
+        value,
+        updated_by: adminId,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'key' }
+    );
 
     if (error) {
       logger.error('[Admin] Failed to update setting', { key, error });
@@ -394,10 +394,7 @@ export async function resetSettingsToDefault(
     }
   } else {
     // Delete settings for specific category
-    const { error } = await supabase
-      .from('site_settings')
-      .delete()
-      .like('key', `${category}.%`);
+    const { error } = await supabase.from('site_settings').delete().like('key', `${category}.%`);
 
     if (error) {
       logger.error('[Admin] Failed to reset category settings', error);

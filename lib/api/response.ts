@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
 // ============================================================================
 // STANDARDIZED API RESPONSE HELPERS
@@ -64,10 +64,7 @@ export function success<T>(
   );
 }
 
-export function created<T>(
-  data: T,
-  headers?: HeadersInit
-): NextResponse<ApiSuccessResponse<T>> {
+export function created<T>(data: T, headers?: HeadersInit): NextResponse<ApiSuccessResponse<T>> {
   return success(data, 201, headers);
 }
 
@@ -117,18 +114,20 @@ export function paginated<T>(
 // ============================================================================
 
 export type ErrorCode =
-  | "BAD_REQUEST"
-  | "VALIDATION_ERROR"
-  | "UNAUTHORIZED"
-  | "FORBIDDEN"
-  | "NOT_FOUND"
-  | "METHOD_NOT_ALLOWED"
-  | "CONFLICT"
-  | "RATE_LIMITED"
-  | "INTERNAL_ERROR"
-  | "SERVICE_UNAVAILABLE"
-  | "DATABASE_ERROR"
-  | "MEDIA_UPLOAD_ERROR";
+  | 'BAD_REQUEST'
+  | 'VALIDATION_ERROR'
+  | 'UNAUTHORIZED'
+  | 'FORBIDDEN'
+  | 'NOT_FOUND'
+  | 'METHOD_NOT_ALLOWED'
+  | 'CONFLICT'
+  | 'RATE_LIMITED'
+  | 'INTERNAL_ERROR'
+  | 'SERVICE_UNAVAILABLE'
+  | 'DATABASE_ERROR'
+  | 'MEDIA_UPLOAD_ERROR'
+  | 'PARSE_ERROR'
+  | 'LIMIT_EXCEEDED';
 
 const STATUS_CODES: Record<ErrorCode, number> = {
   BAD_REQUEST: 400,
@@ -143,11 +142,13 @@ const STATUS_CODES: Record<ErrorCode, number> = {
   SERVICE_UNAVAILABLE: 503,
   DATABASE_ERROR: 500,
   MEDIA_UPLOAD_ERROR: 500,
+  PARSE_ERROR: 400,
+  LIMIT_EXCEEDED: 429,
 };
 
 export function error(
   message: string,
-  code: ErrorCode = "INTERNAL_ERROR",
+  code: ErrorCode = 'INTERNAL_ERROR',
   details?: Record<string, unknown>,
   headers?: HeadersInit
 ): NextResponse<ApiErrorResponse> {
@@ -169,49 +170,35 @@ export function error(
 }
 
 // Convenience error methods
-export const badRequest = (
-  message: string,
-  details?: Record<string, unknown>
-) => error(message, "BAD_REQUEST", details);
+export const badRequest = (message: string, details?: Record<string, unknown>) =>
+  error(message, 'BAD_REQUEST', details);
 
-export const validationError = (
-  message: string,
-  details?: Record<string, unknown>
-) => error(message, "VALIDATION_ERROR", details);
+export const validationError = (message: string, details?: Record<string, unknown>) =>
+  error(message, 'VALIDATION_ERROR', details);
 
-export const unauthorized = (message: string = "Authentication required") =>
-  error(message, "UNAUTHORIZED");
+export const unauthorized = (message: string = 'Authentication required') =>
+  error(message, 'UNAUTHORIZED');
 
-export const forbidden = (message: string = "Access denied") =>
-  error(message, "FORBIDDEN");
+export const forbidden = (message: string = 'Access denied') => error(message, 'FORBIDDEN');
 
-export const notFound = (resource: string = "Resource") =>
-  error(`${resource} not found`, "NOT_FOUND");
+export const notFound = (resource: string = 'Resource') =>
+  error(`${resource} not found`, 'NOT_FOUND');
 
 export const methodNotAllowed = (allowed: string[]) =>
-  error(
-    `Method not allowed. Allowed: ${allowed.join(", ")}`,
-    "METHOD_NOT_ALLOWED"
-  );
+  error(`Method not allowed. Allowed: ${allowed.join(', ')}`, 'METHOD_NOT_ALLOWED');
 
-export const conflict = (message: string) => error(message, "CONFLICT");
+export const conflict = (message: string) => error(message, 'CONFLICT');
 
 export const rateLimited = (retryAfter: number = 60) =>
-  error(
-    `Rate limit exceeded. Try again in ${retryAfter} seconds`,
-    "RATE_LIMITED",
-    undefined,
-    {
-      "Retry-After": retryAfter.toString(),
-    }
-  );
+  error(`Rate limit exceeded. Try again in ${retryAfter} seconds`, 'RATE_LIMITED', undefined, {
+    'Retry-After': retryAfter.toString(),
+  });
 
-export const internalError = (
-  message: string = "An unexpected error occurred"
-) => error(message, "INTERNAL_ERROR");
+export const internalError = (message: string = 'An unexpected error occurred') =>
+  error(message, 'INTERNAL_ERROR');
 
-export const databaseError = (message: string = "Database operation failed") =>
-  error(message, "DATABASE_ERROR");
+export const databaseError = (message: string = 'Database operation failed') =>
+  error(message, 'DATABASE_ERROR');
 
 // ============================================================================
 // HANDLE THROWN ERRORS
@@ -238,36 +225,34 @@ export function handleApiError(err: unknown, requestId?: string): NextResponse<A
 export class ApiError extends Error {
   constructor(
     message: string,
-    public code: ErrorCode = "INTERNAL_ERROR",
+    public code: ErrorCode = 'INTERNAL_ERROR',
     public details?: Record<string, unknown>
   ) {
     super(message);
-    this.name = "ApiError";
+    this.name = 'ApiError';
   }
 
   static badRequest(message: string, details?: Record<string, unknown>) {
-    return new ApiError(message, "BAD_REQUEST", details);
+    return new ApiError(message, 'BAD_REQUEST', details);
   }
 
-  static unauthorized(message: string = "Authentication required") {
-    return new ApiError(message, "UNAUTHORIZED");
+  static unauthorized(message: string = 'Authentication required') {
+    return new ApiError(message, 'UNAUTHORIZED');
   }
 
-  static forbidden(message: string = "Access denied") {
-    return new ApiError(message, "FORBIDDEN");
+  static forbidden(message: string = 'Access denied') {
+    return new ApiError(message, 'FORBIDDEN');
   }
 
-  static notFound(resource: string = "Resource") {
-    return new ApiError(`${resource} not found`, "NOT_FOUND");
+  static notFound(resource: string = 'Resource') {
+    return new ApiError(`${resource} not found`, 'NOT_FOUND');
   }
 
   static conflict(message: string) {
-    return new ApiError(message, "CONFLICT");
+    return new ApiError(message, 'CONFLICT');
   }
 
   static validation(message: string, details?: Record<string, unknown>) {
-    return new ApiError(message, "VALIDATION_ERROR", details);
+    return new ApiError(message, 'VALIDATION_ERROR', details);
   }
 }
-
-

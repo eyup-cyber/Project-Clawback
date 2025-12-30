@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface DiffViewerProps {
   postId: string;
@@ -32,7 +32,7 @@ export default function DiffViewer({ postId, versionA, versionB }: DiffViewerPro
 
   useEffect(() => {
     void fetchVersions();
-  }, [postId, versionA, versionB]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [postId, versionA, versionB]);
 
   const fetchVersions = async () => {
     setLoading(true);
@@ -171,7 +171,9 @@ export default function DiffViewer({ postId, versionA, versionB }: DiffViewerPro
               className={`px-3 py-2 text-sm transition-all ${
                 viewMode === 'inline' ? 'bg-[var(--primary)] text-black' : ''
               }`}
-              style={{ color: viewMode === 'inline' ? '#000' : 'var(--foreground)' }}
+              style={{
+                color: viewMode === 'inline' ? '#000' : 'var(--foreground)',
+              }}
             >
               Inline
             </button>
@@ -181,7 +183,9 @@ export default function DiffViewer({ postId, versionA, versionB }: DiffViewerPro
               className={`px-3 py-2 text-sm transition-all ${
                 viewMode === 'side-by-side' ? 'bg-[var(--primary)] text-black' : ''
               }`}
-              style={{ color: viewMode === 'side-by-side' ? '#000' : 'var(--foreground)' }}
+              style={{
+                color: viewMode === 'side-by-side' ? '#000' : 'var(--foreground)',
+              }}
             >
               Side by Side
             </button>

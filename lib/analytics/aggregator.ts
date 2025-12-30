@@ -161,7 +161,12 @@ export async function getDashboardMetrics(
   return {
     pageViews: calculateMetricSummary(currentViews, previousViews),
     uniqueVisitors: calculateMetricSummary(currentUnique, previousUnique),
-    avgSessionDuration: { total: 0, change: 0, changePercent: 0, trend: 'stable' }, // Would need session data
+    avgSessionDuration: {
+      total: 0,
+      change: 0,
+      changePercent: 0,
+      trend: 'stable',
+    }, // Would need session data
     bounceRate: { total: 0, change: 0, changePercent: 0, trend: 'stable' }, // Would need session data
     topPages,
     topReferrers,
@@ -399,10 +404,11 @@ function getTimeBucket(date: Date, granularity: 'hour' | 'day' | 'week' | 'month
       return date.toISOString().slice(0, 13) + ':00:00Z';
     case 'day':
       return date.toISOString().slice(0, 10);
-    case 'week':
+    case 'week': {
       const weekStart = new Date(date);
       weekStart.setDate(date.getDate() - date.getDay());
       return weekStart.toISOString().slice(0, 10);
+    }
     case 'month':
       return date.toISOString().slice(0, 7);
   }

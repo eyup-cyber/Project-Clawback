@@ -34,7 +34,7 @@ const createWebhookSchema = z.object({
   active: z.boolean().optional().default(true),
   retryCount: z.number().int().min(0).max(10).optional().default(3),
   timeoutSeconds: z.number().int().min(5).max(60).optional().default(30),
-  customHeaders: z.record(z.string()).optional(),
+  customHeaders: z.record(z.string(), z.string()).optional(),
   allowedIps: z.array(z.string()).optional(),
 });
 
@@ -54,7 +54,7 @@ export async function GET(_request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     // Get webhooks
@@ -66,7 +66,7 @@ export async function GET(_request: NextRequest) {
 
     if (error) {
       logger.error('Error fetching webhooks', error);
-      return applySecurityHeaders(apiError('Failed to fetch webhooks', 'INTERNAL_ERROR', 500));
+      return applySecurityHeaders(apiError('Failed to fetch webhooks', 'INTERNAL_ERROR'));
     }
 
     // Transform and hide secrets
@@ -96,7 +96,7 @@ export async function GET(_request: NextRequest) {
     return applySecurityHeaders(success({ webhooks: transformedWebhooks }));
   } catch (err) {
     logger.error('Webhooks GET error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR'));
   }
 }
 
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     // Check if user can create webhooks (contributors and above)
@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
 
     if (!profile || profile.role === 'reader') {
       return applySecurityHeaders(
-        apiError('Contributors and above can create webhooks', 'FORBIDDEN', 403)
+        apiError('Contributors and above can create webhooks', 'FORBIDDEN')
       );
     }
 
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
 
     if (!parseResult.success) {
       return applySecurityHeaders(
-        apiError('Invalid request', 'VALIDATION_ERROR', 400, {
+        apiError('Invalid request', 'VALIDATION_ERROR', {
           errors: parseResult.error.flatten().fieldErrors,
         })
       );
@@ -151,9 +151,7 @@ export async function POST(request: NextRequest) {
       .eq('user_id', user.id);
 
     if ((count || 0) >= 10) {
-      return applySecurityHeaders(
-        apiError('Maximum webhook limit reached (10)', 'LIMIT_EXCEEDED', 400)
-      );
+      return applySecurityHeaders(apiError('Maximum webhook limit reached (10)', 'LIMIT_EXCEEDED'));
     }
 
     // Generate secret
@@ -180,7 +178,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       logger.error('Error creating webhook', error);
-      return applySecurityHeaders(apiError('Failed to create webhook', 'INTERNAL_ERROR', 500));
+      return applySecurityHeaders(apiError('Failed to create webhook', 'INTERNAL_ERROR'));
     }
 
     logger.info('Webhook created', { webhookId: webhook.id, userId: user.id });
@@ -202,7 +200,7 @@ export async function POST(request: NextRequest) {
     );
   } catch (err) {
     logger.error('Webhooks POST error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR'));
   }
 }
 
@@ -220,14 +218,14 @@ export async function DELETE(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     const { searchParams } = new URL(request.url);
     const webhookId = searchParams.get('id');
 
     if (!webhookId) {
-      return applySecurityHeaders(apiError('Webhook ID required', 'VALIDATION_ERROR', 400));
+      return applySecurityHeaders(apiError('Webhook ID required', 'VALIDATION_ERROR'));
     }
 
     // Delete webhook (RLS will ensure user owns it)
@@ -239,7 +237,7 @@ export async function DELETE(request: NextRequest) {
 
     if (error) {
       logger.error('Error deleting webhook', error);
-      return applySecurityHeaders(apiError('Failed to delete webhook', 'INTERNAL_ERROR', 500));
+      return applySecurityHeaders(apiError('Failed to delete webhook', 'INTERNAL_ERROR'));
     }
 
     logger.info('Webhook deleted', { webhookId, userId: user.id });
@@ -247,7 +245,7 @@ export async function DELETE(request: NextRequest) {
     return applySecurityHeaders(success({ deleted: true }));
   } catch (err) {
     logger.error('Webhooks DELETE error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR'));
   }
 }
 
@@ -265,21 +263,21 @@ export async function PATCH(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     const body = await request.json();
     const { id, ...updates } = body;
 
     if (!id) {
-      return applySecurityHeaders(apiError('Webhook ID required', 'VALIDATION_ERROR', 400));
+      return applySecurityHeaders(apiError('Webhook ID required', 'VALIDATION_ERROR'));
     }
 
     const parseResult = updateWebhookSchema.safeParse(updates);
 
     if (!parseResult.success) {
       return applySecurityHeaders(
-        apiError('Invalid request', 'VALIDATION_ERROR', 400, {
+        apiError('Invalid request', 'VALIDATION_ERROR', {
           errors: parseResult.error.flatten().fieldErrors,
         })
       );
@@ -308,7 +306,7 @@ export async function PATCH(request: NextRequest) {
 
     if (error) {
       logger.error('Error updating webhook', error);
-      return applySecurityHeaders(apiError('Failed to update webhook', 'INTERNAL_ERROR', 500));
+      return applySecurityHeaders(apiError('Failed to update webhook', 'INTERNAL_ERROR'));
     }
 
     logger.info('Webhook updated', { webhookId: id, userId: user.id });
@@ -327,6 +325,6 @@ export async function PATCH(request: NextRequest) {
     );
   } catch (err) {
     logger.error('Webhooks PATCH error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR'));
   }
 }

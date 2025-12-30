@@ -1,8 +1,8 @@
-import { createClient } from '@/lib/supabase/server';
 import { ApiError } from '@/lib/api/response';
-import { generateSlug, calculateReadingTime } from '@/lib/api/validation';
-import type { ContentType, PostStatus } from '@/types/database';
+import { calculateReadingTime, generateSlug } from '@/lib/api/validation';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/server';
+import type { ContentType, PostStatus } from '@/types/database';
 
 // ============================================================================
 // TYPES
@@ -136,7 +136,10 @@ export async function createPost(input: CreatePostInput): Promise<PostWithDetail
     .single();
 
   if (error) {
-    logger.error('[createPost] Error', error, { authorId: input.author_id, title: input.title });
+    logger.error('[createPost] Error', error, {
+      authorId: input.author_id,
+      title: input.title,
+    });
     throw ApiError.badRequest('Failed to create post');
   }
 
@@ -282,7 +285,11 @@ export async function listPosts(options: {
   const { data, error, count } = await query;
 
   if (error) {
-    logger.error('[listPosts] Error', error, { filters, pagination: { page, limit }, sort });
+    logger.error('[listPosts] Error', error, {
+      filters,
+      pagination: { page, limit },
+      sort,
+    });
     throw ApiError.badRequest('Failed to fetch posts');
   }
 
@@ -527,6 +534,10 @@ export async function incrementViewCount(
 
   // Ignore duplicate key errors (same user viewing multiple times)
   if (error && !error.message.includes('duplicate')) {
-    logger.error('[incrementViewCount] Error', error, { postId, viewerId: userId, ip: ipAddress });
+    logger.error('[incrementViewCount] Error', error, {
+      postId,
+      viewerId: userId,
+      ip: ipAddress,
+    });
   }
 }

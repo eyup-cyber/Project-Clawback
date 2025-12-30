@@ -25,7 +25,7 @@ const createFlagSchema = z.object({
   environments: z.array(z.string()).optional(),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
   tags: z.array(z.string()).optional(),
 });
 
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     // Check admin role
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (profile?.role !== 'admin') {
-      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN', 403));
+      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN'));
     }
 
     // Parse query params
@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Error fetching feature flags', error);
-      return applySecurityHeaders(apiError('Failed to fetch flags', 'INTERNAL_ERROR', 500));
+      return applySecurityHeaders(apiError('Failed to fetch flags', 'INTERNAL_ERROR'));
     }
 
     // Transform to camelCase
@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
     return applySecurityHeaders(success({ flags: transformedFlags }));
   } catch (err) {
     logger.error('Feature flags GET error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR'));
   }
 }
 
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     // Check admin role
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (profile?.role !== 'admin') {
-      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN', 403));
+      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN'));
     }
 
     // Parse and validate body
@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
 
     if (!parseResult.success) {
       return applySecurityHeaders(
-        apiError('Invalid request', 'VALIDATION_ERROR', 400, {
+        apiError('Invalid request', 'VALIDATION_ERROR', {
           errors: parseResult.error.flatten().fieldErrors,
         })
       );
@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existing) {
-      return applySecurityHeaders(apiError('Flag key already exists', 'CONFLICT', 409));
+      return applySecurityHeaders(apiError('Flag key already exists', 'CONFLICT'));
     }
 
     // Create flag
@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       logger.error('Error creating feature flag', error);
-      return applySecurityHeaders(apiError('Failed to create flag', 'INTERNAL_ERROR', 500));
+      return applySecurityHeaders(apiError('Failed to create flag', 'INTERNAL_ERROR'));
     }
 
     logger.info('Feature flag created', { key: input.key, userId: user.id });
@@ -216,7 +216,7 @@ export async function POST(request: NextRequest) {
     );
   } catch (err) {
     logger.error('Feature flags POST error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR'));
   }
 }
 
@@ -234,7 +234,7 @@ export async function PATCH(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     // Check admin role
@@ -245,7 +245,7 @@ export async function PATCH(request: NextRequest) {
       .single();
 
     if (profile?.role !== 'admin') {
-      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN', 403));
+      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN'));
     }
 
     const body = await request.json();
@@ -282,9 +282,9 @@ export async function PATCH(request: NextRequest) {
     return applySecurityHeaders(success({ results }));
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return applySecurityHeaders(apiError('Invalid request', 'VALIDATION_ERROR', 400));
+      return applySecurityHeaders(apiError('Invalid request', 'VALIDATION_ERROR'));
     }
     logger.error('Feature flags PATCH error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR'));
   }
 }

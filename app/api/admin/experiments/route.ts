@@ -16,7 +16,7 @@ const variantSchema = z.object({
   description: z.string().max(500).optional(),
   weight: z.number().int().min(0).max(100),
   control: z.boolean(),
-  config: z.record(z.unknown()).optional(),
+  config: z.record(z.string(), z.unknown()).optional(),
 });
 
 const createExperimentSchema = z.object({
@@ -40,7 +40,7 @@ const createExperimentSchema = z.object({
   sampleSize: z.number().int().min(1).max(100).optional().default(100),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 /**
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     // Check admin role
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (profile?.role !== 'admin') {
-      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN', 403));
+      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN'));
     }
 
     // Parse query params
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Error fetching experiments', error);
-      return applySecurityHeaders(apiError('Failed to fetch experiments', 'INTERNAL_ERROR', 500));
+      return applySecurityHeaders(apiError('Failed to fetch experiments', 'INTERNAL_ERROR'));
     }
 
     // Transform to camelCase
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
     return applySecurityHeaders(success({ experiments: transformedExperiments }));
   } catch (err) {
     logger.error('Experiments GET error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR'));
   }
 }
 
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     // Check admin role
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (profile?.role !== 'admin') {
-      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN', 403));
+      return applySecurityHeaders(apiError('Admin access required', 'FORBIDDEN'));
     }
 
     // Parse and validate body
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
 
     if (!parseResult.success) {
       return applySecurityHeaders(
-        apiError('Invalid request', 'VALIDATION_ERROR', 400, {
+        apiError('Invalid request', 'VALIDATION_ERROR', {
           errors: parseResult.error.flatten().fieldErrors,
         })
       );
@@ -171,16 +171,14 @@ export async function POST(request: NextRequest) {
     // Validate variant weights sum to 100
     const totalWeight = input.variants.reduce((sum, v) => sum + v.weight, 0);
     if (totalWeight !== 100) {
-      return applySecurityHeaders(
-        apiError('Variant weights must sum to 100%', 'VALIDATION_ERROR', 400)
-      );
+      return applySecurityHeaders(apiError('Variant weights must sum to 100%', 'VALIDATION_ERROR'));
     }
 
     // Ensure exactly one control variant
     const controlCount = input.variants.filter((v) => v.control).length;
     if (controlCount !== 1) {
       return applySecurityHeaders(
-        apiError('Exactly one variant must be marked as control', 'VALIDATION_ERROR', 400)
+        apiError('Exactly one variant must be marked as control', 'VALIDATION_ERROR')
       );
     }
 
@@ -192,7 +190,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existing) {
-      return applySecurityHeaders(apiError('Experiment key already exists', 'CONFLICT', 409));
+      return applySecurityHeaders(apiError('Experiment key already exists', 'CONFLICT'));
     }
 
     // Add IDs to variants
@@ -223,7 +221,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       logger.error('Error creating experiment', error);
-      return applySecurityHeaders(apiError('Failed to create experiment', 'INTERNAL_ERROR', 500));
+      return applySecurityHeaders(apiError('Failed to create experiment', 'INTERNAL_ERROR'));
     }
 
     logger.info('Experiment created', { key: input.key, userId: user.id });
@@ -240,6 +238,6 @@ export async function POST(request: NextRequest) {
     );
   } catch (err) {
     logger.error('Experiments POST error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR'));
   }
 }

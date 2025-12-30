@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 
 interface Session {
@@ -133,15 +133,32 @@ export default function SecuritySettingsPage() {
 
   return (
     <div className="p-6 max-w-4xl">
-      <h1 className="text-2xl font-bold mb-6" style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--foreground)' }}>
+      <h1
+        className="text-2xl font-bold mb-6"
+        style={{
+          fontFamily: 'var(--font-kindergarten)',
+          color: 'var(--foreground)',
+        }}
+      >
         Security Settings
       </h1>
 
       {/* Two-Factor Authentication */}
-      <section className="mb-8 rounded-xl p-6" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+      <section
+        className="mb-8 rounded-xl p-6"
+        style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+        }}
+      >
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: twoFactorStatus?.enabled ? 'var(--primary)' : 'var(--border)' }}>
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center"
+              style={{
+                background: twoFactorStatus?.enabled ? 'var(--primary)' : 'var(--border)',
+              }}
+            >
               <span className="text-2xl">{twoFactorStatus?.enabled ? '🔒' : '🔓'}</span>
             </div>
             <div>
@@ -149,7 +166,7 @@ export default function SecuritySettingsPage() {
                 Two-Factor Authentication
               </h2>
               <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.7 }}>
-                {twoFactorStatus?.enabled 
+                {twoFactorStatus?.enabled
                   ? `Enabled since ${twoFactorStatus.verifiedAt ? formatDate(twoFactorStatus.verifiedAt) : 'recently'}`
                   : 'Add an extra layer of security to your account'}
               </p>
@@ -157,11 +174,15 @@ export default function SecuritySettingsPage() {
           </div>
           <Link
             href={twoFactorStatus?.enabled ? '#' : '/2fa'}
-            onClick={twoFactorStatus?.enabled ? (e) => {
-              e.preventDefault();
-              // Would show disable modal
-              toast.error('To disable 2FA, use the verification flow');
-            } : undefined}
+            onClick={
+              twoFactorStatus?.enabled
+                ? (e) => {
+                    e.preventDefault();
+                    // Would show disable modal
+                    toast.error('To disable 2FA, use the verification flow');
+                  }
+                : undefined
+            }
             className="px-4 py-2 rounded-lg font-medium text-sm transition-all hover:scale-[1.02]"
             style={{
               background: twoFactorStatus?.enabled ? 'transparent' : 'var(--primary)',
@@ -175,7 +196,13 @@ export default function SecuritySettingsPage() {
       </section>
 
       {/* Active Sessions */}
-      <section className="rounded-xl p-6" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+      <section
+        className="rounded-xl p-6"
+        style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+        }}
+      >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>
             Active Sessions
@@ -193,7 +220,10 @@ export default function SecuritySettingsPage() {
         </div>
 
         {sessions.length === 0 ? (
-          <p className="text-sm py-4 text-center" style={{ color: 'var(--foreground)', opacity: 0.6 }}>
+          <p
+            className="text-sm py-4 text-center"
+            style={{ color: 'var(--foreground)', opacity: 0.6 }}
+          >
             No active sessions found
           </p>
         ) : (
@@ -210,7 +240,13 @@ export default function SecuritySettingsPage() {
                     <p className="font-medium" style={{ color: 'var(--foreground)' }}>
                       {session.device.browser} on {session.device.os}
                       {session.isCurrent && (
-                        <span className="ml-2 text-xs px-2 py-0.5 rounded" style={{ background: 'var(--primary)', color: 'var(--background)' }}>
+                        <span
+                          className="ml-2 text-xs px-2 py-0.5 rounded"
+                          style={{
+                            background: 'var(--primary)',
+                            color: 'var(--background)',
+                          }}
+                        >
                           Current
                         </span>
                       )}
@@ -228,7 +264,10 @@ export default function SecuritySettingsPage() {
                     onClick={() => void revokeSession(session.id)}
                     disabled={revoking === session.id}
                     className="text-sm px-3 py-1 rounded border transition-all hover:bg-[var(--surface-elevated)] disabled:opacity-50"
-                    style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                    style={{
+                      borderColor: 'var(--border)',
+                      color: 'var(--foreground)',
+                    }}
                   >
                     {revoking === session.id ? 'Revoking...' : 'Revoke'}
                   </button>

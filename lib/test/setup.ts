@@ -3,10 +3,7 @@
  * Provides mocks and test helpers
  */
 
-import { createMockSupabaseClient, type createChainableMock } from './mocks';
-
-// Ensure this file is treated as a module
-export {};
+import { type createChainableMock, createMockSupabaseClient } from './mocks';
 
 // Extend global namespace for test utilities
 declare global {
@@ -161,10 +158,14 @@ jest.mock('next/server', () => {
 
 // Global test utilities
 (
-  globalThis as typeof globalThis & { createMockRequest: typeof createMockRequest }
+  globalThis as typeof globalThis & {
+    createMockRequest: typeof createMockRequest;
+  }
 ).createMockRequest = createMockRequest;
 (
-  globalThis as typeof globalThis & { createMockResponse: typeof createMockResponse }
+  globalThis as typeof globalThis & {
+    createMockResponse: typeof createMockResponse;
+  }
 ).createMockResponse = createMockResponse;
 
 function createMockRequest(overrides: Record<string, unknown> = {}) {

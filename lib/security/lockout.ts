@@ -66,15 +66,16 @@ export async function getRecentFailedAttempts(
 /**
  * Check if a user/IP is locked out
  */
-export async function checkLockout(
-  identifier: { userId?: string; ipAddress?: string }
-): Promise<LoginAttemptResult> {
+export async function checkLockout(identifier: {
+  userId?: string;
+  ipAddress?: string;
+}): Promise<LoginAttemptResult> {
   const failedAttempts = await getRecentFailedAttempts(identifier);
 
   // Check if locked out
   if (failedAttempts >= MAX_ATTEMPTS) {
     const supabase = await createServiceClient();
-    
+
     // Get the most recent failed attempt to calculate lockout end
     let query = supabase
       .from('login_attempts')
@@ -91,11 +92,11 @@ export async function checkLockout(
     }
 
     const { data } = await query;
-    
+
     if (data && data.length > 0) {
       const lastAttempt = new Date(data[0].created_at);
       const lockoutEnd = new Date(lastAttempt.getTime() + LOCKOUT_DURATION_MINUTES * 60 * 1000);
-      
+
       if (lockoutEnd > new Date()) {
         const minutesRemaining = Math.ceil((lockoutEnd.getTime() - Date.now()) / 60000);
         return {
@@ -118,9 +119,10 @@ export async function checkLockout(
     attemptsRemaining: Math.max(0, MAX_ATTEMPTS - failedAttempts),
     lockoutUntil: null,
     delayMs,
-    message: failedAttempts > 0 
-      ? `${MAX_ATTEMPTS - failedAttempts} attempts remaining before lockout.`
-      : '',
+    message:
+      failedAttempts > 0
+        ? `${MAX_ATTEMPTS - failedAttempts} attempts remaining before lockout.`
+        : '',
   };
 }
 
@@ -168,13 +170,15 @@ export async function clearLoginAttempts(_userId: string): Promise<void> {
 export async function getLoginHistory(
   userId: string,
   limit: number = 20
-): Promise<Array<{
-  id: string;
-  ipAddress: string;
-  userAgent: string | null;
-  success: boolean;
-  createdAt: Date;
-}>> {
+): Promise<
+  Array<{
+    id: string;
+    ipAddress: string;
+    userAgent: string | null;
+    success: boolean;
+    createdAt: Date;
+  }>
+> {
   const supabase = await createServiceClient();
 
   const { data, error } = await supabase

@@ -393,14 +393,18 @@ export async function forecastRevenue(
     growthRates.length > 0 ? growthRates.reduce((sum, g) => sum + g, 0) / growthRates.length : 0;
 
   const lastRevenue = historicalGrowth[historicalGrowth.length - 1].revenue;
-  const forecasts: Array<{ month: string; forecast: number; confidence: number }> = [];
+  const forecasts: Array<{
+    month: string;
+    forecast: number;
+    confidence: number;
+  }> = [];
 
   for (let i = 1; i <= months; i++) {
     const futureDate = new Date();
     futureDate.setMonth(futureDate.getMonth() + i);
 
     // Simple linear forecast with decreasing confidence
-    const forecast = lastRevenue * Math.pow(1 + avgGrowthRate / 100, i);
+    const forecast = lastRevenue * (1 + avgGrowthRate / 100) ** i;
     const confidence = Math.max(50, 90 - i * 10); // Confidence decreases over time
 
     forecasts.push({

@@ -81,7 +81,10 @@ export function removeSyncTask(id: string): void {
 /**
  * Process all pending sync tasks
  */
-export async function processSyncQueue(): Promise<{ success: number; failed: number }> {
+export async function processSyncQueue(): Promise<{
+  success: number;
+  failed: number;
+}> {
   const tasks = getPendingTasks();
   let success = 0;
   let failed = 0;
@@ -262,14 +265,26 @@ export const syncQueue = {
     create: (data: Record<string, unknown>) =>
       queueSyncTask({ type: 'comment', action: 'create', data }),
     update: (id: string, data: Record<string, unknown>) =>
-      queueSyncTask({ type: 'comment', action: 'update', data: { id, ...data } }),
+      queueSyncTask({
+        type: 'comment',
+        action: 'update',
+        data: { id, ...data },
+      }),
     delete: (id: string) => queueSyncTask({ type: 'comment', action: 'delete', data: { id } }),
   },
   reaction: {
     add: (postId: string, type: string) =>
-      queueSyncTask({ type: 'reaction', action: 'create', data: { postId, type } }),
+      queueSyncTask({
+        type: 'reaction',
+        action: 'create',
+        data: { postId, type },
+      }),
     remove: (postId: string, type: string) =>
-      queueSyncTask({ type: 'reaction', action: 'delete', data: { postId, type } }),
+      queueSyncTask({
+        type: 'reaction',
+        action: 'delete',
+        data: { postId, type },
+      }),
   },
   profile: {
     update: (data: Record<string, unknown>) =>

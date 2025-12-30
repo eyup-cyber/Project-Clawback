@@ -3,8 +3,8 @@
  * Phase 35: Live metrics, current visitors, real-time events
  */
 
-import { createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -108,18 +108,19 @@ export async function registerPresence(
 ): Promise<void> {
   const supabase = await createServiceClient();
 
-  const { error } = await supabase
-    .from('realtime_presence')
-    .upsert({
+  const { error } = await supabase.from('realtime_presence').upsert(
+    {
       visitor_id: visitorId,
       page_path: presence.page_path,
       entered_at: presence.entered_at,
       user_agent: presence.user_agent,
       metadata: presence.metadata,
       last_seen: new Date().toISOString(),
-    }, {
+    },
+    {
       onConflict: 'visitor_id',
-    });
+    }
+  );
 
   if (error) {
     logger.error('[Realtime] Failed to register presence', error);
@@ -147,10 +148,7 @@ export async function updateHeartbeat(visitorId: string, pagePath: string): Prom
 export async function removePresence(visitorId: string): Promise<void> {
   const supabase = await createServiceClient();
 
-  await supabase
-    .from('realtime_presence')
-    .delete()
-    .eq('visitor_id', visitorId);
+  await supabase.from('realtime_presence').delete().eq('visitor_id', visitorId);
 }
 
 /**
@@ -389,9 +387,7 @@ function extractReferrerSource(referrer: string): string {
 async function getGeoDistribution(): Promise<GeoMetric[]> {
   const supabase = await createServiceClient();
 
-  const { data } = await supabase
-    .from('realtime_presence')
-    .select('metadata');
+  const { data } = await supabase.from('realtime_presence').select('metadata');
 
   const countryStats: Record<string, number> = {};
   let total = 0;
@@ -416,14 +412,14 @@ function getCountryCode(country: string): string {
   const codes: Record<string, string> = {
     'United States': 'US',
     'United Kingdom': 'GB',
-    'Canada': 'CA',
-    'Australia': 'AU',
-    'Germany': 'DE',
-    'France': 'FR',
-    'Japan': 'JP',
-    'India': 'IN',
-    'Brazil': 'BR',
-    'Unknown': 'XX',
+    Canada: 'CA',
+    Australia: 'AU',
+    Germany: 'DE',
+    France: 'FR',
+    Japan: 'JP',
+    India: 'IN',
+    Brazil: 'BR',
+    Unknown: 'XX',
   };
   return codes[country] || 'XX';
 }
@@ -431,9 +427,7 @@ function getCountryCode(country: string): string {
 async function getDeviceBreakdown(): Promise<DeviceMetric[]> {
   const supabase = await createServiceClient();
 
-  const { data } = await supabase
-    .from('realtime_presence')
-    .select('user_agent');
+  const { data } = await supabase.from('realtime_presence').select('user_agent');
 
   const deviceStats: Record<string, number> = {
     desktop: 0,
@@ -577,7 +571,7 @@ export async function getLiveEvents(options: {
     user_id: event.user_id,
     event_type: event.event_type,
     event_data: event.event_data as Record<string, unknown>,
-    page_path: ((event.event_data as Record<string, string>)?.path) || '/',
+    page_path: (event.event_data as Record<string, string>)?.path || '/',
     timestamp: event.created_at,
   }));
 }
@@ -593,14 +587,12 @@ export async function trackRealtimeEvent(
 ): Promise<void> {
   const supabase = await createServiceClient();
 
-  const { error } = await supabase
-    .from('analytics_events')
-    .insert({
-      visitor_id: visitorId,
-      user_id: userId || null,
-      event_type: eventType,
-      event_data: eventData,
-    });
+  const { error } = await supabase.from('analytics_events').insert({
+    visitor_id: visitorId,
+    user_id: userId || null,
+    event_type: eventType,
+    event_data: eventData,
+  });
 
   if (error) {
     logger.error('[Realtime] Failed to track event', error);

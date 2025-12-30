@@ -72,9 +72,9 @@ class SearchService {
    */
   async searchPosts(query: SearchQuery): Promise<SearchResult<SearchDocument>> {
     const startTime = Date.now();
-    
+
     const result = await this.provider.searchPosts(query);
-    
+
     return {
       ...result,
       executionTimeMs: Date.now() - startTime,
@@ -86,9 +86,9 @@ class SearchService {
    */
   async search(query: SearchQuery): Promise<SearchResult<SearchDocument>> {
     const startTime = Date.now();
-    
+
     const result = await this.provider.search(query);
-    
+
     return {
       ...result,
       executionTimeMs: Date.now() - startTime,

@@ -5,8 +5,8 @@
  * Phase 2.8: CRUD, merge duplicates, cleanup unused, popular tracking
  */
 
-import { useState, useEffect, useCallback } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { useCallback, useEffect, useState } from 'react';
 
 // ============================================================================
 // TYPES
@@ -43,7 +43,11 @@ export function TagsManager() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState<Tag | null>(null);
   const [showMergeModal, setShowMergeModal] = useState(false);
-  const [pagination, setPagination] = useState({ page: 1, limit: 50, total: 0 });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 50,
+    total: 0,
+  });
   const [filters, setFilters] = useState<TagFilters>({
     search: '',
     sort: 'post_count',
@@ -85,10 +89,15 @@ export function TagsManager() {
   }, [pagination.page, pagination.limit, filters]);
 
   useEffect(() => {
-    fetchTags();
+    void fetchTags();
   }, [fetchTags]);
 
-  const handleCreate = async (data: { name: string; description: string; is_featured: boolean; color: string }) => {
+  const handleCreate = async (data: {
+    name: string;
+    description: string;
+    is_featured: boolean;
+    color: string;
+  }) => {
     try {
       const response = await fetch('/api/admin/tags', {
         method: 'POST',
@@ -97,7 +106,7 @@ export function TagsManager() {
       });
 
       if (response.ok) {
-        fetchTags();
+        void fetchTags();
         setShowCreateModal(false);
       }
     } catch (error) {
@@ -127,7 +136,7 @@ export function TagsManager() {
 
     try {
       await fetch(`/api/admin/tags/${id}`, { method: 'DELETE' });
-      fetchTags();
+      void fetchTags();
     } catch (error) {
       console.error('Failed to delete tag:', error);
     }
@@ -160,7 +169,7 @@ export function TagsManager() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ids: Array.from(selectedTags) }),
       });
-      fetchTags();
+      void fetchTags();
       setSelectedTags(new Set());
     } catch (error) {
       console.error('Failed to delete tags:', error);
@@ -172,7 +181,7 @@ export function TagsManager() {
 
     try {
       await fetch('/api/admin/tags/cleanup', { method: 'POST' });
-      fetchTags();
+      void fetchTags();
     } catch (error) {
       console.error('Failed to cleanup tags:', error);
     }
@@ -203,7 +212,7 @@ export function TagsManager() {
         <h1>Tags</h1>
         <div className="header-actions">
           {stats.unused > 0 && (
-            <button className="cleanup-btn" onClick={handleCleanupUnused}>
+            <button className="cleanup-btn" onClick={() => void handleCleanupUnused()}>
               🧹 Cleanup {stats.unused} unused
             </button>
           )}
@@ -254,7 +263,10 @@ export function TagsManager() {
         <select
           value={`${filters.sort}-${filters.order}`}
           onChange={(e) => {
-            const [sort, order] = e.target.value.split('-') as [TagFilters['sort'], TagFilters['order']];
+            const [sort, order] = e.target.value.split('-') as [
+              TagFilters['sort'],
+              TagFilters['order'],
+            ];
             setFilters((f) => ({ ...f, sort, order }));
           }}
         >
@@ -307,8 +319,10 @@ export function TagsManager() {
                   isSelected={selectedTags.has(tag.id)}
                   onSelect={() => toggleSelect(tag.id)}
                   onEdit={() => setShowEditModal(tag)}
-                  onDelete={() => handleDelete(tag.id)}
-                  onToggleFeatured={() => handleUpdate(tag.id, { is_featured: !tag.is_featured })}
+                  onDelete={() => void handleDelete(tag.id)}
+                  onToggleFeatured={() =>
+                    void handleUpdate(tag.id, { is_featured: !tag.is_featured })
+                  }
                 />
               ))}
             </div>
@@ -328,10 +342,7 @@ export function TagsManager() {
 
       {/* Create Modal */}
       {showCreateModal && (
-        <TagFormModal
-          onClose={() => setShowCreateModal(false)}
-          onSubmit={handleCreate}
-        />
+        <TagFormModal onClose={() => setShowCreateModal(false)} onSubmit={handleCreate} />
       )}
 
       {/* Edit Modal */}
@@ -525,10 +536,7 @@ function TagCard({
     <div className={`tag-card ${isSelected ? 'selected' : ''}`}>
       <div className="card-header">
         <input type="checkbox" checked={isSelected} onChange={onSelect} />
-        <div
-          className="tag-color"
-          style={{ backgroundColor: tag.color || '#6b7280' }}
-        />
+        <div className="tag-color" style={{ backgroundColor: tag.color || '#6b7280' }} />
         <div className="tag-info">
           <div className="tag-name">
             #{tag.name}
@@ -558,7 +566,12 @@ function TagCard({
           <button onClick={onEdit} title="Edit">
             ✏️
           </button>
-          <button onClick={onDelete} title="Delete" className="danger" disabled={tag.post_count > 0}>
+          <button
+            onClick={onDelete}
+            title="Delete"
+            className="danger"
+            disabled={tag.post_count > 0}
+          >
             🗑️
           </button>
         </div>
@@ -681,7 +694,12 @@ function TagFormModal({
 }: {
   tag?: Tag;
   onClose: () => void;
-  onSubmit: (data: { name: string; description: string; is_featured: boolean; color: string }) => void;
+  onSubmit: (data: {
+    name: string;
+    description: string;
+    is_featured: boolean;
+    color: string;
+  }) => void;
 }) {
   const [name, setName] = useState(tag?.name || '');
   const [description, setDescription] = useState(tag?.description || '');
@@ -701,7 +719,9 @@ function TagFormModal({
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{tag ? 'Edit Tag' : 'New Tag'}</h2>
-          <button onClick={onClose} className="close-btn">×</button>
+          <button onClick={onClose} className="close-btn">
+            ×
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-body">
@@ -729,11 +749,7 @@ function TagFormModal({
           <div className="form-row">
             <div className="form-group">
               <label>Color</label>
-              <input
-                type="color"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-              />
+              <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
             </div>
             <label className="checkbox-label">
               <input
@@ -874,7 +890,9 @@ function MergeTagsModal({
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Merge Tags</h2>
-          <button onClick={onClose} className="close-btn">×</button>
+          <button onClick={onClose} className="close-btn">
+            ×
+          </button>
         </div>
 
         <div className="modal-body">
@@ -898,14 +916,20 @@ function MergeTagsModal({
 
           <div className="merge-preview">
             <p>
-              Posts from {selectedTags.filter((t) => t.id !== targetId).map((t) => `#${t.name}`).join(', ')} 
+              Posts from{' '}
+              {selectedTags
+                .filter((t) => t.id !== targetId)
+                .map((t) => `#${t.name}`)
+                .join(', ')}
               will be moved to <strong>#{selectedTags.find((t) => t.id === targetId)?.name}</strong>
             </p>
           </div>
 
           <div className="modal-actions">
             <button onClick={onClose}>Cancel</button>
-            <button onClick={handleMerge} className="primary">Merge Tags</button>
+            <button onClick={handleMerge} className="primary">
+              Merge Tags
+            </button>
           </div>
         </div>
 

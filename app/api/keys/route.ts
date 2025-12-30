@@ -1,14 +1,29 @@
 import { type NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { success, unauthorized, badRequest, handleApiError, parseBody } from '@/lib/api';
-import { createApiKey, getUserApiKeys, deleteApiKey, API_KEY_SCOPES, type ApiKeyScope } from '@/lib/security/api-keys';
+import {
+  createApiKey,
+  getUserApiKeys,
+  deleteApiKey,
+  API_KEY_SCOPES,
+  type ApiKeyScope,
+} from '@/lib/security/api-keys';
 import { applySecurityHeaders } from '@/lib/security/headers';
 import { z } from 'zod';
 
 const createKeySchema = z.object({
   name: z.string().min(1).max(100),
   scopes: z.array(z.string()).min(1),
-  allowedIps: z.array(z.string().regex(/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|^(?:[a-fA-F0-9]{1,4}:){7}[a-fA-F0-9]{1,4}$/, 'Invalid IP address')).optional(),
+  allowedIps: z
+    .array(
+      z
+        .string()
+        .regex(
+          /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|^(?:[a-fA-F0-9]{1,4}:){7}[a-fA-F0-9]{1,4}$/,
+          'Invalid IP address'
+        )
+    )
+    .optional(),
   expiresInDays: z.number().int().positive().max(365).optional(),
 });
 
@@ -19,8 +34,11 @@ const createKeySchema = z.object({
 export async function GET(_request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
     if (authError || !user) {
       return applySecurityHeaders(unauthorized('Authentication required'));
     }
@@ -39,10 +57,12 @@ export async function GET(_request: NextRequest) {
       createdAt: key.createdAt.toISOString(),
     }));
 
-    return applySecurityHeaders(success({
-      keys: formattedKeys,
-      availableScopes: API_KEY_SCOPES,
-    }));
+    return applySecurityHeaders(
+      success({
+        keys: formattedKeys,
+        availableScopes: API_KEY_SCOPES,
+      })
+    );
   } catch (error) {
     return applySecurityHeaders(handleApiError(error));
   }
@@ -55,8 +75,11 @@ export async function GET(_request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
     if (authError || !user) {
       return applySecurityHeaders(unauthorized('Authentication required'));
     }
@@ -78,21 +101,25 @@ export async function POST(request: NextRequest) {
     });
 
     if (!result) {
-      return applySecurityHeaders(badRequest('Failed to create API key. You may have reached your limit.'));
+      return applySecurityHeaders(
+        badRequest('Failed to create API key. You may have reached your limit.')
+      );
     }
 
-    return applySecurityHeaders(success({
-      key: result.key, // Only shown once!
-      apiKey: {
-        id: result.apiKey.id,
-        name: result.apiKey.name,
-        keyPrefix: result.apiKey.keyPrefix,
-        scopes: result.apiKey.scopes,
-        expiresAt: result.apiKey.expiresAt?.toISOString() || null,
-        createdAt: result.apiKey.createdAt.toISOString(),
-      },
-      message: 'API key created. Save this key securely - it will only be shown once!',
-    }));
+    return applySecurityHeaders(
+      success({
+        key: result.key, // Only shown once!
+        apiKey: {
+          id: result.apiKey.id,
+          name: result.apiKey.name,
+          keyPrefix: result.apiKey.keyPrefix,
+          scopes: result.apiKey.scopes,
+          expiresAt: result.apiKey.expiresAt?.toISOString() || null,
+          createdAt: result.apiKey.createdAt.toISOString(),
+        },
+        message: 'API key created. Save this key securely - it will only be shown once!',
+      })
+    );
   } catch (error) {
     return applySecurityHeaders(handleApiError(error));
   }
@@ -105,8 +132,11 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
     if (authError || !user) {
       return applySecurityHeaders(unauthorized('Authentication required'));
     }
@@ -124,10 +154,12 @@ export async function DELETE(request: NextRequest) {
       return applySecurityHeaders(badRequest('Failed to delete API key'));
     }
 
-    return applySecurityHeaders(success({
-      deleted: true,
-      message: 'API key deleted',
-    }));
+    return applySecurityHeaders(
+      success({
+        deleted: true,
+        message: 'API key deleted',
+      })
+    );
   } catch (error) {
     return applySecurityHeaders(handleApiError(error));
   }

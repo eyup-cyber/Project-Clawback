@@ -32,34 +32,34 @@ const SPAM_PATTERNS = [
 
 // Spam keywords with weights
 const SPAM_KEYWORDS: Record<string, number> = {
-  'free': 0.1,
-  'win': 0.1,
-  'winner': 0.15,
-  'prize': 0.15,
-  'click': 0.1,
-  'subscribe': 0.05,
-  'offer': 0.1,
-  'deal': 0.05,
-  'discount': 0.1,
-  'promotion': 0.1,
-  'limited': 0.1,
-  'exclusive': 0.05,
-  'urgent': 0.15,
-  'immediately': 0.1,
+  free: 0.1,
+  win: 0.1,
+  winner: 0.15,
+  prize: 0.15,
+  click: 0.1,
+  subscribe: 0.05,
+  offer: 0.1,
+  deal: 0.05,
+  discount: 0.1,
+  promotion: 0.1,
+  limited: 0.1,
+  exclusive: 0.05,
+  urgent: 0.15,
+  immediately: 0.1,
   'act now': 0.2,
   'call now': 0.2,
   'order now': 0.15,
   'buy now': 0.15,
-  'crypto': 0.1,
-  'bitcoin': 0.1,
-  'investment': 0.1,
+  crypto: 0.1,
+  bitcoin: 0.1,
+  investment: 0.1,
   'earn money': 0.2,
   'make money': 0.2,
   'work from home': 0.15,
-  'mlm': 0.3,
-  'pills': 0.2,
-  'viagra': 0.5,
-  'enlargement': 0.5,
+  mlm: 0.3,
+  pills: 0.2,
+  viagra: 0.5,
+  enlargement: 0.5,
 };
 
 // Thresholds
@@ -69,10 +69,7 @@ const CAPS_RATIO_THRESHOLD = 0.5; // Max ratio of uppercase letters
 /**
  * Check content for spam
  */
-export function checkSpam(
-  content: string,
-  existingContent?: string
-): SpamCheckResult {
+export function checkSpam(content: string, existingContent?: string): SpamCheckResult {
   const reasons: string[] = [];
   let confidence = 0;
 
@@ -164,11 +161,14 @@ function calculateSimilarity(text1: string, text2: string): number {
 /**
  * Check if content looks like a bot
  */
-export function checkBotPatterns(content: string, metadata?: {
-  postingSpeed?: number; // Posts per minute
-  accountAge?: number; // Days
-  previousPosts?: number;
-}): { isBot: boolean; confidence: number; reasons: string[] } {
+export function checkBotPatterns(
+  content: string,
+  metadata?: {
+    postingSpeed?: number; // Posts per minute
+    accountAge?: number; // Days
+    previousPosts?: number;
+  }
+): { isBot: boolean; confidence: number; reasons: string[] } {
   const reasons: string[] = [];
   let confidence = 0;
 

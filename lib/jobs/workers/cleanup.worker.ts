@@ -3,24 +3,24 @@
  * Handles periodic cleanup of old data
  */
 
-import { type Job } from 'bullmq';
-import { registerWorker, type CleanupJobData, QUEUE_NAMES, addJob } from '../queue';
+import type { Job } from 'bullmq';
+import { addJob, type CleanupJobData, QUEUE_NAMES, registerWorker } from '../queue';
 
 /**
  * Cleanup sessions older than specified days
  */
 async function cleanupSessions(olderThanDays: number): Promise<number> {
   console.log(`🧹 Cleaning up sessions older than ${olderThanDays} days`);
-  
+
   // In production:
   // const { data, error } = await supabase
   //   .from('user_sessions')
   //   .delete()
   //   .lt('created_at', new Date(Date.now() - olderThanDays * 24 * 60 * 60 * 1000).toISOString())
   //   .select();
-  
+
   await new Promise((resolve) => setTimeout(resolve, 100));
-  
+
   const deletedCount = Math.floor(Math.random() * 100); // Mock
   console.log(`✅ Cleaned up ${deletedCount} old sessions`);
   return deletedCount;
@@ -31,10 +31,10 @@ async function cleanupSessions(olderThanDays: number): Promise<number> {
  */
 async function cleanupLogs(olderThanDays: number): Promise<number> {
   console.log(`🧹 Cleaning up logs older than ${olderThanDays} days`);
-  
+
   // Clean audit logs, security events, etc.
   await new Promise((resolve) => setTimeout(resolve, 150));
-  
+
   const deletedCount = Math.floor(Math.random() * 500);
   console.log(`✅ Cleaned up ${deletedCount} old log entries`);
   return deletedCount;
@@ -45,11 +45,11 @@ async function cleanupLogs(olderThanDays: number): Promise<number> {
  */
 async function cleanupMedia(olderThanDays: number): Promise<number> {
   console.log(`🧹 Cleaning up orphaned media older than ${olderThanDays} days`);
-  
+
   // Find media not referenced by any post or profile
   // Delete from storage (R2/S3) and database
   await new Promise((resolve) => setTimeout(resolve, 200));
-  
+
   const deletedCount = Math.floor(Math.random() * 50);
   console.log(`✅ Cleaned up ${deletedCount} orphaned media files`);
   return deletedCount;
@@ -60,10 +60,10 @@ async function cleanupMedia(olderThanDays: number): Promise<number> {
  */
 async function cleanupNotifications(olderThanDays: number): Promise<number> {
   console.log(`🧹 Cleaning up notifications older than ${olderThanDays} days`);
-  
+
   // Delete read notifications older than threshold
   await new Promise((resolve) => setTimeout(resolve, 100));
-  
+
   const deletedCount = Math.floor(Math.random() * 1000);
   console.log(`✅ Cleaned up ${deletedCount} old notifications`);
   return deletedCount;
@@ -160,7 +160,10 @@ export async function scheduleCleanupJobs(): Promise<void> {
 /**
  * Run cleanup now (for manual trigger)
  */
-export async function runCleanupNow(type: CleanupJobData['type'], olderThanDays: number = 30): Promise<void> {
+export async function runCleanupNow(
+  type: CleanupJobData['type'],
+  olderThanDays: number = 30
+): Promise<void> {
   await addJob(
     QUEUE_NAMES.CLEANUP,
     { type, olderThanDays },

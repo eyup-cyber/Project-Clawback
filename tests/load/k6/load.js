@@ -3,10 +3,10 @@
  * Standard load test with ramping users simulating realistic traffic
  */
 
-import http from 'k6/http';
-import { check, sleep, group } from 'k6';
-import { Rate, Trend, Counter } from 'k6/metrics';
 import { randomIntBetween } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
+import { check, group, sleep } from 'k6';
+import http from 'k6/http';
+import { Counter, Rate, Trend } from 'k6/metrics';
 
 // Custom metrics
 const errorRate = new Rate('errors');

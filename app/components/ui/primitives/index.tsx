@@ -1,22 +1,22 @@
 'use client';
 
+import * as AccordionPrimitive from '@radix-ui/react-accordion';
+import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
+import * as AvatarPrimitive from '@radix-ui/react-avatar';
+import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
+import * as PopoverPrimitive from '@radix-ui/react-popover';
+import * as ProgressPrimitive from '@radix-ui/react-progress';
+import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
+import * as SelectPrimitive from '@radix-ui/react-select';
+import * as SliderPrimitive from '@radix-ui/react-slider';
+import * as SwitchPrimitive from '@radix-ui/react-switch';
+import * as TabsPrimitive from '@radix-ui/react-tabs';
+import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import type * as React from 'react';
 import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
-import * as SelectPrimitive from '@radix-ui/react-select';
-import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
-import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
-import * as SwitchPrimitive from '@radix-ui/react-switch';
-import * as SliderPrimitive from '@radix-ui/react-slider';
-import * as DialogPrimitive from '@radix-ui/react-dialog';
-import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
-import * as TooltipPrimitive from '@radix-ui/react-tooltip';
-import * as PopoverPrimitive from '@radix-ui/react-popover';
-import * as TabsPrimitive from '@radix-ui/react-tabs';
-import * as AccordionPrimitive from '@radix-ui/react-accordion';
-import * as ProgressPrimitive from '@radix-ui/react-progress';
-import * as AvatarPrimitive from '@radix-ui/react-avatar';
-import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
 
 /* -----------------------------------------------------------------------------
  * Icons (tiny inline SVGs to avoid external deps)
@@ -242,7 +242,9 @@ export const Slider = forwardRef<
       <SliderPrimitive.Range className="absolute h-full bg-(--primary)" />
     </SliderPrimitive.Track>
     {/* Dynamic thumbs based on value/defaultValue length */}
-    {Array.from({ length: (props.value || props.defaultValue || [0]).length }).map((_, i) => (
+    {Array.from({
+      length: (props.value || props.defaultValue || [0]).length,
+    }).map((_, i) => (
       <SliderPrimitive.Thumb
         key={i}
         className="block h-4 w-4 rounded-full border border-(--background) bg-(--foreground) shadow transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 focus-visible:ring-offset-(--background)"

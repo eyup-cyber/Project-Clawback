@@ -192,7 +192,7 @@ export function ApplicationsQueue() {
           onChange={(e) => {
             const [sort, order] = e.target.value.split('-') as [
               ApplicationFilters['sort'],
-              ApplicationFilters['order']
+              ApplicationFilters['order'],
             ];
             setFilters((f) => ({ ...f, sort, order }));
           }}
@@ -210,9 +210,7 @@ export function ApplicationsQueue() {
         ) : applications.length === 0 ? (
           <div className="empty-state">
             <p>No applications found</p>
-            {filters.status === 'pending' && (
-              <p className="empty-hint">All caught up! 🎉</p>
-            )}
+            {filters.status === 'pending' && <p className="empty-hint">All caught up! 🎉</p>}
           </div>
         ) : (
           applications.map((application) => (
@@ -246,7 +244,9 @@ export function ApplicationsQueue() {
             setShowReviewModal(false);
             setSelectedApplication(null);
           }}
-          onReview={(id, decision, notes) => void handleReview(id, decision, notes)}
+          onReview={(id, decision, notes) => {
+            void handleReview(id, decision, notes);
+          }}
         />
       )}
 
@@ -414,10 +414,7 @@ function ApplicationCard({
           </div>
         </div>
         <div className="card-meta">
-          <span
-            className="status-badge"
-            style={{ backgroundColor: colors.bg, color: colors.text }}
-          >
+          <span className="status-badge" style={{ backgroundColor: colors.bg, color: colors.text }}>
             {application.status}
           </span>
           <span className="date">
@@ -442,7 +439,8 @@ function ApplicationCard({
           )}
         </div>
         <div className="samples-count">
-          📄 {application.writing_samples.length} sample{application.writing_samples.length !== 1 ? 's' : ''}
+          📄 {application.writing_samples.length} sample
+          {application.writing_samples.length !== 1 ? 's' : ''}
         </div>
       </div>
 
@@ -453,7 +451,9 @@ function ApplicationCard({
           padding: 1.25rem;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
           cursor: pointer;
-          transition: box-shadow 0.2s, transform 0.2s;
+          transition:
+            box-shadow 0.2s,
+            transform 0.2s;
         }
 
         .application-card:hover {
@@ -662,9 +662,7 @@ function ReviewModal({
                   className="sample-link"
                 >
                   <span className="sample-title">{sample.title}</span>
-                  {sample.description && (
-                    <span className="sample-desc">{sample.description}</span>
-                  )}
+                  {sample.description && <span className="sample-desc">{sample.description}</span>}
                   <span className="sample-url">{new URL(sample.url).hostname}</span>
                 </a>
               ))}
@@ -723,14 +721,18 @@ function ReviewModal({
               Cancel
             </button>
             <button
-              onClick={() => void handleDecision('rejected')}
+              onClick={() => {
+                void handleDecision('rejected');
+              }}
               className="reject-btn"
               disabled={submitting}
             >
               {submitting ? 'Processing...' : 'Reject'}
             </button>
             <button
-              onClick={() => void handleDecision('approved')}
+              onClick={() => {
+                void handleDecision('approved');
+              }}
               className="approve-btn"
               disabled={submitting}
             >

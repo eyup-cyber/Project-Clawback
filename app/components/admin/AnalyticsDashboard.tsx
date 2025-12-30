@@ -143,12 +143,14 @@ export function AnalyticsDashboard() {
   }, [dateRange]);
 
   useEffect(() => {
-    fetchAnalytics();
+    void fetchAnalytics();
   }, [fetchAnalytics]);
 
   const handleExport = async (format: 'csv' | 'json') => {
     try {
-      const response = await fetch(`/api/admin/analytics/export?range=${dateRange}&format=${format}`);
+      const response = await fetch(
+        `/api/admin/analytics/export?range=${dateRange}&format=${format}`
+      );
       if (response.ok) {
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
@@ -178,8 +180,8 @@ export function AnalyticsDashboard() {
           <div className="export-dropdown">
             <button className="export-btn">📥 Export</button>
             <div className="export-menu">
-              <button onClick={() => handleExport('csv')}>Export CSV</button>
-              <button onClick={() => handleExport('json')}>Export JSON</button>
+              <button onClick={() => void handleExport('csv')}>Export CSV</button>
+              <button onClick={() => void handleExport('json')}>Export JSON</button>
             </div>
           </div>
         </div>
@@ -187,13 +189,22 @@ export function AnalyticsDashboard() {
 
       {/* Tabs */}
       <div className="tabs">
-        <button className={activeTab === 'overview' ? 'active' : ''} onClick={() => setActiveTab('overview')}>
+        <button
+          className={activeTab === 'overview' ? 'active' : ''}
+          onClick={() => setActiveTab('overview')}
+        >
           Overview
         </button>
-        <button className={activeTab === 'content' ? 'active' : ''} onClick={() => setActiveTab('content')}>
+        <button
+          className={activeTab === 'content' ? 'active' : ''}
+          onClick={() => setActiveTab('content')}
+        >
           Content
         </button>
-        <button className={activeTab === 'users' ? 'active' : ''} onClick={() => setActiveTab('users')}>
+        <button
+          className={activeTab === 'users' ? 'active' : ''}
+          onClick={() => setActiveTab('users')}
+        >
           Users
         </button>
       </div>
@@ -441,7 +452,8 @@ function ContentTab({ data }: { data: ContentMetrics }) {
                 <div className="item-info">
                   <span className="item-title">{post.title}</span>
                   <span className="item-stats">
-                    {post.views.toLocaleString()} views · {post.reactions} reactions · {post.comments} comments
+                    {post.views.toLocaleString()} views · {post.reactions} reactions ·{' '}
+                    {post.comments} comments
                   </span>
                 </div>
               </div>
@@ -455,7 +467,9 @@ function ContentTab({ data }: { data: ContentMetrics }) {
           <div className="list">
             {data.topCategories.map((cat, i) => (
               <div key={cat.id} className="list-item">
-                <span className="rank" style={{ backgroundColor: cat.color }}>#{i + 1}</span>
+                <span className="rank" style={{ backgroundColor: cat.color }}>
+                  #{i + 1}
+                </span>
                 <div className="item-info">
                   <span className="item-title">{cat.name}</span>
                   <span className="item-stats">
@@ -857,11 +871,13 @@ function MetricCard({
 
 function MiniSparkline({ data, color }: { data: ChartDataPoint[]; color: string }) {
   const maxValue = Math.max(...data.map((d) => d.value), 1);
-  const points = data.map((d, i) => {
-    const x = (i / (data.length - 1)) * 100;
-    const y = 100 - (d.value / maxValue) * 100;
-    return `${x},${y}`;
-  }).join(' ');
+  const points = data
+    .map((d, i) => {
+      const x = (i / (data.length - 1)) * 100;
+      const y = 100 - (d.value / maxValue) * 100;
+      return `${x},${y}`;
+    })
+    .join(' ');
 
   return (
     <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="sparkline">

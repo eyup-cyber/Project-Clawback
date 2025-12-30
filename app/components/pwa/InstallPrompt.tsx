@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -136,7 +136,10 @@ export default function InstallPrompt() {
                 type="button"
                 onClick={() => void handleInstall()}
                 className="px-4 py-2 rounded-lg font-medium text-sm transition-all hover:opacity-90"
-                style={{ background: 'var(--primary)', color: 'var(--background)' }}
+                style={{
+                  background: 'var(--primary)',
+                  color: 'var(--background)',
+                }}
               >
                 Install Now
               </button>

@@ -32,7 +32,12 @@ export interface A11yInput {
   links?: Array<{ href: string; text: string; opensInNewTab?: boolean }>;
   headings?: Array<{ level: number; text: string }>;
   forms?: Array<{
-    inputs: Array<{ type: string; label?: string; id?: string; required?: boolean }>;
+    inputs: Array<{
+      type: string;
+      label?: string;
+      id?: string;
+      required?: boolean;
+    }>;
   }>;
   language?: string;
   pageTitle?: string;

@@ -3,8 +3,8 @@
  * Phase 22: User CRUD, role management, suspensions, bulk actions
  */
 
-import { createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -72,9 +72,7 @@ export async function getUsers(
   const supabase = await createServiceClient();
   const offset = (page - 1) * limit;
 
-  let query = supabase
-    .from('profiles')
-    .select('*', { count: 'exact' });
+  let query = supabase.from('profiles').select('*', { count: 'exact' });
 
   // Apply filters
   if (filters.role) {
@@ -142,11 +140,7 @@ export async function getUsers(
 export async function getUser(userId: string): Promise<AdminUser | null> {
   const supabase = await createServiceClient();
 
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single();
+  const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
 
   if (error || !data) return null;
 
@@ -194,7 +188,10 @@ export async function updateUserRole(
   }
 
   // Log the action
-  await logAdminAction(adminId, 'update_role', userId, { old_role: data.role, new_role: role });
+  await logAdminAction(adminId, 'update_role', userId, {
+    old_role: data.role,
+    new_role: role,
+  });
 
   logger.info('[Admin] User role updated', { userId, role, adminId });
 
@@ -265,7 +262,11 @@ export async function banUser(
 
   await logAdminAction(adminId, 'ban_user', userId, options);
 
-  logger.info('[Admin] User banned', { userId, reason: options.reason, adminId });
+  logger.info('[Admin] User banned', {
+    userId,
+    reason: options.reason,
+    adminId,
+  });
 
   return data as AdminUser;
 }
@@ -360,9 +361,17 @@ export async function deleteUser(
     }
   }
 
-  await logAdminAction(adminId, options.hardDelete ? 'hard_delete_user' : 'soft_delete_user', userId);
+  await logAdminAction(
+    adminId,
+    options.hardDelete ? 'hard_delete_user' : 'soft_delete_user',
+    userId
+  );
 
-  logger.info('[Admin] User deleted', { userId, hardDelete: options.hardDelete, adminId });
+  logger.info('[Admin] User deleted', {
+    userId,
+    hardDelete: options.hardDelete,
+    adminId,
+  });
 }
 
 // ============================================================================
@@ -476,7 +485,7 @@ async function logAdminAction(
       metadata,
     });
   } catch (error) {
-    logger.warn('[Admin] Failed to log admin action', error);
+    logger.warn('[Admin] Failed to log admin action', error as Record<string, unknown>);
   }
 }
 

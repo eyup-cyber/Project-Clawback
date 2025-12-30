@@ -323,7 +323,9 @@ export async function processWebhookRetries(): Promise<void> {
 
   logger.info('[Webhook] Processing retries', { count: deliveries.length });
 
-  for (const delivery of deliveries as (WebhookDelivery & { webhook: Webhook })[]) {
+  for (const delivery of deliveries as (WebhookDelivery & {
+    webhook: Webhook;
+  })[]) {
     if (!delivery.webhook || !delivery.webhook.is_active) {
       // Mark as failed if webhook is inactive or deleted
       await supabase

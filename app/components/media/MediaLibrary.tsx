@@ -5,8 +5,8 @@
  * Phase 43: Visual media browser with folders, grid/list views, search
  */
 
-import { useCallback, useEffect, useState, type ChangeEvent, type KeyboardEvent } from 'react';
-import type { MediaItem, MediaFolder, MediaType } from '@/lib/media/library';
+import { type ChangeEvent, type KeyboardEvent, useCallback, useEffect, useState } from 'react';
+import type { MediaFolder, MediaItem, MediaType } from '@/lib/media/library';
 
 // ============================================================================
 // TYPES
@@ -105,7 +105,7 @@ function formatFileSize(bytes: number): string {
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  return parseFloat((bytes / k ** i).toFixed(1)) + ' ' + sizes[i];
 }
 
 function getMediaIcon(type: MediaType) {
@@ -225,15 +225,15 @@ function MediaListItem({ item, isSelected, onSelect, onDoubleClick }: MediaListI
       onClick={onSelect}
       onDoubleClick={onDoubleClick}
       className={`w-full flex items-center p-3 border-b transition-colors ${
-        isSelected
-          ? 'bg-blue-50 dark:bg-blue-900/20'
-          : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+        isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800'
       }`}
     >
       {/* Checkbox */}
       <div
         className={`w-5 h-5 rounded border mr-3 flex items-center justify-center ${
-          isSelected ? 'bg-blue-500 border-blue-500 text-white' : 'border-gray-300 dark:border-gray-600'
+          isSelected
+            ? 'bg-blue-500 border-blue-500 text-white'
+            : 'border-gray-300 dark:border-gray-600'
         }`}
       >
         {isSelected && <CheckIcon />}
@@ -535,9 +535,7 @@ export default function MediaLibrary({
             {items.length > 0 ? (
               <>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-medium text-gray-500">
-                    Files ({totalItems})
-                  </h3>
+                  <h3 className="text-sm font-medium text-gray-500">Files ({totalItems})</h3>
                   {allowMultiple && (
                     <button
                       onClick={handleSelectAll}

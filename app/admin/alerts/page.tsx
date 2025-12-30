@@ -55,7 +55,7 @@ export default function AlertsPage() {
       setAlerts(result.data?.alerts || getMockAlerts());
       setRules(result.data?.rules || getMockRules());
       setError(null);
-    } catch {
+    } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load alerts');
       setAlerts(getMockAlerts());
       setRules(getMockRules());

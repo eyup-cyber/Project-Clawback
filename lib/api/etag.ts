@@ -10,10 +10,7 @@ import { NextResponse } from 'next/server';
  * Generate an ETag from data
  */
 export function generateETag(data: unknown): string {
-  const hash = crypto
-    .createHash('md5')
-    .update(JSON.stringify(data))
-    .digest('hex');
+  const hash = crypto.createHash('md5').update(JSON.stringify(data)).digest('hex');
   return `"${hash}"`;
 }
 
@@ -21,11 +18,7 @@ export function generateETag(data: unknown): string {
  * Generate a weak ETag (for semantically equivalent responses)
  */
 export function generateWeakETag(data: unknown): string {
-  const hash = crypto
-    .createHash('md5')
-    .update(JSON.stringify(data))
-    .digest('hex')
-    .substring(0, 16);
+  const hash = crypto.createHash('md5').update(JSON.stringify(data)).digest('hex').substring(0, 16);
   return `W/"${hash}"`;
 }
 
@@ -41,16 +34,13 @@ export function generateTimestampETag(timestamp: Date | string, version?: string
 /**
  * Check if request has matching ETag (Not Modified)
  */
-export function checkIfNoneMatch(
-  requestHeaders: Headers,
-  currentETag: string
-): boolean {
+export function checkIfNoneMatch(requestHeaders: Headers, currentETag: string): boolean {
   const ifNoneMatch = requestHeaders.get('if-none-match');
   if (!ifNoneMatch) return false;
 
   // Handle multiple ETags
   const tags = ifNoneMatch.split(',').map((t) => t.trim());
-  
+
   // Check for wildcard
   if (tags.includes('*')) return true;
 
@@ -65,16 +55,13 @@ export function checkIfNoneMatch(
 /**
  * Check If-Match header for conditional updates
  */
-export function checkIfMatch(
-  requestHeaders: Headers,
-  currentETag: string
-): boolean {
+export function checkIfMatch(requestHeaders: Headers, currentETag: string): boolean {
   const ifMatch = requestHeaders.get('if-match');
   if (!ifMatch) return true; // No If-Match means proceed
 
   // Handle multiple ETags
   const tags = ifMatch.split(',').map((t) => t.trim());
-  
+
   // Wildcard matches any
   if (tags.includes('*')) return true;
 
@@ -95,21 +82,13 @@ export function responseWithETag<T>(
     isPrivate?: boolean;
   } = {}
 ): NextResponse<T> {
-  const {
-    weak = false,
-    maxAge = 60,
-    staleWhileRevalidate = 0,
-    isPrivate = false,
-  } = options;
+  const { weak = false, maxAge = 60, staleWhileRevalidate = 0, isPrivate = false } = options;
 
   const etag = options.etag || (weak ? generateWeakETag(data) : generateETag(data));
 
   // Build Cache-Control header
-  const cacheDirectives = [
-    isPrivate ? 'private' : 'public',
-    `max-age=${maxAge}`,
-  ];
-  
+  const cacheDirectives = [isPrivate ? 'private' : 'public', `max-age=${maxAge}`];
+
   if (staleWhileRevalidate > 0) {
     cacheDirectives.push(`stale-while-revalidate=${staleWhileRevalidate}`);
   }
@@ -190,9 +169,7 @@ export function handleConditionalUpdate(
 /**
  * Middleware helper for ETag handling
  */
-export function withETag<T>(
-  handler: (request: Request) => Promise<{ data: T; etag?: string }>
-) {
+export function withETag<T>(handler: (request: Request) => Promise<{ data: T; etag?: string }>) {
   return async (request: Request): Promise<NextResponse> => {
     const { data, etag } = await handler(request);
     return handleConditionalGet(request, data, { etag });

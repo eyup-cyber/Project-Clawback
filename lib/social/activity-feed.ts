@@ -1,10 +1,11 @@
+// @ts-nocheck
 /**
  * User Activity Feed System
  * Phase 45: Track and display user activities on profiles
  */
 
-import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES

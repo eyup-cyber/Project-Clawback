@@ -46,23 +46,23 @@ describe('Rate Limiting', () => {
 
     it('should track multiple requests', () => {
       const config = { maxRequests: 3, windowMs: 60000 };
-      
+
       const r1 = checkRateLimit('test-user', config);
       expect(r1.remaining).toBe(2);
-      
+
       const r2 = checkRateLimit('test-user', config);
       expect(r2.remaining).toBe(1);
-      
+
       const r3 = checkRateLimit('test-user', config);
       expect(r3.remaining).toBe(0);
     });
 
     it('should block requests exceeding limit', () => {
       const config = { maxRequests: 2, windowMs: 60000 };
-      
+
       checkRateLimit('test-user', config);
       checkRateLimit('test-user', config);
-      
+
       const result = checkRateLimit('test-user', config);
       expect(result.success).toBe(false);
       expect(result.remaining).toBe(0);
@@ -71,11 +71,11 @@ describe('Rate Limiting', () => {
 
     it('should isolate rate limits by identifier', () => {
       const config = { maxRequests: 1, windowMs: 60000 };
-      
+
       checkRateLimit('user-1', config);
       const result1 = checkRateLimit('user-1', config);
       expect(result1.success).toBe(false);
-      
+
       const result2 = checkRateLimit('user-2', config);
       expect(result2.success).toBe(true);
     });
@@ -89,13 +89,13 @@ describe('Rate Limiting', () => {
   describe('clearRateLimit', () => {
     it('should clear rate limit for identifier', () => {
       const config = { maxRequests: 1, windowMs: 60000 };
-      
+
       checkRateLimit('test-user', config);
       let result = checkRateLimit('test-user', config);
       expect(result.success).toBe(false);
-      
+
       clearRateLimit('test-user');
-      
+
       result = checkRateLimit('test-user', config);
       expect(result.success).toBe(true);
     });

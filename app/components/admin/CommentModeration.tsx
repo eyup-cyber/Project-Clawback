@@ -5,9 +5,9 @@
  * Phase 2.5: Table, hide/delete, bulk actions
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
+import Link from 'next/link';
+import { useCallback, useEffect, useState } from 'react';
 
 // ============================================================================
 // TYPES
@@ -63,7 +63,11 @@ export function CommentModeration() {
     action: ModerateAction;
     commentId: string;
   } | null>(null);
-  const [pagination, setPagination] = useState({ page: 1, limit: 25, total: 0 });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 25,
+    total: 0,
+  });
   const [filters, setFilters] = useState<CommentFilters>({
     status: 'all',
     search: '',
@@ -229,7 +233,7 @@ export function CommentModeration() {
           onChange={(e) => {
             const [sort, order] = e.target.value.split('-') as [
               CommentFilters['sort'],
-              CommentFilters['order']
+              CommentFilters['order'],
             ];
             setFilters((f) => ({ ...f, sort, order }));
           }}
@@ -245,10 +249,33 @@ export function CommentModeration() {
       {selectedComments.size > 0 && (
         <div className="bulk-actions">
           <span>{selectedComments.size} selected</span>
-          <button onClick={() => void handleBulkAction('hide')}>Hide</button>
-          <button onClick={() => void handleBulkAction('unhide')}>Unhide</button>
-          <button onClick={() => void handleBulkAction('spam')}>Mark as Spam</button>
-          <button onClick={() => void handleBulkAction('delete')} className="danger">
+          <button
+            onClick={() => {
+              void handleBulkAction('hide');
+            }}
+          >
+            Hide
+          </button>
+          <button
+            onClick={() => {
+              void handleBulkAction('unhide');
+            }}
+          >
+            Unhide
+          </button>
+          <button
+            onClick={() => {
+              void handleBulkAction('spam');
+            }}
+          >
+            Mark as Spam
+          </button>
+          <button
+            onClick={() => {
+              void handleBulkAction('delete');
+            }}
+            className="danger"
+          >
             Delete
           </button>
           <button onClick={() => setSelectedComments(new Set())}>Clear</button>
@@ -288,9 +315,9 @@ export function CommentModeration() {
       {showActionModal && (
         <ActionModal
           action={showActionModal.action}
-          onConfirm={(reason) =>
-            void handleAction(showActionModal.action, showActionModal.commentId, reason)
-          }
+          onConfirm={(reason) => {
+            void handleAction(showActionModal.action, showActionModal.commentId, reason);
+          }}
           onCancel={() => setShowActionModal(null)}
         />
       )}
@@ -455,7 +482,9 @@ function CommentCard({
             {comment.status}
           </span>
           <span className="date">
-            {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+            {formatDistanceToNow(new Date(comment.created_at), {
+              addSuffix: true,
+            })}
           </span>
         </div>
       </div>

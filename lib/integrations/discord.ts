@@ -93,24 +93,26 @@ export async function notifyNewPost(post: {
   category?: string;
 }): Promise<boolean> {
   return sendDiscordMessage({
-    embeds: [{
-      title: post.title,
-      url: post.url,
-      description: post.excerpt,
-      color: DISCORD_COLORS.primary,
-      author: {
-        name: `New post by ${post.author}`,
-        icon_url: post.authorAvatar,
+    embeds: [
+      {
+        title: post.title,
+        url: post.url,
+        description: post.excerpt,
+        color: DISCORD_COLORS.primary,
+        author: {
+          name: `New post by ${post.author}`,
+          icon_url: post.authorAvatar,
+        },
+        thumbnail: post.imageUrl ? { url: post.imageUrl } : undefined,
+        fields: post.category
+          ? [{ name: 'Category', value: post.category, inline: true }]
+          : undefined,
+        timestamp: new Date().toISOString(),
+        footer: {
+          text: 'Scroungers Multimedia',
+        },
       },
-      thumbnail: post.imageUrl ? { url: post.imageUrl } : undefined,
-      fields: post.category ? [
-        { name: 'Category', value: post.category, inline: true },
-      ] : undefined,
-      timestamp: new Date().toISOString(),
-      footer: {
-        text: 'Scroungers Multimedia',
-      },
-    }],
+    ],
   });
 }
 
@@ -123,14 +125,16 @@ export async function notifyNewMember(user: {
   profileUrl: string;
 }): Promise<boolean> {
   return sendDiscordMessage({
-    embeds: [{
-      title: '👋 New Member Joined!',
-      description: `Welcome **${user.name}** to Scroungers Multimedia!`,
-      color: DISCORD_COLORS.success,
-      thumbnail: user.avatarUrl ? { url: user.avatarUrl } : undefined,
-      url: user.profileUrl,
-      timestamp: new Date().toISOString(),
-    }],
+    embeds: [
+      {
+        title: '👋 New Member Joined!',
+        description: `Welcome **${user.name}** to Scroungers Multimedia!`,
+        color: DISCORD_COLORS.success,
+        thumbnail: user.avatarUrl ? { url: user.avatarUrl } : undefined,
+        url: user.profileUrl,
+        timestamp: new Date().toISOString(),
+      },
+    ],
   });
 }
 
@@ -149,16 +153,22 @@ export async function notifyMilestone(milestone: {
   };
 
   return sendDiscordMessage({
-    embeds: [{
-      title: `${emojis[milestone.type]} Milestone Reached!`,
-      description: milestone.message,
-      color: DISCORD_COLORS.success,
-      fields: [
-        { name: 'Count', value: milestone.count.toLocaleString(), inline: true },
-        { name: 'Type', value: milestone.type, inline: true },
-      ],
-      timestamp: new Date().toISOString(),
-    }],
+    embeds: [
+      {
+        title: `${emojis[milestone.type]} Milestone Reached!`,
+        description: milestone.message,
+        color: DISCORD_COLORS.success,
+        fields: [
+          {
+            name: 'Count',
+            value: milestone.count.toLocaleString(),
+            inline: true,
+          },
+          { name: 'Type', value: milestone.type, inline: true },
+        ],
+        timestamp: new Date().toISOString(),
+      },
+    ],
   });
 }
 
@@ -178,13 +188,15 @@ export async function notifyAlert(alert: {
   };
 
   return sendDiscordMessage({
-    embeds: [{
-      title: alert.title,
-      description: alert.message,
-      color: colors[alert.severity],
-      fields: alert.fields,
-      timestamp: new Date().toISOString(),
-    }],
+    embeds: [
+      {
+        title: alert.title,
+        description: alert.message,
+        color: colors[alert.severity],
+        fields: alert.fields,
+        timestamp: new Date().toISOString(),
+      },
+    ],
   });
 }
 
@@ -202,18 +214,34 @@ export async function notifyWeeklyDigest(digest: {
   };
 }): Promise<boolean> {
   return sendDiscordMessage({
-    embeds: [{
-      title: '📊 Weekly Digest',
-      color: DISCORD_COLORS.primary,
-      fields: [
-        { name: 'New Posts', value: digest.newPosts.toString(), inline: true },
-        { name: 'New Users', value: digest.newUsers.toString(), inline: true },
-        { name: 'Total Views', value: digest.totalViews.toLocaleString(), inline: true },
-      ],
-      footer: digest.topPost ? {
-        text: `Top Post: ${digest.topPost.title} (${digest.topPost.views} views)`,
-      } : undefined,
-      timestamp: new Date().toISOString(),
-    }],
+    embeds: [
+      {
+        title: '📊 Weekly Digest',
+        color: DISCORD_COLORS.primary,
+        fields: [
+          {
+            name: 'New Posts',
+            value: digest.newPosts.toString(),
+            inline: true,
+          },
+          {
+            name: 'New Users',
+            value: digest.newUsers.toString(),
+            inline: true,
+          },
+          {
+            name: 'Total Views',
+            value: digest.totalViews.toLocaleString(),
+            inline: true,
+          },
+        ],
+        footer: digest.topPost
+          ? {
+              text: `Top Post: ${digest.topPost.title} (${digest.topPost.views} views)`,
+            }
+          : undefined,
+        timestamp: new Date().toISOString(),
+      },
+    ],
   });
 }

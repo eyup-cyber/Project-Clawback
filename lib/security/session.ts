@@ -33,7 +33,7 @@ export function parseUserAgent(userAgent: string): {
   os: string;
 } {
   const ua = userAgent.toLowerCase();
-  
+
   // Detect device type
   let deviceType = 'desktop';
   if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')) {
@@ -70,18 +70,9 @@ export function generateDeviceFingerprint(
   acceptLanguage?: string,
   acceptEncoding?: string
 ): string {
-  const components = [
-    userAgent,
-    ipAddress,
-    acceptLanguage || '',
-    acceptEncoding || '',
-  ].join('|');
+  const components = [userAgent, ipAddress, acceptLanguage || '', acceptEncoding || ''].join('|');
 
-  return crypto
-    .createHash('sha256')
-    .update(components)
-    .digest('hex')
-    .substring(0, 32);
+  return crypto.createHash('sha256').update(components).digest('hex').substring(0, 32);
 }
 
 /**
@@ -93,7 +84,7 @@ export async function createSession(
   expiresInHours: number = 24 * 7 // 7 days default
 ): Promise<SessionInfo | null> {
   const supabase = await createServiceClient();
-  
+
   const userAgent = request.headers.get('user-agent') || 'Unknown';
   const ipAddress = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
   const acceptLanguage = request.headers.get('accept-language') || undefined;
@@ -209,16 +200,10 @@ export async function revokeSession(sessionId: string, userId: string): Promise<
 /**
  * Revoke all sessions for a user (except current)
  */
-export async function revokeAllSessions(
-  userId: string,
-  exceptSessionId?: string
-): Promise<number> {
+export async function revokeAllSessions(userId: string, exceptSessionId?: string): Promise<number> {
   const supabase = await createServiceClient();
 
-  let query = supabase
-    .from('user_sessions')
-    .delete()
-    .eq('user_id', userId);
+  let query = supabase.from('user_sessions').delete().eq('user_id', userId);
 
   if (exceptSessionId) {
     query = query.neq('id', exceptSessionId);
@@ -236,10 +221,7 @@ export async function revokeAllSessions(
 /**
  * Check if a session is valid
  */
-export async function validateSession(
-  sessionId: string,
-  userId: string
-): Promise<boolean> {
+export async function validateSession(sessionId: string, userId: string): Promise<boolean> {
   const supabase = await createServiceClient();
 
   const { data, error } = await supabase
@@ -269,7 +251,7 @@ export async function detectSuspiciousLogin(
 }> {
   const userAgent = request.headers.get('user-agent') || 'Unknown';
   const ipAddress = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
-  
+
   const deviceFingerprint = generateDeviceFingerprint(
     userAgent,
     ipAddress,

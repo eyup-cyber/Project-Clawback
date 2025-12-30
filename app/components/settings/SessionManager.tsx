@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import { formatRelativeTime } from '@/lib/utils';
 
@@ -304,7 +304,10 @@ function SessionCard({
             {isRevoking ? (
               <div
                 className="w-4 h-4 border-2 rounded-full animate-spin"
-                style={{ borderColor: '#ef4444', borderTopColor: 'transparent' }}
+                style={{
+                  borderColor: '#ef4444',
+                  borderTopColor: 'transparent',
+                }}
               />
             ) : (
               Icons.logout
@@ -412,7 +415,10 @@ export default function SessionManager() {
         <div>
           <h3
             className="text-lg font-bold"
-            style={{ color: 'var(--foreground)', fontFamily: 'var(--font-kindergarten)' }}
+            style={{
+              color: 'var(--foreground)',
+              fontFamily: 'var(--font-kindergarten)',
+            }}
           >
             Active Sessions
           </h3>
@@ -532,12 +538,18 @@ export default function SessionManager() {
         >
           <div
             className="p-6 rounded-xl w-full max-w-md animate-in fade-in zoom-in-95"
-            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <h3
               className="text-lg font-bold mb-2"
-              style={{ color: 'var(--foreground)', fontFamily: 'var(--font-kindergarten)' }}
+              style={{
+                color: 'var(--foreground)',
+                fontFamily: 'var(--font-kindergarten)',
+              }}
             >
               Sign out all other devices?
             </h3>

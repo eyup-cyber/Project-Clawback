@@ -1,9 +1,9 @@
 'use client';
 
-import { forwardRef, type TextareaHTMLAttributes, useState, useEffect, useRef } from 'react';
-import { cn } from '@/lib/utils';
 import gsap from 'gsap';
-import { EASING, prefersReducedMotion, getDuration, DURATION } from '@/lib/animations/gsap-config';
+import { forwardRef, type TextareaHTMLAttributes, useEffect, useRef, useState } from 'react';
+import { DURATION, EASING, getDuration, prefersReducedMotion } from '@/lib/animations/gsap-config';
+import { cn } from '@/lib/utils';
 
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
@@ -17,7 +17,23 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
 }
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, label, error, hint, id, floatingLabel = false, showCharacterCount = false, maxLength, autoResize = true, success = false, value, ...props }, ref) => {
+  (
+    {
+      className,
+      label,
+      error,
+      hint,
+      id,
+      floatingLabel = false,
+      showCharacterCount = false,
+      maxLength,
+      autoResize = true,
+      success = false,
+      value,
+      ...props
+    },
+    ref
+  ) => {
     const textareaId = id || label?.toLowerCase().replace(/\s+/g, '-');
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const labelRef = useRef<HTMLLabelElement>(null);
@@ -35,7 +51,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       if (!autoResize || !textareaRef.current) return;
 
       const textarea = textareaRef.current;
-      
+
       const resize = () => {
         textarea.style.height = 'auto';
         textarea.style.height = `${textarea.scrollHeight}px`;
@@ -54,7 +70,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 
       const handleFocus = () => {
         setIsFocused(true);
-        
+
         if (floatingLabel && labelRef.current) {
           gsap.to(labelRef.current, {
             y: -24,
@@ -76,7 +92,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 
       const handleBlur = () => {
         setIsFocused(false);
-        
+
         if (floatingLabel && labelRef.current && !hasValue) {
           gsap.to(labelRef.current, {
             y: 0,
@@ -146,8 +162,12 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               htmlFor={textareaId}
               className={cn(
                 'absolute left-4 pointer-events-none transition-colors',
-                (isFocused || hasValue) ? 'top-2 text-xs' : 'top-4 text-base',
-                error ? 'text-[var(--accent)]' : success ? 'text-[var(--primary)]' : 'text-[var(--foreground)] opacity-70'
+                isFocused || hasValue ? 'top-2 text-xs' : 'top-4 text-base',
+                error
+                  ? 'text-[var(--accent)]'
+                  : success
+                    ? 'text-[var(--primary)]'
+                    : 'text-[var(--foreground)] opacity-70'
               )}
               style={{ fontFamily: 'var(--font-body)' }}
             >
@@ -160,7 +180,10 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             <label
               htmlFor={textareaId}
               className="block mb-2 font-medium"
-              style={{ color: 'var(--foreground)', fontFamily: 'var(--font-body)' }}
+              style={{
+                color: 'var(--foreground)',
+                fontFamily: 'var(--font-body)',
+              }}
             >
               {label}
               {props.required && <span style={{ color: 'var(--accent)' }}> *</span>}
@@ -183,8 +206,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                 error
                   ? 'border-[var(--accent)] focus:ring-[var(--accent)]'
                   : success
-                  ? 'border-[var(--primary)] focus:ring-[var(--primary)]'
-                  : 'border-[var(--border)] focus:ring-[var(--primary)]',
+                    ? 'border-[var(--primary)] focus:ring-[var(--primary)]'
+                    : 'border-[var(--border)] focus:ring-[var(--primary)]',
                 className
               )}
               style={{
@@ -193,7 +216,9 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                 fontFamily: 'var(--font-body)',
               }}
               aria-invalid={!!error}
-              aria-describedby={error ? `${textareaId}-error` : hint ? `${textareaId}-hint` : undefined}
+              aria-describedby={
+                error ? `${textareaId}-error` : hint ? `${textareaId}-hint` : undefined
+              }
               maxLength={maxLength}
               onChange={(e) => {
                 props.onChange?.(e);
@@ -219,7 +244,14 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                 className="absolute right-4 top-4 pointer-events-none"
                 style={{ color: 'var(--primary)' }}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                >
                   <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
@@ -249,7 +281,14 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             style={{ color: 'var(--accent)', fontFamily: 'var(--font-body)' }}
             role="alert"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -262,7 +301,11 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           <p
             id={`${textareaId}-hint`}
             className="mt-2 text-sm"
-            style={{ color: 'var(--foreground)', opacity: 0.6, fontFamily: 'var(--font-body)' }}
+            style={{
+              color: 'var(--foreground)',
+              opacity: 0.6,
+              fontFamily: 'var(--font-body)',
+            }}
           >
             {hint}
           </p>
@@ -275,9 +318,3 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 Textarea.displayName = 'Textarea';
 
 export default Textarea;
-
-
-
-
-
-

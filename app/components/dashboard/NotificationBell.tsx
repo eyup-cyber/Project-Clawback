@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { formatRelativeTime } from '@/lib/utils';
 
 interface Notification {
@@ -81,10 +81,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
   }, []);
 
   const markAsRead = async (notificationId: string) => {
-    await supabase
-      .from('notifications')
-      .update({ read: true })
-      .eq('id', notificationId);
+    await supabase.from('notifications').update({ read: true }).eq('id', notificationId);
 
     setNotifications((prev) =>
       prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n))
@@ -205,16 +202,16 @@ export default function NotificationBell({ userId }: { userId: string }) {
               <div className="p-4 text-center">
                 <div
                   className="w-6 h-6 border-2 rounded-full animate-spin mx-auto"
-                  style={{ borderColor: 'var(--border)', borderTopColor: 'var(--primary)' }}
+                  style={{
+                    borderColor: 'var(--border)',
+                    borderTopColor: 'var(--primary)',
+                  }}
                 />
               </div>
             ) : notifications.length === 0 ? (
               <div className="p-6 text-center">
                 <span className="text-3xl block mb-2">🔔</span>
-                <p
-                  className="text-sm"
-                  style={{ color: 'var(--foreground)', opacity: 0.6 }}
-                >
+                <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.6 }}>
                   No notifications yet
                 </p>
               </div>
@@ -250,7 +247,10 @@ export default function NotificationBell({ userId }: { userId: string }) {
                           {notification.message && (
                             <p
                               className="text-xs mt-0.5 line-clamp-2"
-                              style={{ color: 'var(--foreground)', opacity: 0.7 }}
+                              style={{
+                                color: 'var(--foreground)',
+                                opacity: 0.7,
+                              }}
                             >
                               {notification.message}
                             </p>
@@ -270,7 +270,10 @@ export default function NotificationBell({ userId }: { userId: string }) {
                           {notification.message && (
                             <p
                               className="text-xs mt-0.5 line-clamp-2"
-                              style={{ color: 'var(--foreground)', opacity: 0.7 }}
+                              style={{
+                                color: 'var(--foreground)',
+                                opacity: 0.7,
+                              }}
                             >
                               {notification.message}
                             </p>

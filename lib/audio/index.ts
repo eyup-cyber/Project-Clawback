@@ -1,1 +1,1 @@
-export { playXylophoneNote, initializeAudio, disposeAudio } from './xylophone';
+export { disposeAudio, initializeAudio, playXylophoneNote } from './xylophone';

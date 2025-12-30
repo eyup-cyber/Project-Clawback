@@ -5,7 +5,7 @@
  * Phase 42: Audio player with waveform display and playlist support
  */
 
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { type KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 
 // ============================================================================
 // TYPES
@@ -210,7 +210,10 @@ function ProgressBar({ progress, buffered, onSeek, accentColor }: ProgressBarPro
       {/* Scrubber */}
       <div
         className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{ left: `calc(${progress * 100}% - 6px)`, backgroundColor: accentColor }}
+        style={{
+          left: `calc(${progress * 100}% - 6px)`,
+          backgroundColor: accentColor,
+        }}
       />
     </div>
   );
@@ -238,7 +241,8 @@ function Playlist({ tracks, currentIndex, onSelect, accentColor }: PlaylistProps
             index === currentIndex ? 'bg-white/10' : 'hover:bg-white/5'
           }`}
           style={{
-            borderLeft: index === currentIndex ? `3px solid ${accentColor}` : '3px solid transparent',
+            borderLeft:
+              index === currentIndex ? `3px solid ${accentColor}` : '3px solid transparent',
           }}
         >
           {track.coverUrl ? (
@@ -254,9 +258,7 @@ function Playlist({ tracks, currentIndex, onSelect, accentColor }: PlaylistProps
           )}
           <div className="ml-3 text-left flex-1 min-w-0">
             <p className="text-white font-medium truncate">{track.title}</p>
-            {track.artist && (
-              <p className="text-white/60 text-sm truncate">{track.artist}</p>
-            )}
+            {track.artist && <p className="text-white/60 text-sm truncate">{track.artist}</p>}
           </div>
           {track.duration && (
             <span className="text-white/40 text-sm ml-2">{formatTime(track.duration)}</span>
@@ -575,9 +577,7 @@ export default function AudioPlayer({
         )}
         <div className="flex-1 min-w-0">
           <h3 className="text-white text-xl font-bold truncate">{currentTrack?.title}</h3>
-          {currentTrack?.artist && (
-            <p className="text-white/60 truncate">{currentTrack.artist}</p>
-          )}
+          {currentTrack?.artist && <p className="text-white/60 truncate">{currentTrack.artist}</p>}
           {currentTrack?.album && (
             <p className="text-white/40 text-sm truncate">{currentTrack.album}</p>
           )}

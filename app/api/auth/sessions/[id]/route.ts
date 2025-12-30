@@ -12,15 +12,15 @@ interface RouteParams {
  * DELETE /api/auth/sessions/[id]
  * Revoke a specific session
  */
-export async function DELETE(
-  _request: NextRequest,
-  { params }: RouteParams
-) {
+export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   try {
     const { id: sessionId } = await params;
     const supabase = await createClient();
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
     if (authError || !user) {
       return applySecurityHeaders(unauthorized('Authentication required'));
     }
@@ -31,10 +31,12 @@ export async function DELETE(
       return applySecurityHeaders(notFound('Session not found'));
     }
 
-    return applySecurityHeaders(success({
-      revoked: true,
-      message: 'Session has been revoked',
-    }));
+    return applySecurityHeaders(
+      success({
+        revoked: true,
+        message: 'Session has been revoked',
+      })
+    );
   } catch (error) {
     return applySecurityHeaders(handleApiError(error));
   }

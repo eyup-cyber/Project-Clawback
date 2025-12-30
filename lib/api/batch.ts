@@ -26,13 +26,18 @@ export interface BatchResult {
 }
 
 export const batchRequestSchema = z.object({
-  requests: z.array(z.object({
-    id: z.string(),
-    method: z.enum(['GET', 'POST', 'PUT', 'PATCH', 'DELETE']),
-    path: z.string().startsWith('/api/'),
-    body: z.unknown().optional(),
-    headers: z.record(z.string(), z.string()).optional(),
-  })).min(1).max(20), // Limit batch size
+  requests: z
+    .array(
+      z.object({
+        id: z.string(),
+        method: z.enum(['GET', 'POST', 'PUT', 'PATCH', 'DELETE']),
+        path: z.string().startsWith('/api/'),
+        body: z.unknown().optional(),
+        headers: z.record(z.string(), z.string()).optional(),
+      })
+    )
+    .min(1)
+    .max(20), // Limit batch size
 });
 
 export type BatchRequestInput = z.infer<typeof batchRequestSchema>;
@@ -46,13 +51,13 @@ export async function executeBatch(
   authHeaders: Record<string, string> = {}
 ): Promise<BatchResult> {
   const startTime = Date.now();
-  
+
   // Execute requests in parallel (with concurrency limit)
   const responses = await Promise.all(
     batch.map(async (request): Promise<BatchResponse> => {
       try {
         const url = new URL(request.path, baseUrl);
-        
+
         const fetchOptions: RequestInit = {
           method: request.method,
           headers: {
@@ -61,14 +66,14 @@ export async function executeBatch(
             ...request.headers,
           },
         };
-        
+
         if (request.body && request.method !== 'GET') {
           fetchOptions.body = JSON.stringify(request.body);
         }
-        
+
         const response = await fetch(url.toString(), fetchOptions);
         const body = await response.json().catch(() => null);
-        
+
         return {
           id: request.id,
           status: response.status,
@@ -107,7 +112,7 @@ export async function coalesce<T>(
   options: { ttlMs?: number } = {}
 ): Promise<T> {
   const { ttlMs = 100 } = options;
-  
+
   // Check for existing in-flight request
   const existing = coalescedRequests.get(key);
   if (existing) {
@@ -130,14 +135,26 @@ export async function coalesce<T>(
  * DataLoader pattern for batching database queries
  */
 export class DataLoader<K, V> {
-  private batch: Map<K, { resolve: (value: V | undefined) => void; reject: (error: Error) => void }[]> = new Map();
+  private batch: Map<
+    K,
+    {
+      resolve: (value: V | undefined) => void;
+      reject: (error: Error) => void;
+    }[]
+  > = new Map();
   private scheduled = false;
   private batchFn: (keys: K[]) => Promise<Map<K, V>>;
-  private options: { maxBatchSize?: number; batchScheduleFn?: (callback: () => void) => void };
+  private options: {
+    maxBatchSize?: number;
+    batchScheduleFn?: (callback: () => void) => void;
+  };
 
   constructor(
     batchFn: (keys: K[]) => Promise<Map<K, V>>,
-    options: { maxBatchSize?: number; batchScheduleFn?: (callback: () => void) => void } = {}
+    options: {
+      maxBatchSize?: number;
+      batchScheduleFn?: (callback: () => void) => void;
+    } = {}
   ) {
     this.batchFn = batchFn;
     this.options = {
@@ -172,10 +189,10 @@ export class DataLoader<K, V> {
     if (batch.size === 0) return;
 
     const keys = Array.from(batch.keys());
-    
+
     try {
       const results = await this.batchFn(keys);
-      
+
       for (const [key, callbacks] of batch) {
         const value = results.get(key);
         for (const { resolve } of callbacks) {
@@ -225,12 +242,12 @@ export async function batchDatabaseOperations<T>(
   // Execute with concurrency limit
   const CONCURRENCY = 10;
   const results: PromiseSettledResult<T>[] = [];
-  
+
   for (let i = 0; i < operations.length; i += CONCURRENCY) {
     const batch = operations.slice(i, i + CONCURRENCY);
     const batchResults = await Promise.allSettled(batch.map((op) => op()));
     results.push(...batchResults);
   }
-  
+
   return results;
 }

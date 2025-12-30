@@ -49,14 +49,16 @@ let hasErrors = false;
 // ============================================================================
 logSection('Running npm audit');
 
-const auditResult = runCommand('npm audit --audit-level=high --json', { silent: true });
+const auditResult = runCommand('npm audit --audit-level=high --json', {
+  silent: true,
+});
 if (auditResult.success) {
   try {
     const auditData = JSON.parse(auditResult.output);
     const vulns = auditData.metadata?.vulnerabilities || {};
     const high = vulns.high || 0;
     const critical = vulns.critical || 0;
-    
+
     if (critical > 0) {
       log(`CRITICAL: ${critical} critical vulnerabilities found`, colors.red);
       hasErrors = true;
@@ -64,15 +66,17 @@ if (auditResult.success) {
     } else {
       checks.push({ name: 'npm audit (critical)', passed: true });
     }
-    
+
     if (high > 0) {
       log(`WARNING: ${high} high severity vulnerabilities found`, colors.yellow);
       checks.push({ name: 'npm audit (high)', passed: false });
     } else {
       checks.push({ name: 'npm audit (high)', passed: true });
     }
-    
-    log(`Total: ${vulns.total || 0} vulnerabilities (${critical} critical, ${high} high, ${vulns.moderate || 0} moderate, ${vulns.low || 0} low)`);
+
+    log(
+      `Total: ${vulns.total || 0} vulnerabilities (${critical} critical, ${high} high, ${vulns.moderate || 0} moderate, ${vulns.low || 0} low)`
+    );
   } catch {
     log('No vulnerabilities found or audit ran successfully', colors.green);
     checks.push({ name: 'npm audit', passed: true });
@@ -84,7 +88,7 @@ if (auditResult.success) {
     const vulns = auditData.metadata?.vulnerabilities || {};
     const critical = vulns.critical || 0;
     const high = vulns.high || 0;
-    
+
     if (critical > 0 || high > 0) {
       log(`Found ${critical} critical and ${high} high vulnerabilities`, colors.red);
       hasErrors = critical > 0;
@@ -107,45 +111,52 @@ const secretPatterns = [
   { name: 'Private Key', pattern: /-----BEGIN (RSA |EC )?PRIVATE KEY-----/g },
   { name: 'GitHub Token', pattern: /ghp_[A-Za-z0-9]{36}/g },
   { name: 'Slack Token', pattern: /xox[baprs]-[A-Za-z0-9-]+/g },
-  { name: 'Generic API Key', pattern: /api[_-]?key['":\s]*[=:]\s*['"][A-Za-z0-9]{20,}['"]/gi },
-  { name: 'Password in code', pattern: /password['":\s]*[=:]\s*['"][^'"]{8,}['"]/gi },
+  {
+    name: 'Generic API Key',
+    pattern: /api[_-]?key['":\s]*[=:]\s*['"][A-Za-z0-9]{20,}['"]/gi,
+  },
+  {
+    name: 'Password in code',
+    pattern: /password['":\s]*[=:]\s*['"][^'"]{8,}['"]/gi,
+  },
 ];
 
 function scanFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8');
   const findings = [];
-  
+
   for (const { name, pattern } of secretPatterns) {
     const matches = content.match(pattern);
     if (matches) {
       // Filter out false positives (like example values or env var references)
-      const realMatches = matches.filter(m => 
-        !m.includes('process.env') && 
-        !m.includes('example') &&
-        !m.includes('your-') &&
-        !m.includes('xxx') &&
-        !m.includes('placeholder')
+      const realMatches = matches.filter(
+        (m) =>
+          !m.includes('process.env') &&
+          !m.includes('example') &&
+          !m.includes('your-') &&
+          !m.includes('xxx') &&
+          !m.includes('placeholder')
       );
       if (realMatches.length > 0) {
         findings.push({ type: name, count: realMatches.length });
       }
     }
   }
-  
+
   return findings;
 }
 
 function scanDirectory(dir, extensions = ['.ts', '.tsx', '.js', '.jsx', '.json']) {
   const findings = [];
   const ignoreDirs = ['node_modules', '.git', '.next', 'dist', 'build', '.cursor'];
-  
+
   function walk(currentDir) {
     const items = fs.readdirSync(currentDir);
-    
+
     for (const item of items) {
       const fullPath = path.join(currentDir, item);
       const stat = fs.statSync(fullPath);
-      
+
       if (stat.isDirectory()) {
         if (!ignoreDirs.includes(item)) {
           walk(fullPath);
@@ -161,7 +172,7 @@ function scanDirectory(dir, extensions = ['.ts', '.tsx', '.js', '.jsx', '.json']
       }
     }
   }
-  
+
   walk(dir);
   return findings;
 }
@@ -187,20 +198,22 @@ if (secretFindings.length > 0) {
 logSection('Checking .env files');
 
 const envFiles = ['.env', '.env.local', '.env.development', '.env.production'];
-const foundEnvFiles = envFiles.filter(f => fs.existsSync(path.join(process.cwd(), f)));
+const foundEnvFiles = envFiles.filter((f) => fs.existsSync(path.join(process.cwd(), f)));
 
 if (foundEnvFiles.length > 0) {
   log('Found .env files:', colors.yellow);
   for (const file of foundEnvFiles) {
     log(`  - ${file}`, colors.yellow);
   }
-  
+
   // Check if they're in .gitignore
   const gitignorePath = path.join(process.cwd(), '.gitignore');
   if (fs.existsSync(gitignorePath)) {
     const gitignore = fs.readFileSync(gitignorePath, 'utf-8');
-    const unignoredEnvFiles = foundEnvFiles.filter(f => !gitignore.includes(f) && !gitignore.includes('.env*'));
-    
+    const unignoredEnvFiles = foundEnvFiles.filter(
+      (f) => !gitignore.includes(f) && !gitignore.includes('.env*')
+    );
+
     if (unignoredEnvFiles.length > 0) {
       log('WARNING: These .env files may not be in .gitignore:', colors.red);
       for (const file of unignoredEnvFiles) {
@@ -226,7 +239,7 @@ const outdatedResult = runCommand('npm outdated --json', { silent: true });
 try {
   const outdated = JSON.parse(outdatedResult.output || '{}');
   const outdatedCount = Object.keys(outdated).length;
-  
+
   if (outdatedCount > 0) {
     log(`${outdatedCount} packages have updates available`, colors.yellow);
     const majorUpdates = Object.entries(outdated).filter(([, info]) => {
@@ -234,7 +247,7 @@ try {
       const latest = info.latest?.split('.')[0];
       return current && latest && current !== latest;
     });
-    
+
     if (majorUpdates.length > 0) {
       log('Packages with major version updates:', colors.yellow);
       for (const [pkg, info] of majorUpdates.slice(0, 5)) {
@@ -259,8 +272,8 @@ try {
 // ============================================================================
 logSection('Security Scan Summary');
 
-const passed = checks.filter(c => c.passed).length;
-const failed = checks.filter(c => !c.passed).length;
+const passed = checks.filter((c) => c.passed).length;
+const failed = checks.filter((c) => !c.passed).length;
 
 for (const check of checks) {
   const status = check.passed ? `${colors.green}✓` : `${colors.red}✗`;

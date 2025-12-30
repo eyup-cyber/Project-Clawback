@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type * as THREE from 'three';
 import { prefersReducedMotion } from '@/lib/animations/gsap-config';
 

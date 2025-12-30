@@ -3,8 +3,8 @@
  * Phase 44: Archive old content, restore, permanent deletion
  */
 
-import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -186,7 +186,10 @@ export async function archiveContent(
 
   // Delete original content (soft delete or hard delete based on type)
   if (contentType === 'post') {
-    await supabase.from(tableName).update({ status: 'archived', archived_at: new Date().toISOString() }).eq('id', contentId);
+    await supabase
+      .from(tableName)
+      .update({ status: 'archived', archived_at: new Date().toISOString() })
+      .eq('id', contentId);
   } else {
     await supabase.from(tableName).delete().eq('id', contentId);
   }
@@ -287,7 +290,9 @@ export async function permanentlyDelete(archiveId: string): Promise<void> {
     throw error;
   }
 
-  logger.info('[Archiving] Content permanently deleted', { archive_id: archiveId });
+  logger.info('[Archiving] Content permanently deleted', {
+    archive_id: archiveId,
+  });
 }
 
 /**
@@ -318,9 +323,7 @@ export async function queryArchive(
     offset = 0,
   } = query;
 
-  let queryBuilder = supabase
-    .from('archived_content')
-    .select('*', { count: 'exact' });
+  let queryBuilder = supabase.from('archived_content').select('*', { count: 'exact' });
 
   // Filter by deletion status
   if (!include_deleted) {
@@ -437,7 +440,10 @@ export async function createRetentionPolicy(
     throw error;
   }
 
-  logger.info('[Archiving] Retention policy created', { policy_id: data.id, name: policy.name });
+  logger.info('[Archiving] Retention policy created', {
+    policy_id: data.id,
+    name: policy.name,
+  });
   return data as RetentionPolicy;
 }
 
@@ -447,10 +453,7 @@ export async function createRetentionPolicy(
 export async function getRetentionPolicies(): Promise<RetentionPolicy[]> {
   const supabase = await createServiceClient();
 
-  const { data, error } = await supabase
-    .from('retention_policies')
-    .select('*')
-    .order('name');
+  const { data, error } = await supabase.from('retention_policies').select('*').order('name');
 
   if (error) {
     logger.error('[Archiving] Failed to get retention policies', error);
@@ -503,7 +506,7 @@ export async function executeRetentionPolicies(): Promise<{
     })
     .lt('retention_until', new Date().toISOString())
     .eq('is_permanently_deleted', false)
-    .select('*', { count: 'exact', head: true });
+    .select('*');
 
   result.deleted += expiredDeleted || 0;
 
@@ -587,7 +590,7 @@ async function executeAutoDelete(policy: RetentionPolicy): Promise<number> {
     .in('content_type', policy.content_types)
     .lte('archived_at', cutoffDate.toISOString())
     .eq('is_permanently_deleted', false)
-    .select('*', { count: 'exact', head: true });
+    .select('*');
 
   return count || 0;
 }
@@ -668,7 +671,10 @@ function getTableName(contentType: ContentType): string {
   return tables[contentType];
 }
 
-function extractMetadata(content: Record<string, unknown>, contentType: ContentType): ContentMetadata {
+function extractMetadata(
+  content: Record<string, unknown>,
+  contentType: ContentType
+): ContentMetadata {
   const metadata: ContentMetadata = {};
 
   if (contentType === 'post') {

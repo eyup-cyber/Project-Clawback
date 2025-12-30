@@ -3,7 +3,8 @@
  * React hook for checking feature flags
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface FeatureFlagState {
   enabled: boolean;

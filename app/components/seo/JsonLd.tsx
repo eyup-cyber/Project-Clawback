@@ -372,7 +372,9 @@ export function ProfilePageSchema({ profile }: { profile: ProfilePage }) {
       }),
       ...(profile.mainEntity.image && { image: profile.mainEntity.image }),
       ...(profile.mainEntity.url && { url: profile.mainEntity.url }),
-      ...(profile.mainEntity.jobTitle && { jobTitle: profile.mainEntity.jobTitle }),
+      ...(profile.mainEntity.jobTitle && {
+        jobTitle: profile.mainEntity.jobTitle,
+      }),
       ...(profile.mainEntity.worksFor && {
         worksFor: {
           '@type': 'Organization',

@@ -3,8 +3,8 @@
  * Phase 5: Review assignment, inline annotations, revision tracking
  */
 
-import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -236,7 +236,11 @@ export async function getPostAnnotations(
   options: { status?: string } = {}
 ): Promise<
   (InlineAnnotation & {
-    author: { username: string; display_name: string; avatar_url: string | null };
+    author: {
+      username: string;
+      display_name: string;
+      avatar_url: string | null;
+    };
   })[]
 > {
   const { status } = options;
@@ -265,7 +269,11 @@ export async function getPostAnnotations(
   }
 
   return data as unknown as (InlineAnnotation & {
-    author: { username: string; display_name: string; avatar_url: string | null };
+    author: {
+      username: string;
+      display_name: string;
+      avatar_url: string | null;
+    };
   })[];
 }
 
@@ -368,7 +376,11 @@ export async function addAnnotationReply(options: {
  */
 export async function getAnnotationReplies(annotationId: string): Promise<
   (AnnotationReply & {
-    author: { username: string; display_name: string; avatar_url: string | null };
+    author: {
+      username: string;
+      display_name: string;
+      avatar_url: string | null;
+    };
   })[]
 > {
   const supabase = await createClient();
@@ -390,7 +402,11 @@ export async function getAnnotationReplies(annotationId: string): Promise<
   }
 
   return data as unknown as (AnnotationReply & {
-    author: { username: string; display_name: string; avatar_url: string | null };
+    author: {
+      username: string;
+      display_name: string;
+      avatar_url: string | null;
+    };
   })[];
 }
 
@@ -445,7 +461,11 @@ export async function createRevisionRequest(options: {
  */
 export async function getPostRevisionRequests(postId: string): Promise<
   (RevisionRequest & {
-    reviewer: { username: string; display_name: string; avatar_url: string | null };
+    reviewer: {
+      username: string;
+      display_name: string;
+      avatar_url: string | null;
+    };
   })[]
 > {
   const supabase = await createClient();
@@ -467,7 +487,11 @@ export async function getPostRevisionRequests(postId: string): Promise<
   }
 
   return data as unknown as (RevisionRequest & {
-    reviewer: { username: string; display_name: string; avatar_url: string | null };
+    reviewer: {
+      username: string;
+      display_name: string;
+      avatar_url: string | null;
+    };
   })[];
 }
 
@@ -581,7 +605,10 @@ export async function getAvailableReviewers(options: {
 export async function autoAssignReview(
   postId: string,
   assignedBy: string,
-  options: { categoryId?: string; priority?: 'low' | 'normal' | 'high' | 'urgent' } = {}
+  options: {
+    categoryId?: string;
+    priority?: 'low' | 'normal' | 'high' | 'urgent';
+  } = {}
 ): Promise<ReviewAssignment | null> {
   const { categoryId, priority = 'normal' } = options;
 
@@ -600,7 +627,9 @@ export async function autoAssignReview(
   });
 
   if (reviewers.length === 0) {
-    logger.warn('[Editorial] No available reviewers for auto-assignment', { postId });
+    logger.warn('[Editorial] No available reviewers for auto-assignment', {
+      postId,
+    });
     return null;
   }
 

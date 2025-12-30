@@ -57,10 +57,7 @@ export function generateApiKey(): string {
  * Hash an API key for storage
  */
 export function hashApiKey(key: string): string {
-  return crypto
-    .createHash('sha256')
-    .update(key)
-    .digest('hex');
+  return crypto.createHash('sha256').update(key).digest('hex');
 }
 
 /**
@@ -87,7 +84,7 @@ export async function createApiKey(
   input: CreateApiKeyInput
 ): Promise<{ key: string; apiKey: ApiKey } | null> {
   const supabase = await createServiceClient();
-  
+
   // Generate the key
   const plainKey = generateApiKey();
   const hashedKey = hashApiKey(plainKey);
@@ -180,7 +177,10 @@ export async function validateApiKey(
   const keyScopes = data.scopes as string[];
   const missingScopes = requiredScopes.filter((s) => !keyScopes.includes(s));
   if (missingScopes.length > 0) {
-    return { valid: false, error: `Missing required scopes: ${missingScopes.join(', ')}` };
+    return {
+      valid: false,
+      error: `Missing required scopes: ${missingScopes.join(', ')}`,
+    };
   }
 
   // Update last used timestamp
@@ -231,11 +231,7 @@ export async function getUserApiKeys(userId: string): Promise<ApiKey[]> {
 export async function deleteApiKey(keyId: string, userId: string): Promise<boolean> {
   const supabase = await createServiceClient();
 
-  const { error } = await supabase
-    .from('api_keys')
-    .delete()
-    .eq('id', keyId)
-    .eq('user_id', userId);
+  const { error } = await supabase.from('api_keys').delete().eq('id', keyId).eq('user_id', userId);
 
   return !error;
 }
@@ -255,7 +251,9 @@ export async function updateApiKey(
     .update({
       ...(updates.name && { name: updates.name }),
       ...(updates.scopes && { scopes: updates.scopes }),
-      ...(updates.allowedIps !== undefined && { allowed_ips: updates.allowedIps }),
+      ...(updates.allowedIps !== undefined && {
+        allowed_ips: updates.allowedIps,
+      }),
     })
     .eq('id', keyId)
     .eq('user_id', userId);
@@ -266,10 +264,7 @@ export async function updateApiKey(
 /**
  * Rotate an API key (generate new key, keep same settings)
  */
-export async function rotateApiKey(
-  keyId: string,
-  userId: string
-): Promise<{ key: string } | null> {
+export async function rotateApiKey(keyId: string, userId: string): Promise<{ key: string } | null> {
   const supabase = await createServiceClient();
 
   // Get existing key settings

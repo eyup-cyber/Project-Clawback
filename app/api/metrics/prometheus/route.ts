@@ -3,7 +3,7 @@
  * Exposes application metrics in Prometheus format
  */
 
-import { type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getMetricsString } from '@/lib/monitoring/prometheus';
 
 /**

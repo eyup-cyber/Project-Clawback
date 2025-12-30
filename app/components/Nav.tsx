@@ -315,7 +315,6 @@ export default function Nav() {
                   style={{ background: 'var(--primary)', color: 'var(--background)' }}
                 >
                   {profile?.avatar_url ? (
-                     
                     <img
                       src={profile.avatar_url}
                       alt={profile.display_name || 'User'}

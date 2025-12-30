@@ -24,9 +24,12 @@ const verifySchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
+
     // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
     if (authError || !user) {
       return applySecurityHeaders(unauthorized('Authentication required'));
     }
@@ -114,20 +117,24 @@ export async function POST(request: NextRequest) {
         })
         .eq('id', user.id);
 
-      return applySecurityHeaders(success({
-        verified: true,
-        message: '2FA has been successfully enabled',
-        enabled: true,
-      }));
+      return applySecurityHeaders(
+        success({
+          verified: true,
+          message: '2FA has been successfully enabled',
+          enabled: true,
+        })
+      );
     }
 
-    return applySecurityHeaders(success({
-      verified: true,
-      message: body.isBackupCode 
-        ? `Verified with backup code. ${profile.backup_codes!.length - 1} backup codes remaining.`
-        : 'Verification successful',
-      remainingBackupCodes: body.isBackupCode ? profile.backup_codes!.length - 1 : undefined,
-    }));
+    return applySecurityHeaders(
+      success({
+        verified: true,
+        message: body.isBackupCode
+          ? `Verified with backup code. ${profile.backup_codes!.length - 1} backup codes remaining.`
+          : 'Verification successful',
+        remainingBackupCodes: body.isBackupCode ? profile.backup_codes!.length - 1 : undefined,
+      })
+    );
   } catch (error) {
     return applySecurityHeaders(handleApiError(error));
   }

@@ -11,7 +11,7 @@ const REDIS_CONFIG: RedisOptions = {
   port: parseInt(process.env.REDIS_PORT || '6379', 10),
   password: process.env.REDIS_PASSWORD || undefined,
   db: parseInt(process.env.REDIS_DB || '0', 10),
-  
+
   // Connection pooling
   maxRetriesPerRequest: 3,
   retryStrategy(times) {
@@ -19,7 +19,7 @@ const REDIS_CONFIG: RedisOptions = {
     const delay = Math.min(times * 500, 30000);
     return delay;
   },
-  
+
   // Reconnect on error
   reconnectOnError(err) {
     const targetError = 'READONLY';
@@ -28,17 +28,17 @@ const REDIS_CONFIG: RedisOptions = {
     }
     return false;
   },
-  
+
   // Timeouts
   connectTimeout: 10000,
   commandTimeout: 5000,
-  
+
   // Keep alive
   keepAlive: 30000,
-  
+
   // Enable offline queue
   enableOfflineQueue: true,
-  
+
   // TLS for production
   ...(process.env.REDIS_TLS === 'true' && {
     tls: {
@@ -59,7 +59,7 @@ export function getRedisClient(): Redis | null {
   if (process.env.NODE_ENV === 'test') {
     return null;
   }
-  
+
   // Skip if Redis is not configured
   if (!process.env.REDIS_HOST && process.env.NODE_ENV !== 'development') {
     return null;
@@ -289,7 +289,7 @@ export const redis = {
       try {
         const data = await client.hgetall(key);
         if (!data || Object.keys(data).length === 0) return null;
-        
+
         const result: Record<string, T> = {};
         for (const [field, value] of Object.entries(data)) {
           result[field] = JSON.parse(value) as T;

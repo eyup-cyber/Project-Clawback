@@ -11,8 +11,11 @@ import { applySecurityHeaders } from '@/lib/security/headers';
 export async function GET(_request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
     if (authError || !user) {
       return applySecurityHeaders(unauthorized('Authentication required'));
     }
@@ -36,10 +39,12 @@ export async function GET(_request: NextRequest) {
       isCurrent: false,
     }));
 
-    return applySecurityHeaders(success({
-      sessions: formattedSessions,
-      count: formattedSessions.length,
-    }));
+    return applySecurityHeaders(
+      success({
+        sessions: formattedSessions,
+        count: formattedSessions.length,
+      })
+    );
   } catch (error) {
     return applySecurityHeaders(handleApiError(error));
   }
@@ -52,8 +57,11 @@ export async function GET(_request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
     if (authError || !user) {
       return applySecurityHeaders(unauthorized('Authentication required'));
     }
@@ -63,10 +71,12 @@ export async function DELETE(request: NextRequest) {
 
     const revokedCount = await revokeAllSessions(user.id, currentSessionId);
 
-    return applySecurityHeaders(success({
-      revoked: revokedCount,
-      message: `Revoked ${revokedCount} session(s)`,
-    }));
+    return applySecurityHeaders(
+      success({
+        revoked: revokedCount,
+        message: `Revoked ${revokedCount} session(s)`,
+      })
+    );
   } catch (error) {
     return applySecurityHeaders(handleApiError(error));
   }

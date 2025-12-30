@@ -160,7 +160,9 @@ export function AdminOverview() {
   useEffect(() => {
     void fetchDashboardData();
     // Refresh every 30 seconds
-    const interval = setInterval(() => void fetchDashboardData(), 30000);
+    const interval = setInterval(() => {
+      void fetchDashboardData();
+    }, 30000);
     return () => clearInterval(interval);
   }, [fetchDashboardData]);
 
@@ -227,7 +229,10 @@ export function AdminOverview() {
     <div className="admin-overview">
       {/* Alerts Banner */}
       {alerts.length > 0 && (
-        <AlertsBanner alerts={alerts} onDismiss={(id) => setAlerts((a) => a.filter((alert) => alert.id !== id))} />
+        <AlertsBanner
+          alerts={alerts}
+          onDismiss={(id) => setAlerts((a) => a.filter((alert) => alert.id !== id))}
+        />
       )}
 
       {/* Stats Grid */}
@@ -317,7 +322,9 @@ export function AdminOverview() {
             {activities.length === 0 ? (
               <p className="empty-state">No recent activity</p>
             ) : (
-              activities.map((activity) => <ActivityFeedItem key={activity.id} activity={activity} />)
+              activities.map((activity) => (
+                <ActivityFeedItem key={activity.id} activity={activity} />
+              ))
             )}
           </div>
         </div>
@@ -471,7 +478,9 @@ function StatCard({
           padding: 1.25rem;
           text-decoration: none;
           color: inherit;
-          transition: transform 0.2s, box-shadow 0.2s;
+          transition:
+            transform 0.2s,
+            box-shadow 0.2s;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
@@ -765,7 +774,9 @@ function ActivityFeedItem({ activity }: { activity: ActivityItem }) {
       <div className="activity-content">
         <div className="activity-text">
           <strong>{activity.actor.display_name}</strong> {activity.action}
-          {activity.target && <span className="activity-target"> &quot;{activity.target.title}&quot;</span>}
+          {activity.target && (
+            <span className="activity-target"> &quot;{activity.target.title}&quot;</span>
+          )}
         </div>
         <div className="activity-time">{formatRelativeTime(activity.created_at)}</div>
       </div>
@@ -814,13 +825,7 @@ function ActivityFeedItem({ activity }: { activity: ActivityItem }) {
 /**
  * Alerts Banner Component
  */
-function AlertsBanner({
-  alerts,
-  onDismiss,
-}: {
-  alerts: Alert[];
-  onDismiss: (id: string) => void;
-}) {
+function AlertsBanner({ alerts, onDismiss }: { alerts: Alert[]; onDismiss: (id: string) => void }) {
   const alertStyles = {
     info: { bg: '#dbeafe', border: '#3b82f6', text: '#1e40af' },
     warning: { bg: '#fef3c7', border: '#f59e0b', text: '#92400e' },
@@ -852,7 +857,11 @@ function AlertsBanner({
               )}
             </div>
             {alert.dismissible && (
-              <button className="alert-dismiss" onClick={() => onDismiss(alert.id)} aria-label="Dismiss">
+              <button
+                className="alert-dismiss"
+                onClick={() => onDismiss(alert.id)}
+                aria-label="Dismiss"
+              >
                 ×
               </button>
             )}

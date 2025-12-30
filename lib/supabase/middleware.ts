@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
-import { NextResponse, type NextRequest } from 'next/server';
-import type { Database } from '@/types/database';
+import { type NextRequest, NextResponse } from 'next/server';
 import { supabaseFetch } from '@/lib/supabase/fetch';
+import type { Database } from '@/types/database';
 
 function requireEnv(key: string): string {
   const value = process.env[key];
@@ -19,29 +19,23 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
-  const supabase = createServerClient<Database>(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY,
-    {
-      global: { fetch: supabaseFetch },
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({
-            request,
-          });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
+  const supabase = createServerClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    global: { fetch: supabaseFetch },
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
       },
-    }
-  );
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+        supabaseResponse = NextResponse.next({
+          request,
+        });
+        cookiesToSet.forEach(({ name, value, options }) =>
+          supabaseResponse.cookies.set(name, value, options)
+        );
+      },
+    },
+  });
 
   // Refresh session if expired
   const {
@@ -62,7 +56,7 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Check if accessing protected route without auth
-  if (protectedPaths.some(path => pathname.startsWith(path)) && !user) {
+  if (protectedPaths.some((path) => pathname.startsWith(path)) && !user) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.searchParams.set('redirect', pathname);
@@ -70,7 +64,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Check role-based access for protected routes
-  if (protectedPaths.some(path => pathname.startsWith(path)) && user) {
+  if (protectedPaths.some((path) => pathname.startsWith(path)) && user) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
@@ -108,7 +102,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Redirect authenticated users away from auth pages
-  if (authPaths.some(path => pathname.startsWith(path)) && user) {
+  if (authPaths.some((path) => pathname.startsWith(path)) && user) {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
     return NextResponse.redirect(url);
@@ -116,6 +110,3 @@ export async function updateSession(request: NextRequest) {
 
   return supabaseResponse;
 }
-
-
-

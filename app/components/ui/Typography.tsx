@@ -1,10 +1,10 @@
 'use client';
 
-import React, { type ReactNode, forwardRef, useRef, useEffect, useCallback } from 'react';
-import { cn } from '@/lib/utils';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { prefersReducedMotion, getDuration, DURATION, EASING } from '@/lib/animations/gsap-config';
+import React, { forwardRef, type ReactNode, useCallback, useEffect, useRef } from 'react';
+import { DURATION, EASING, getDuration, prefersReducedMotion } from '@/lib/animations/gsap-config';
+import { cn } from '@/lib/utils';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -71,7 +71,12 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
 
       // Animate on scroll
       const animationProps: Record<string, gsap.TweenVars> = {
-        fadeIn: { opacity: 1, duration: getDuration(DURATION.medium), ease: EASING.smooth, delay },
+        fadeIn: {
+          opacity: 1,
+          duration: getDuration(DURATION.medium),
+          ease: EASING.smooth,
+          delay,
+        },
         slideUp: {
           opacity: 1,
           y: 0,

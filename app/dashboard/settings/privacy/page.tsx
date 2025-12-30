@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useCallback, useEffect, useState } from 'react';
 
 interface ConsentRecord {
   category: string;
@@ -84,7 +84,7 @@ export default function PrivacySettingsPage() {
 
       setSuccess('Privacy settings saved successfully');
       setTimeout(() => setSuccess(null), 3000);
-    } catch {
+    } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save settings');
     } finally {
       setSaving(false);
@@ -113,7 +113,7 @@ export default function PrivacySettingsPage() {
 
       setSuccess('Data exported successfully');
       setTimeout(() => setSuccess(null), 3000);
-    } catch {
+    } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to export data');
     } finally {
       setExportLoading(false);
@@ -142,7 +142,7 @@ export default function PrivacySettingsPage() {
 
       // Redirect to homepage after deletion
       window.location.href = '/?account_deleted=true';
-    } catch {
+    } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete account');
     } finally {
       setSaving(false);
@@ -210,7 +210,10 @@ export default function PrivacySettingsPage() {
         <div className="text-center py-12">
           <div
             className="animate-spin w-8 h-8 border-4 rounded-full mx-auto"
-            style={{ borderColor: 'var(--border)', borderTopColor: 'var(--primary)' }}
+            style={{
+              borderColor: 'var(--border)',
+              borderTopColor: 'var(--primary)',
+            }}
           />
         </div>
       ) : (
@@ -218,7 +221,10 @@ export default function PrivacySettingsPage() {
           {/* Privacy preferences */}
           <div
             className="p-6 rounded-xl border"
-            style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+            style={{
+              background: 'var(--surface)',
+              borderColor: 'var(--border)',
+            }}
           >
             <h2 className="font-bold text-lg mb-4" style={{ color: 'var(--foreground)' }}>
               Privacy Preferences
@@ -317,7 +323,10 @@ export default function PrivacySettingsPage() {
               onClick={() => void handleSaveSettings()}
               disabled={saving}
               className="mt-6 px-4 py-2 rounded-lg font-medium transition-all disabled:opacity-50"
-              style={{ background: 'var(--primary)', color: 'var(--background)' }}
+              style={{
+                background: 'var(--primary)',
+                color: 'var(--background)',
+              }}
             >
               {saving ? 'Saving...' : 'Save Preferences'}
             </button>
@@ -326,7 +335,10 @@ export default function PrivacySettingsPage() {
           {/* Data export */}
           <div
             className="p-6 rounded-xl border"
-            style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+            style={{
+              background: 'var(--surface)',
+              borderColor: 'var(--border)',
+            }}
           >
             <h2 className="font-bold text-lg mb-2" style={{ color: 'var(--foreground)' }}>
               Export Your Data
@@ -341,7 +353,10 @@ export default function PrivacySettingsPage() {
                 onClick={() => void handleExportData('json')}
                 disabled={exportLoading}
                 className="px-4 py-2 rounded-lg transition-all disabled:opacity-50"
-                style={{ border: '1px solid var(--border)', color: 'var(--foreground)' }}
+                style={{
+                  border: '1px solid var(--border)',
+                  color: 'var(--foreground)',
+                }}
               >
                 {exportLoading ? 'Preparing...' : 'Download as JSON'}
               </button>
@@ -350,7 +365,10 @@ export default function PrivacySettingsPage() {
                 onClick={() => void handleExportData('csv')}
                 disabled={exportLoading}
                 className="px-4 py-2 rounded-lg transition-all disabled:opacity-50"
-                style={{ border: '1px solid var(--border)', color: 'var(--foreground)' }}
+                style={{
+                  border: '1px solid var(--border)',
+                  color: 'var(--foreground)',
+                }}
               >
                 {exportLoading ? 'Preparing...' : 'Download as CSV'}
               </button>
@@ -361,7 +379,10 @@ export default function PrivacySettingsPage() {
           {consents.length > 0 && (
             <div
               className="p-6 rounded-xl border"
-              style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+              style={{
+                background: 'var(--surface)',
+                borderColor: 'var(--border)',
+              }}
             >
               <h2 className="font-bold text-lg mb-4" style={{ color: 'var(--foreground)' }}>
                 Consent History
@@ -399,7 +420,10 @@ export default function PrivacySettingsPage() {
           {/* Delete account */}
           <div
             className="p-6 rounded-xl border"
-            style={{ background: 'var(--surface)', borderColor: 'rgba(239, 68, 68, 0.3)' }}
+            style={{
+              background: 'var(--surface)',
+              borderColor: 'rgba(239, 68, 68, 0.3)',
+            }}
           >
             <h2 className="font-bold text-lg mb-2" style={{ color: '#ef4444' }}>
               Delete Account
@@ -442,7 +466,10 @@ export default function PrivacySettingsPage() {
                       setDeleteEmail('');
                     }}
                     className="px-4 py-2 rounded-lg transition-all"
-                    style={{ border: '1px solid var(--border)', color: 'var(--foreground)' }}
+                    style={{
+                      border: '1px solid var(--border)',
+                      color: 'var(--foreground)',
+                    }}
                   >
                     Cancel
                   </button>

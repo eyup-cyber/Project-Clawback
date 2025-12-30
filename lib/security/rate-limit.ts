@@ -119,10 +119,7 @@ export function rateLimit(
 /**
  * Add rate limit headers to response
  */
-export function addRateLimitHeaders(
-  headers: Headers,
-  result: RateLimitResult
-): void {
+export function addRateLimitHeaders(headers: Headers, result: RateLimitResult): void {
   headers.set('X-RateLimit-Remaining', result.remaining.toString());
   headers.set('X-RateLimit-Reset', result.resetAt.toString());
   if (result.retryAfter) {

@@ -5,22 +5,21 @@
 
 'use client';
 
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Placeholder from '@tiptap/extension-placeholder';
 import CharacterCount from '@tiptap/extension-character-count';
-import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
+import Link from '@tiptap/extension-link';
+import Placeholder from '@tiptap/extension-placeholder';
+import TaskItem from '@tiptap/extension-task-item';
+import TaskList from '@tiptap/extension-task-list';
 import Underline from '@tiptap/extension-underline';
 import Youtube from '@tiptap/extension-youtube';
-import TaskList from '@tiptap/extension-task-list';
-import TaskItem from '@tiptap/extension-task-item';
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
-
-import SlashCommands from './extensions/SlashCommands';
-import { EditorBubbleMenu } from './extensions/BubbleMenu';
-import { FocusMode, FocusModeToggle } from './EditorFocusMode';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import { type ReactNode, useCallback, useEffect, useState } from 'react';
 import { useEditorAutosave } from '@/lib/hooks/useEditorAutosave';
+import { FocusMode, FocusModeToggle } from './EditorFocusMode';
+import { EditorBubbleMenu } from './extensions/BubbleMenu';
+import SlashCommands from './extensions/SlashCommands';
 
 // ============================================================================
 // TYPES
@@ -392,7 +391,10 @@ export default function EnhancedTipTapEditor({
       {!readOnly && (
         <div
           className="flex items-center justify-between gap-2 p-3 border-b overflow-x-auto"
-          style={{ borderColor: 'var(--border)', background: 'var(--surface-elevated)' }}
+          style={{
+            borderColor: 'var(--border)',
+            background: 'var(--surface-elevated)',
+          }}
         >
           <div className="flex items-center gap-0.5">
             <ToolbarButton

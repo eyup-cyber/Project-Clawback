@@ -5,8 +5,8 @@
  * Phase 2.9: Admin view, storage stats, cleanup tools, CDN purge
  */
 
-import { useState, useEffect, useCallback } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { useCallback, useEffect, useState } from 'react';
 
 // ============================================================================
 // TYPES
@@ -87,7 +87,11 @@ export function MediaLibrary() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [pagination, setPagination] = useState({ page: 1, limit: 50, total: 0 });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 50,
+    total: 0,
+  });
   const [filters, setFilters] = useState<MediaFilters>({
     search: '',
     type: 'all',
@@ -141,7 +145,7 @@ export function MediaLibrary() {
   }, [pagination.page, pagination.limit, filters]);
 
   useEffect(() => {
-    fetchMedia();
+    void fetchMedia();
   }, [fetchMedia]);
 
   const handleDelete = async (ids: string[]) => {
@@ -153,7 +157,7 @@ export function MediaLibrary() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ids }),
       });
-      fetchMedia();
+      void fetchMedia();
       setSelectedFiles(new Set());
     } catch (error) {
       console.error('Failed to delete files:', error);
@@ -206,7 +210,7 @@ export function MediaLibrary() {
       <div className="header">
         <h1>Media Library</h1>
         <div className="header-actions">
-          <button onClick={handlePurgeCDN} className="secondary-btn">
+          <button onClick={() => void handlePurgeCDN()} className="secondary-btn">
             🔄 Purge CDN
           </button>
           <button onClick={() => setShowUploadModal(true)} className="primary-btn">
@@ -230,7 +234,12 @@ export function MediaLibrary() {
 
         <select
           value={filters.type}
-          onChange={(e) => setFilters((f) => ({ ...f, type: e.target.value as MediaFilters['type'] }))}
+          onChange={(e) =>
+            setFilters((f) => ({
+              ...f,
+              type: e.target.value as MediaFilters['type'],
+            }))
+          }
         >
           <option value="all">All Types</option>
           <option value="image">Images</option>
@@ -254,7 +263,10 @@ export function MediaLibrary() {
         <select
           value={filters.filter}
           onChange={(e) =>
-            setFilters((f) => ({ ...f, filter: e.target.value as MediaFilters['filter'] }))
+            setFilters((f) => ({
+              ...f,
+              filter: e.target.value as MediaFilters['filter'],
+            }))
           }
         >
           <option value="all">All Files</option>
@@ -266,7 +278,10 @@ export function MediaLibrary() {
         <select
           value={`${filters.sort}-${filters.order}`}
           onChange={(e) => {
-            const [sort, order] = e.target.value.split('-') as [MediaFilters['sort'], MediaFilters['order']];
+            const [sort, order] = e.target.value.split('-') as [
+              MediaFilters['sort'],
+              MediaFilters['order'],
+            ];
             setFilters((f) => ({ ...f, sort, order }));
           }}
         >
@@ -397,7 +412,7 @@ export function MediaLibrary() {
             setSelectedFile(null);
           }}
           onDelete={() => {
-            handleDelete([selectedFile.id]);
+            void handleDelete([selectedFile.id]);
             setShowDetailModal(false);
             setSelectedFile(null);
           }}
@@ -410,7 +425,7 @@ export function MediaLibrary() {
           onClose={() => setShowUploadModal(false)}
           onUploadComplete={() => {
             setShowUploadModal(false);
-            fetchMedia();
+            void fetchMedia();
           }}
         />
       )}
@@ -745,7 +760,9 @@ function MediaGridItem({
         <div className="media-overlay">
           <span>{formatBytes(file.size_bytes)}</span>
           {file.width && file.height && (
-            <span>{file.width}×{file.height}</span>
+            <span>
+              {file.width}×{file.height}
+            </span>
           )}
         </div>
       </div>
@@ -875,8 +892,12 @@ function MediaListItem({
       <td>
         <div className="actions">
           <button onClick={onView}>👁️</button>
-          <a href={file.url} target="_blank" rel="noopener noreferrer">↗️</a>
-          <button onClick={onDelete} className="danger">🗑️</button>
+          <a href={file.url} target="_blank" rel="noopener noreferrer">
+            ↗️
+          </a>
+          <button onClick={onDelete} className="danger">
+            🗑️
+          </button>
         </div>
       </td>
 
@@ -976,7 +997,9 @@ function MediaDetailModal({
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>File Details</h2>
-          <button onClick={onClose} className="close-btn">×</button>
+          <button onClick={onClose} className="close-btn">
+            ×
+          </button>
         </div>
 
         <div className="modal-body">
@@ -1005,7 +1028,9 @@ function MediaDetailModal({
               {file.width && file.height && (
                 <div>
                   <dt>Dimensions</dt>
-                  <dd>{file.width} × {file.height}</dd>
+                  <dd>
+                    {file.width} × {file.height}
+                  </dd>
                 </div>
               )}
               <div>
@@ -1243,17 +1268,14 @@ function UploadModal({
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Upload Files</h2>
-          <button onClick={onClose} className="close-btn">×</button>
+          <button onClick={onClose} className="close-btn">
+            ×
+          </button>
         </div>
 
         <div className="modal-body">
           <div className="dropzone">
-            <input
-              type="file"
-              multiple
-              onChange={handleFileSelect}
-              id="file-input"
-            />
+            <input type="file" multiple onChange={handleFileSelect} id="file-input" />
             <label htmlFor="file-input">
               <span>📁</span>
               <p>Drop files here or click to browse</p>
@@ -1279,8 +1301,14 @@ function UploadModal({
         </div>
 
         <div className="modal-actions">
-          <button onClick={onClose} disabled={uploading}>Cancel</button>
-          <button onClick={handleUpload} disabled={files.length === 0 || uploading} className="primary">
+          <button onClick={onClose} disabled={uploading}>
+            Cancel
+          </button>
+          <button
+            onClick={handleUpload}
+            disabled={files.length === 0 || uploading}
+            className="primary"
+          >
             {uploading ? `Uploading... ${Math.round(progress)}%` : `Upload ${files.length} file(s)`}
           </button>
         </div>
@@ -1428,7 +1456,9 @@ function Pagination({
       <button disabled={page === 1} onClick={() => onChange(page - 1)}>
         ← Previous
       </button>
-      <span>Page {page} of {totalPages}</span>
+      <span>
+        Page {page} of {totalPages}
+      </span>
       <button disabled={page === totalPages} onClick={() => onChange(page + 1)}>
         Next →
       </button>
@@ -1472,7 +1502,7 @@ function formatBytes(bytes: number): string {
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  return parseFloat((bytes / k ** i).toFixed(1)) + ' ' + sizes[i];
 }
 
 function getFileIcon(mimeType: string): string {

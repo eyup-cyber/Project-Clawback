@@ -6,8 +6,27 @@
 import { createClient } from '@/lib/supabase/server';
 import type { Database } from '@/types/database';
 
-type Bookmark = Database['public']['Tables']['bookmarks']['Row'];
-type BookmarkFolder = Database['public']['Tables']['bookmark_folders']['Row'];
+// These types are manually defined as the tables may not be in the generated types yet
+interface Bookmark {
+  id: string;
+  user_id: string;
+  post_id: string;
+  folder_id: string | null;
+  created_at: string;
+  notes: string | null;
+}
+
+interface BookmarkFolder {
+  id: string;
+  user_id: string;
+  name: string;
+  description: string | null;
+  color: string | null;
+  icon: string | null;
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+}
 
 export interface BookmarkWithPost extends Bookmark {
   post: {

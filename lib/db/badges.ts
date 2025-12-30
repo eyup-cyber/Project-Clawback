@@ -3,8 +3,8 @@
  * Phase 19: User badges, achievement tracking, leaderboards
  */
 
-import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -484,7 +484,9 @@ export async function checkAndAwardBadges(userId: string): Promise<UserBadge[]> 
     .eq('user_id', userId);
 
   const existingSlugs = new Set(
-    (existingBadges || []).map((b) => (b.badge as { slug: string })?.slug)
+    (existingBadges || []).map(
+      (b) => ((Array.isArray(b.badge) ? b.badge[0] : b.badge) as { slug: string } | undefined)?.slug
+    )
   );
 
   // Get all badges
@@ -516,12 +518,13 @@ export async function checkAndAwardBadges(userId: string): Promise<UserBadge[]> 
       case 'comments_written':
         qualifies = (commentCount || 0) >= req.threshold;
         break;
-      case 'account_age_days':
+      case 'account_age_days': {
         const daysSinceJoin = Math.floor(
           (Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24)
         );
         qualifies = daysSinceJoin >= req.threshold;
         break;
+      }
     }
 
     if (qualifies) {
@@ -573,7 +576,10 @@ export async function getLeaderboard(options: {
     });
 
     if (error) {
-      logger.warn('[Badges] Leaderboard RPC not available, using fallback', error);
+      logger.warn(
+        '[Badges] Leaderboard RPC not available, using fallback',
+        error as unknown as Record<string, unknown>
+      );
       return getLeaderboardFallback(metric, limit, offset);
     }
 
@@ -646,7 +652,13 @@ export async function getUserPoints(userId: string): Promise<number> {
 
   if (!data) return 0;
 
-  return data.reduce((sum, ub) => sum + ((ub.badge as { points: number })?.points || 0), 0);
+  return data.reduce(
+    (sum, ub) =>
+      sum +
+      (((Array.isArray(ub.badge) ? ub.badge[0] : ub.badge) as { points: number } | undefined)
+        ?.points || 0),
+    0
+  );
 }
 
 const badgesDb = {

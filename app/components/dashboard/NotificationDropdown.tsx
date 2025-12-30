@@ -5,9 +5,9 @@
 
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useRealtimeNotifications, type Notification } from '@/lib/hooks/useRealtimeNotifications';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { type Notification, useRealtimeNotifications } from '@/lib/hooks/useRealtimeNotifications';
 import { formatRelativeTime } from '@/lib/utils';
 
 // ============================================================================
@@ -260,7 +260,10 @@ function groupNotificationsByDate(notifications: Notification[]): NotificationGr
     } else if (date.toDateString() === yesterday.toDateString()) {
       key = 'Yesterday';
     } else {
-      key = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      key = date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      });
     }
 
     if (!groups.has(key)) {
@@ -525,7 +528,10 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
           >
             <h3
               className="font-bold"
-              style={{ color: 'var(--foreground)', fontFamily: 'var(--font-kindergarten)' }}
+              style={{
+                color: 'var(--foreground)',
+                fontFamily: 'var(--font-kindergarten)',
+              }}
             >
               Notifications
             </h3>

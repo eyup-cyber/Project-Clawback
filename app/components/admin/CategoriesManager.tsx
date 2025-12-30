@@ -127,7 +127,11 @@ export function CategoriesManager() {
     }
   };
 
-  const handleReorder = async (categoryId: string, newPosition: number, newParentId: string | null) => {
+  const handleReorder = async (
+    categoryId: string,
+    newPosition: number,
+    newParentId: string | null
+  ) => {
     try {
       await fetch(`/api/admin/categories/${categoryId}/reorder`, {
         method: 'POST',
@@ -149,7 +153,11 @@ export function CategoriesManager() {
     if (!draggedCategory || draggedCategory.id === targetCategory.id) return;
   };
 
-  const handleDrop = (e: React.DragEvent, targetCategory: Category, position: 'before' | 'after' | 'inside') => {
+  const handleDrop = (
+    e: React.DragEvent,
+    targetCategory: Category,
+    position: 'before' | 'after' | 'inside'
+  ) => {
     e.preventDefault();
     if (!draggedCategory || draggedCategory.id === targetCategory.id) return;
 
@@ -232,7 +240,15 @@ export function CategoriesManager() {
             setShowFormModal(false);
             setSelectedCategory(null);
           }}
-          onSubmit={isEditing ? (data) => void handleUpdate(selectedCategory!.id, data) : (data) => void handleCreate(data)}
+          onSubmit={
+            isEditing
+              ? (data) => {
+                  void handleUpdate(selectedCategory!.id, data);
+                }
+              : (data) => {
+                  void handleCreate(data);
+                }
+          }
         />
       )}
 
@@ -240,7 +256,9 @@ export function CategoriesManager() {
       {showDeleteConfirm && (
         <DeleteConfirmModal
           category={showDeleteConfirm}
-          onConfirm={() => void handleDelete(showDeleteConfirm.id)}
+          onConfirm={() => {
+            void handleDelete(showDeleteConfirm.id);
+          }}
           onCancel={() => setShowDeleteConfirm(null)}
         />
       )}
@@ -356,11 +374,11 @@ function CategoryTreeItem({
             </button>
           )}
           {!hasChildren && <span className="expand-placeholder" />}
-          
+
           <div className="category-icon" style={{ backgroundColor: category.color }}>
             {category.icon || category.name.charAt(0)}
           </div>
-          
+
           <div className="category-info">
             <div className="category-name">
               {category.name}
@@ -566,7 +584,12 @@ function CategoryFormModal({
     setFormData((f) => ({
       ...f,
       name,
-      slug: f.slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      slug:
+        f.slug ||
+        name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, ''),
     }));
   };
 
@@ -578,10 +601,23 @@ function CategoryFormModal({
   };
 
   const colorPresets = [
-    '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
-    '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
-    '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef',
-    '#ec4899', '#f43f5e',
+    '#ef4444',
+    '#f97316',
+    '#f59e0b',
+    '#eab308',
+    '#84cc16',
+    '#22c55e',
+    '#10b981',
+    '#14b8a6',
+    '#06b6d4',
+    '#0ea5e9',
+    '#3b82f6',
+    '#6366f1',
+    '#8b5cf6',
+    '#a855f7',
+    '#d946ef',
+    '#ec4899',
+    '#f43f5e',
   ];
 
   return (
@@ -589,7 +625,9 @@ function CategoryFormModal({
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{isEditing ? 'Edit Category' : 'New Category'}</h2>
-          <button onClick={onClose} className="close-btn">×</button>
+          <button onClick={onClose} className="close-btn">
+            ×
+          </button>
         </div>
 
         <form onSubmit={(e) => void handleSubmit(e)} className="modal-body">
@@ -671,7 +709,8 @@ function CategoryFormModal({
                 .filter((c) => c.id !== category?.id)
                 .map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.parent_id ? '— ' : ''}{c.name}
+                    {c.parent_id ? '— ' : ''}
+                    {c.name}
                   </option>
                 ))}
             </select>
@@ -815,7 +854,7 @@ function CategoryFormModal({
             gap: 0.5rem;
           }
 
-          .color-picker input[type="color"] {
+          .color-picker input[type='color'] {
             width: 40px;
             height: 32px;
             padding: 0;

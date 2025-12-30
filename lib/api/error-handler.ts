@@ -4,9 +4,9 @@
  */
 
 import { NextResponse } from 'next/server';
-import { ApiError, type ErrorCode } from './response';
-import { logger } from '@/lib/logger';
 import type { ZodError } from 'zod';
+import { logger } from '@/lib/logger';
+import { ApiError, type ErrorCode } from './response';
 
 interface ErrorDetails {
   code: ErrorCode;
@@ -120,11 +120,13 @@ function getStatusCode(code: ErrorCode): number {
   const statusMap: Record<ErrorCode, number> = {
     BAD_REQUEST: 400,
     VALIDATION_ERROR: 400,
+    PARSE_ERROR: 400,
     UNAUTHORIZED: 401,
     FORBIDDEN: 403,
     NOT_FOUND: 404,
     METHOD_NOT_ALLOWED: 405,
     CONFLICT: 409,
+    LIMIT_EXCEEDED: 413,
     RATE_LIMITED: 429,
     INTERNAL_ERROR: 500,
     SERVICE_UNAVAILABLE: 503,

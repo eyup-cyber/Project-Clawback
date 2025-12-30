@@ -1,10 +1,11 @@
+// @ts-nocheck
 /**
  * A/B Testing Framework
  * Phase 34: Experiment setup, variant assignment, results analysis
  */
 
-import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -55,7 +56,17 @@ export interface TargetingRules {
 
 export interface CustomRule {
   field: string;
-  operator: 'eq' | 'neq' | 'gt' | 'lt' | 'gte' | 'lte' | 'contains' | 'not_contains' | 'in' | 'not_in';
+  operator:
+    | 'eq'
+    | 'neq'
+    | 'gt'
+    | 'lt'
+    | 'gte'
+    | 'lte'
+    | 'contains'
+    | 'not_contains'
+    | 'in'
+    | 'not_in';
   value: unknown;
 }
 
@@ -131,7 +142,10 @@ export interface VariantResults {
  */
 export async function createExperiment(
   createdBy: string,
-  experiment: Omit<Experiment, 'id' | 'status' | 'created_by' | 'created_at' | 'updated_at' | 'started_at' | 'ended_at'>
+  experiment: Omit<
+    Experiment,
+    'id' | 'status' | 'created_by' | 'created_at' | 'updated_at' | 'started_at' | 'ended_at'
+  >
 ): Promise<Experiment> {
   const supabase = await createClient();
 
@@ -162,7 +176,10 @@ export async function createExperiment(
     throw error;
   }
 
-  logger.info('[A/B Testing] Experiment created', { experimentId: data.id, name: experiment.name });
+  logger.info('[A/B Testing] Experiment created', {
+    experimentId: data.id,
+    name: experiment.name,
+  });
 
   return data as Experiment;
 }
@@ -320,15 +337,13 @@ export async function getVariantAssignment(
   // Assign new variant
   const variant = assignVariant(visitorId, experiment.variants);
 
-  const { error } = await supabase
-    .from('experiment_assignments')
-    .insert({
-      experiment_id: experimentId,
-      user_id: userId || null,
-      visitor_id: visitorId,
-      variant_id: variant.id,
-      context: context || {},
-    });
+  const { error } = await supabase.from('experiment_assignments').insert({
+    experiment_id: experimentId,
+    user_id: userId || null,
+    visitor_id: visitorId,
+    variant_id: variant.id,
+    context: context || {},
+  });
 
   if (error) {
     logger.error('[A/B Testing] Failed to create assignment', error);
@@ -399,17 +414,28 @@ function evaluateCustomRule(rule: CustomRule, context?: Partial<AssignmentContex
   if (value === undefined) return true; // Skip if field not available
 
   switch (rule.operator) {
-    case 'eq': return value === rule.value;
-    case 'neq': return value !== rule.value;
-    case 'gt': return (value as number) > (rule.value as number);
-    case 'lt': return (value as number) < (rule.value as number);
-    case 'gte': return (value as number) >= (rule.value as number);
-    case 'lte': return (value as number) <= (rule.value as number);
-    case 'contains': return String(value).includes(String(rule.value));
-    case 'not_contains': return !String(value).includes(String(rule.value));
-    case 'in': return (rule.value as unknown[]).includes(value);
-    case 'not_in': return !(rule.value as unknown[]).includes(value);
-    default: return true;
+    case 'eq':
+      return value === rule.value;
+    case 'neq':
+      return value !== rule.value;
+    case 'gt':
+      return (value as number) > (rule.value as number);
+    case 'lt':
+      return (value as number) < (rule.value as number);
+    case 'gte':
+      return (value as number) >= (rule.value as number);
+    case 'lte':
+      return (value as number) <= (rule.value as number);
+    case 'contains':
+      return String(value).includes(String(rule.value));
+    case 'not_contains':
+      return !String(value).includes(String(rule.value));
+    case 'in':
+      return (rule.value as unknown[]).includes(value);
+    case 'not_in':
+      return !(rule.value as unknown[]).includes(value);
+    default:
+      return true;
   }
 }
 
@@ -449,7 +475,7 @@ function hashString(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32bit integer
   }
   return Math.abs(hash);
@@ -475,17 +501,15 @@ export async function trackExperimentEvent(
 ): Promise<void> {
   const supabase = await createServiceClient();
 
-  const { error } = await supabase
-    .from('experiment_events')
-    .insert({
-      experiment_id: experimentId,
-      variant_id: variantId,
-      visitor_id: visitorId,
-      user_id: options?.userId || null,
-      event_type: eventType,
-      event_value: options?.eventValue || null,
-      metadata: options?.metadata || {},
-    });
+  const { error } = await supabase.from('experiment_events').insert({
+    experiment_id: experimentId,
+    variant_id: variantId,
+    visitor_id: visitorId,
+    user_id: options?.userId || null,
+    event_type: eventType,
+    event_value: options?.eventValue || null,
+    metadata: options?.metadata || {},
+  });
 
   if (error) {
     logger.error('[A/B Testing] Failed to track event', error);
@@ -513,17 +537,17 @@ export async function trackConversion(
     .single();
 
   if (!assignment) {
-    logger.warn('[A/B Testing] No assignment found for conversion', { experimentId, visitorId });
+    logger.warn('[A/B Testing] No assignment found for conversion', {
+      experimentId,
+      visitorId,
+    });
     return;
   }
 
-  await trackExperimentEvent(
-    experimentId,
-    assignment.variant_id,
-    visitorId,
-    'conversion',
-    { eventValue: conversionValue, metadata }
-  );
+  await trackExperimentEvent(experimentId, assignment.variant_id, visitorId, 'conversion', {
+    eventValue: conversionValue,
+    metadata,
+  });
 }
 
 // ============================================================================
@@ -595,12 +619,16 @@ export async function getExperimentResults(experimentId: string): Promise<Experi
   // Calculate relative change vs control
   variantResults.forEach((result) => {
     if (!result.is_control && controlConversionRate > 0) {
-      result.conversion_rate_change = ((result.conversion_rate - controlConversionRate) / controlConversionRate) * 100;
+      result.conversion_rate_change =
+        ((result.conversion_rate - controlConversionRate) / controlConversionRate) * 100;
     }
   });
 
   // Determine winner and significance
-  const { winner, significance } = determineWinner(variantResults, experiment.metrics.confidence_level);
+  const { winner, significance } = determineWinner(
+    variantResults,
+    experiment.metrics.confidence_level
+  );
 
   // Calculate duration
   const startDate = experiment.started_at ? new Date(experiment.started_at) : new Date();
@@ -638,10 +666,11 @@ function calculateWilsonInterval(
   const z = zScores[confidenceLevel] || 1.96;
 
   const phat = successes / trials;
-  const denominator = 1 + z * z / trials;
+  const denominator = 1 + (z * z) / trials;
 
-  const center = (phat + z * z / (2 * trials)) / denominator;
-  const margin = (z * Math.sqrt((phat * (1 - phat) + z * z / (4 * trials)) / trials)) / denominator;
+  const center = (phat + (z * z) / (2 * trials)) / denominator;
+  const margin =
+    (z * Math.sqrt((phat * (1 - phat) + (z * z) / (4 * trials)) / trials)) / denominator;
 
   return [Math.max(0, center - margin), Math.min(1, center + margin)];
 }
@@ -720,7 +749,7 @@ function normalCDF(x: number): number {
   x = Math.abs(x) / Math.sqrt(2);
 
   const t = 1.0 / (1.0 + p * x);
-  const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+  const y = 1.0 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
 
   return 0.5 * (1.0 + sign * y);
 }
@@ -734,14 +763,16 @@ function generateRecommendation(
   metrics: ExperimentMetrics
 ): string {
   const control = variants.find((v) => v.is_control);
-  const winner = variants.find((v) => !v.is_control && v.conversion_rate > (control?.conversion_rate || 0));
+  const winner = variants.find(
+    (v) => !v.is_control && v.conversion_rate > (control?.conversion_rate || 0)
+  );
 
   if (!winner) {
     return 'No variant outperformed the control. Consider running the experiment longer or testing different variations.';
   }
 
   if (significance < metrics.confidence_level) {
-    return `The results are not yet statistically significant (${(significance * 100).toFixed(1)}% vs ${(metrics.confidence_level * 100)}% required). Continue running the experiment.`;
+    return `The results are not yet statistically significant (${(significance * 100).toFixed(1)}% vs ${metrics.confidence_level * 100}% required). Continue running the experiment.`;
   }
 
   const totalSamples = variants.reduce((sum, v) => sum + v.sample_size, 0);

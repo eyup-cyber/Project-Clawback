@@ -3,8 +3,8 @@
  * Phase 43: Media management with folders, search, and bulk operations
  */
 
-import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -101,7 +101,12 @@ export interface MediaStats {
   total_items: number;
   total_size: number;
   by_type: Record<MediaType, { count: number; size: number }>;
-  by_folder: { folder_id: string; folder_name: string; count: number; size: number }[];
+  by_folder: {
+    folder_id: string;
+    folder_name: string;
+    count: number;
+    size: number;
+  }[];
   recent_uploads: number;
   storage_limit: number;
   storage_used_percent: number;
@@ -303,11 +308,7 @@ export async function deleteFolder(
       .eq('user_id', user.id);
   } else if (options.deleteContents) {
     // Delete all items in folder
-    await supabase
-      .from('media_items')
-      .delete()
-      .eq('folder_id', folderId)
-      .eq('user_id', user.id);
+    await supabase.from('media_items').delete().eq('folder_id', folderId).eq('user_id', user.id);
 
     // Recursively delete subfolders
     const { data: subfolders } = await supabase
@@ -331,11 +332,7 @@ export async function deleteFolder(
   }
 
   // Delete the folder
-  await supabase
-    .from('media_folders')
-    .delete()
-    .eq('id', folderId)
-    .eq('user_id', user.id);
+  await supabase.from('media_folders').delete().eq('id', folderId).eq('user_id', user.id);
 
   logger.info('[MediaLibrary] Folder deleted', { folder_id: folderId });
 }
@@ -425,10 +422,15 @@ export async function addMediaItem(
 
   // Update folder item count
   if (item.folder_id) {
-    await supabase.rpc('increment_folder_item_count', { folder_id: item.folder_id });
+    await supabase.rpc('increment_folder_item_count', {
+      folder_id: item.folder_id,
+    });
   }
 
-  logger.info('[MediaLibrary] Media item added', { item_id: data.id, type: item.type });
+  logger.info('[MediaLibrary] Media item added', {
+    item_id: data.id,
+    type: item.type,
+  });
   return data as MediaItem;
 }
 
@@ -437,7 +439,9 @@ export async function addMediaItem(
  */
 export async function updateMediaItem(
   itemId: string,
-  updates: Partial<Pick<MediaItem, 'filename' | 'alt_text' | 'caption' | 'tags' | 'is_public' | 'folder_id'>>
+  updates: Partial<
+    Pick<MediaItem, 'filename' | 'alt_text' | 'caption' | 'tags' | 'is_public' | 'folder_id'>
+  >
 ): Promise<MediaItem> {
   const supabase = await createClient();
   const {
@@ -472,10 +476,14 @@ export async function updateMediaItem(
   // Update folder counts if folder changed
   if (updates.folder_id !== undefined && currentItem?.folder_id !== updates.folder_id) {
     if (currentItem?.folder_id) {
-      await supabase.rpc('decrement_folder_item_count', { folder_id: currentItem.folder_id });
+      await supabase.rpc('decrement_folder_item_count', {
+        folder_id: currentItem.folder_id,
+      });
     }
     if (updates.folder_id) {
-      await supabase.rpc('increment_folder_item_count', { folder_id: updates.folder_id });
+      await supabase.rpc('increment_folder_item_count', {
+        folder_id: updates.folder_id,
+      });
     }
   }
 
@@ -521,7 +529,9 @@ export async function deleteMediaItem(itemId: string): Promise<void> {
 
   // Update folder count
   if (item.folder_id) {
-    await supabase.rpc('decrement_folder_item_count', { folder_id: item.folder_id });
+    await supabase.rpc('decrement_folder_item_count', {
+      folder_id: item.folder_id,
+    });
   }
 
   // TODO: Delete actual file from storage
@@ -617,7 +627,9 @@ export async function queryMediaItems(
   }
 
   // Sorting
-  queryBuilder = queryBuilder.order(sort_by, { ascending: sort_order === 'asc' });
+  queryBuilder = queryBuilder.order(sort_by, {
+    ascending: sort_order === 'asc',
+  });
 
   // Pagination
   queryBuilder = queryBuilder.range(offset, offset + limit - 1);
@@ -691,7 +703,9 @@ export async function bulkOperation(operation: BulkOperation): Promise<BulkResul
     try {
       switch (operation.operation) {
         case 'move':
-          await updateMediaItem(itemId, { folder_id: operation.target_folder_id || null });
+          await updateMediaItem(itemId, {
+            folder_id: operation.target_folder_id || null,
+          });
           break;
 
         case 'delete':
@@ -726,10 +740,17 @@ export async function bulkOperation(operation: BulkOperation): Promise<BulkResul
           await updateMediaItem(itemId, { is_public: false });
           break;
 
-        case 'copy':
+        case 'copy': {
           const item = await getMediaItem(itemId);
           if (item) {
-            const { id: _id, user_id: _userId, created_at: _createdAt, updated_at: _updatedAt, usage_count: _usageCount, ...copyData } = item;
+            const {
+              id: _id,
+              user_id: _userId,
+              created_at: _createdAt,
+              updated_at: _updatedAt,
+              usage_count: _usageCount,
+              ...copyData
+            } = item;
             await addMediaItem({
               ...copyData,
               folder_id: operation.target_folder_id || item.folder_id,
@@ -737,6 +758,7 @@ export async function bulkOperation(operation: BulkOperation): Promise<BulkResul
             });
           }
           break;
+        }
       }
 
       result.success++;
@@ -856,7 +878,9 @@ export async function getMediaStats(userId?: string): Promise<MediaStats> {
 /**
  * Get popular tags in the library
  */
-export async function getPopularTags(limit: number = 20): Promise<{ tag: string; count: number }[]> {
+export async function getPopularTags(
+  limit: number = 20
+): Promise<{ tag: string; count: number }[]> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -866,10 +890,7 @@ export async function getPopularTags(limit: number = 20): Promise<{ tag: string;
     throw new Error('Not authenticated');
   }
 
-  const { data: items } = await supabase
-    .from('media_items')
-    .select('tags')
-    .eq('user_id', user.id);
+  const { data: items } = await supabase.from('media_items').select('tags').eq('user_id', user.id);
 
   const tagCounts = new Map<string, number>();
 

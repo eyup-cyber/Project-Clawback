@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Responsive Design', () => {
   test.describe('Desktop', () => {
@@ -65,10 +65,8 @@ test.describe('Responsive Design', () => {
       await page.goto('/');
       // Main text should have reasonable font size
       const paragraph = page.locator('p').first();
-      if (await paragraph.count() > 0) {
-        const fontSize = await paragraph.evaluate(el => 
-          window.getComputedStyle(el).fontSize
-        );
+      if ((await paragraph.count()) > 0) {
+        const fontSize = await paragraph.evaluate((el) => window.getComputedStyle(el).fontSize);
         // Font size should be at least 14px
         expect(parseInt(fontSize)).toBeGreaterThanOrEqual(14);
       }

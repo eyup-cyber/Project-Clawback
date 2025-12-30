@@ -1,8 +1,8 @@
 'use client';
 
-import { useRef, useState } from 'react';
 import gsap from 'gsap';
-import { EASING, DURATION, prefersReducedMotion, getDuration } from '@/lib/animations/gsap-config';
+import { useRef, useState } from 'react';
+import { DURATION, EASING, getDuration, prefersReducedMotion } from '@/lib/animations/gsap-config';
 import { useIntersectionObserver } from '@/lib/animations/performance';
 
 interface AnimatedStatCardProps {
@@ -54,7 +54,7 @@ export default function AnimatedStatCard({
           const animate = (currentTime: number) => {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / (duration * 1000), 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
+            const eased = 1 - (1 - progress) ** 3;
             const current = Math.floor(eased * target);
 
             setDisplayValue(current);

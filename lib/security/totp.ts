@@ -3,9 +3,9 @@
  * Implements RFC 6238 for two-factor authentication
  */
 
+import crypto from 'node:crypto';
 import * as OTPAuth from 'otpauth';
 import * as QRCode from 'qrcode';
-import crypto from 'node:crypto';
 
 const ISSUER = 'Scroungers Multimedia';
 const ALGORITHM = 'SHA1';
@@ -19,7 +19,10 @@ export function generateSecret(): string {
   // Generate 20 bytes of random data for the secret
   const buffer = crypto.randomBytes(20);
   // Encode as base32 (OTPAuth library handles this internally)
-  return buffer.toString('base64').replace(/[^A-Za-z0-9]/g, '').substring(0, 32);
+  return buffer
+    .toString('base64')
+    .replace(/[^A-Za-z0-9]/g, '')
+    .substring(0, 32);
 }
 
 /**
@@ -59,7 +62,7 @@ export function verifyToken(
   window: number = 1
 ): boolean {
   const totp = createTOTP(secret, username);
-  
+
   // validate returns null if invalid, or the time step difference if valid
   const delta = totp.validate({ token, window });
   return delta !== null;
@@ -93,14 +96,14 @@ export async function generateQRCode(secret: string, username: string): Promise<
  */
 export function generateBackupCodes(count: number = 10): string[] {
   const codes: string[] = [];
-  
+
   for (let i = 0; i < count; i++) {
     // Generate 8-character alphanumeric codes
     const code = crypto.randomBytes(4).toString('hex').toUpperCase();
     // Format as XXXX-XXXX for readability
     codes.push(`${code.slice(0, 4)}-${code.slice(4, 8)}`);
   }
-  
+
   return codes;
 }
 
@@ -126,7 +129,7 @@ export function hashBackupCodes(codes: string[]): string[] {
 export function verifyBackupCode(code: string, hashedCodes: string[]): number {
   const normalized = code.replace(/-/g, '').toUpperCase();
   const hashed = crypto.createHash('sha256').update(normalized).digest('hex');
-  
+
   return hashedCodes.findIndex((h) => h === hashed);
 }
 
@@ -137,12 +140,12 @@ export function encryptSecret(secret: string, encryptionKey: string): string {
   const iv = crypto.randomBytes(16);
   const key = crypto.scryptSync(encryptionKey, 'salt', 32);
   const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
-  
+
   let encrypted = cipher.update(secret, 'utf8', 'hex');
   encrypted += cipher.final('hex');
-  
+
   const authTag = cipher.getAuthTag();
-  
+
   // Return iv:authTag:encrypted
   return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
 }
@@ -152,17 +155,17 @@ export function encryptSecret(secret: string, encryptionKey: string): string {
  */
 export function decryptSecret(encryptedData: string, encryptionKey: string): string {
   const [ivHex, authTagHex, encrypted] = encryptedData.split(':');
-  
+
   const iv = Buffer.from(ivHex, 'hex');
   const authTag = Buffer.from(authTagHex, 'hex');
   const key = crypto.scryptSync(encryptionKey, 'salt', 32);
-  
+
   const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
   decipher.setAuthTag(authTag);
-  
+
   let decrypted = decipher.update(encrypted, 'hex', 'utf8');
   decrypted += decipher.final('utf8');
-  
+
   return decrypted;
 }
 
@@ -184,7 +187,7 @@ export async function setupTOTP(username: string): Promise<TOTPSetupResponse> {
   const qrCodeDataUrl = await generateQRCode(secret, username);
   const backupCodes = generateBackupCodes(10);
   const otpauthUri = generateOTPAuthURI(secret, username);
-  
+
   return {
     secret,
     qrCodeDataUrl,
@@ -196,10 +199,6 @@ export async function setupTOTP(username: string): Promise<TOTPSetupResponse> {
 /**
  * Verify TOTP is correctly set up by requiring initial verification
  */
-export function verifySetup(
-  token: string,
-  secret: string,
-  username: string
-): boolean {
+export function verifySetup(token: string, secret: string, username: string): boolean {
   return verifyToken(token, secret, username, 1);
 }

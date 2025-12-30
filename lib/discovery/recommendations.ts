@@ -3,8 +3,8 @@
  * Phase 47: Personalized and algorithmic content recommendations
  */
 
-import { createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -102,7 +102,7 @@ function calculateRecencyScore(publishedAt: Date, halfLifeDays: number): number 
   const now = new Date();
   const ageMs = now.getTime() - publishedAt.getTime();
   const ageDays = ageMs / (1000 * 60 * 60 * 24);
-  return Math.pow(0.5, ageDays / halfLifeDays);
+  return 0.5 ** (ageDays / halfLifeDays);
 }
 
 /**
@@ -223,8 +223,11 @@ export async function getSimilarContent(
 
     // Engagement
     score +=
-      calculateEngagementScore(post.reaction_count || 0, post.comment_count || 0, post.view_count || 0) *
-      config.weights.engagement;
+      calculateEngagementScore(
+        post.reaction_count || 0,
+        post.comment_count || 0,
+        post.view_count || 0
+      ) * config.weights.engagement;
 
     return {
       id: post.id,
@@ -237,8 +240,28 @@ export async function getSimilarContent(
       view_count: post.view_count || 0,
       reaction_count: post.reaction_count || 0,
       comment_count: post.comment_count || 0,
-      author: post.author as RecommendedPost['author'],
-      category: post.category as RecommendedPost['category'],
+      author: (() => {
+        const author = Array.isArray(post.author) ? post.author[0] : post.author;
+        return (
+          (author as unknown as RecommendedPost['author']) || {
+            id: '',
+            username: '',
+            display_name: '',
+            avatar_url: null,
+          }
+        );
+      })(),
+      category: (() => {
+        const category = Array.isArray(post.category) ? post.category[0] : post.category;
+        return (
+          (category as unknown as RecommendedPost['category']) || {
+            id: '',
+            name: '',
+            slug: '',
+            color: '',
+          }
+        );
+      })(),
       tags: post.tags || [],
       score,
       reason,
@@ -339,7 +362,8 @@ export async function getPersonalizedRecommendations(
     // Followed tags boost
     const matchingTags = (post.tags || []).filter((t: string) => followedTagIds.has(t));
     if (matchingTags.length > 0) {
-      score += (matchingTags.length / (post.tags?.length || 1)) * 0.25 * config.weights.personalization;
+      score +=
+        (matchingTags.length / (post.tags?.length || 1)) * 0.25 * config.weights.personalization;
       reason = 'followed_tag';
     }
 
@@ -353,8 +377,11 @@ export async function getPersonalizedRecommendations(
 
     // Engagement
     score +=
-      calculateEngagementScore(post.reaction_count || 0, post.comment_count || 0, post.view_count || 0) *
-      config.weights.engagement;
+      calculateEngagementScore(
+        post.reaction_count || 0,
+        post.comment_count || 0,
+        post.view_count || 0
+      ) * config.weights.engagement;
 
     return {
       id: post.id,
@@ -367,8 +394,28 @@ export async function getPersonalizedRecommendations(
       view_count: post.view_count || 0,
       reaction_count: post.reaction_count || 0,
       comment_count: post.comment_count || 0,
-      author: post.author as RecommendedPost['author'],
-      category: post.category as RecommendedPost['category'],
+      author: (() => {
+        const author = Array.isArray(post.author) ? post.author[0] : post.author;
+        return (
+          (author as unknown as RecommendedPost['author']) || {
+            id: '',
+            username: '',
+            display_name: '',
+            avatar_url: null,
+          }
+        );
+      })(),
+      category: (() => {
+        const category = Array.isArray(post.category) ? post.category[0] : post.category;
+        return (
+          (category as unknown as RecommendedPost['category']) || {
+            id: '',
+            name: '',
+            slug: '',
+            color: '',
+          }
+        );
+      })(),
       tags: post.tags || [],
       score,
       reason,
@@ -415,8 +462,7 @@ export async function getTrendingContent(
 
   // Calculate trending score based on velocity
   const scoredPosts = posts.map((post) => {
-    const ageHours =
-      (Date.now() - new Date(post.published_at).getTime()) / (1000 * 60 * 60);
+    const ageHours = (Date.now() - new Date(post.published_at).getTime()) / (1000 * 60 * 60);
     const velocity = (post.view_count || 0) / Math.max(1, ageHours);
 
     return {
@@ -430,8 +476,28 @@ export async function getTrendingContent(
       view_count: post.view_count || 0,
       reaction_count: post.reaction_count || 0,
       comment_count: post.comment_count || 0,
-      author: post.author as RecommendedPost['author'],
-      category: post.category as RecommendedPost['category'],
+      author: (() => {
+        const author = Array.isArray(post.author) ? post.author[0] : post.author;
+        return (
+          (author as unknown as RecommendedPost['author']) || {
+            id: '',
+            username: '',
+            display_name: '',
+            avatar_url: null,
+          }
+        );
+      })(),
+      category: (() => {
+        const category = Array.isArray(post.category) ? post.category[0] : post.category;
+        return (
+          (category as unknown as RecommendedPost['category']) || {
+            id: '',
+            name: '',
+            slug: '',
+            color: '',
+          }
+        );
+      })(),
       tags: post.tags || [],
       score: velocity,
       reason: 'trending' as RecommendationReason,
@@ -480,8 +546,28 @@ export async function getPopularContent(limit: number = 10): Promise<Recommended
     view_count: post.view_count || 0,
     reaction_count: post.reaction_count || 0,
     comment_count: post.comment_count || 0,
-    author: post.author as RecommendedPost['author'],
-    category: post.category as RecommendedPost['category'],
+    author: (() => {
+      const author = Array.isArray(post.author) ? post.author[0] : post.author;
+      return (
+        (author as unknown as RecommendedPost['author']) || {
+          id: '',
+          username: '',
+          display_name: '',
+          avatar_url: null,
+        }
+      );
+    })(),
+    category: (() => {
+      const category = Array.isArray(post.category) ? post.category[0] : post.category;
+      return (
+        (category as unknown as RecommendedPost['category']) || {
+          id: '',
+          name: '',
+          slug: '',
+          color: '',
+        }
+      );
+    })(),
     tags: post.tags || [],
     score: calculatePopularityScore(post.view_count || 0, maxViews),
     reason: 'popular' as RecommendationReason,
@@ -526,8 +612,28 @@ export async function getEditorialPicks(limit: number = 5): Promise<RecommendedP
     view_count: post.view_count || 0,
     reaction_count: post.reaction_count || 0,
     comment_count: post.comment_count || 0,
-    author: post.author as RecommendedPost['author'],
-    category: post.category as RecommendedPost['category'],
+    author: (() => {
+      const author = Array.isArray(post.author) ? post.author[0] : post.author;
+      return (
+        (author as unknown as RecommendedPost['author']) || {
+          id: '',
+          username: '',
+          display_name: '',
+          avatar_url: null,
+        }
+      );
+    })(),
+    category: (() => {
+      const category = Array.isArray(post.category) ? post.category[0] : post.category;
+      return (
+        (category as unknown as RecommendedPost['category']) || {
+          id: '',
+          name: '',
+          slug: '',
+          color: '',
+        }
+      );
+    })(),
     tags: post.tags || [],
     score: 1 - index * 0.1, // Maintain order
     reason: 'editorial_pick' as RecommendationReason,
@@ -584,8 +690,28 @@ export async function getCategoryRecommendations(
     view_count: post.view_count || 0,
     reaction_count: post.reaction_count || 0,
     comment_count: post.comment_count || 0,
-    author: post.author as RecommendedPost['author'],
-    category: post.category as RecommendedPost['category'],
+    author: (() => {
+      const author = Array.isArray(post.author) ? post.author[0] : post.author;
+      return (
+        (author as unknown as RecommendedPost['author']) || {
+          id: '',
+          username: '',
+          display_name: '',
+          avatar_url: null,
+        }
+      );
+    })(),
+    category: (() => {
+      const category = Array.isArray(post.category) ? post.category[0] : post.category;
+      return (
+        (category as unknown as RecommendedPost['category']) || {
+          id: '',
+          name: '',
+          slug: '',
+          color: '',
+        }
+      );
+    })(),
     tags: post.tags || [],
     score:
       calculateRecencyScore(new Date(post.published_at), 7) * 0.5 +
@@ -603,10 +729,7 @@ export async function getCategoryRecommendations(
 /**
  * Apply diversity to recommendations
  */
-function applyDiversity(
-  posts: RecommendedPost[],
-  diversityFactor: number
-): RecommendedPost[] {
+function applyDiversity(posts: RecommendedPost[], diversityFactor: number): RecommendedPost[] {
   if (diversityFactor === 0) return posts;
 
   const result: RecommendedPost[] = [];
