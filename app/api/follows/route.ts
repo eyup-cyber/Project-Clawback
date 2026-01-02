@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Follows API Routes
  * Phase 1.1.5: Following system API

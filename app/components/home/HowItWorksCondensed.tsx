@@ -1,10 +1,16 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { EASING, COLORS, prefersReducedMotion, getDuration, DURATION } from '@/lib/animations/gsap-config';
+import Link from 'next/link';
+import { useEffect, useRef } from 'react';
+import {
+  COLORS,
+  DURATION,
+  EASING,
+  getDuration,
+  prefersReducedMotion,
+} from '@/lib/animations/gsap-config';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -43,13 +49,16 @@ export default function HowItWorksCondensed() {
 
   useEffect(() => {
     if (prefersReducedMotion()) {
-      gsap.set([headingRef.current, stepsRef.current, ctaRef.current], { opacity: 1 });
+      gsap.set([headingRef.current, stepsRef.current, ctaRef.current], {
+        opacity: 1,
+      });
       return;
     }
 
     const ctx = gsap.context(() => {
       // Heading animation
-      gsap.fromTo(headingRef.current,
+      gsap.fromTo(
+        headingRef.current,
         { y: 50, opacity: 0 },
         {
           y: 0,
@@ -67,7 +76,8 @@ export default function HowItWorksCondensed() {
       // Steps stagger animation
       const stepCards = stepsRef.current?.querySelectorAll('.step-card');
       if (stepCards) {
-        gsap.fromTo(stepCards,
+        gsap.fromTo(
+          stepCards,
           { y: 30, opacity: 0 },
           {
             y: 0,
@@ -85,7 +95,8 @@ export default function HowItWorksCondensed() {
       }
 
       // CTA animation
-      gsap.fromTo(ctaRef.current,
+      gsap.fromTo(
+        ctaRef.current,
         { y: 20, opacity: 0 },
         {
           y: 0,
@@ -130,33 +141,36 @@ export default function HowItWorksCondensed() {
             <div
               key={step.number}
               className="step-card relative p-5 rounded-lg border text-center transition-all duration-300 hover:border-[var(--secondary)] hover:shadow-[0_0_20px_var(--glow-secondary)]"
-              style={{ 
-                background: 'var(--surface)', 
+              style={{
+                background: 'var(--surface)',
                 borderColor: 'var(--border)',
               }}
             >
               {/* Step number - faded background */}
-              <span 
+              <span
                 className="absolute top-2 right-3 text-4xl font-bold opacity-10"
-                style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--primary)' }}
+                style={{
+                  fontFamily: 'var(--font-kindergarten)',
+                  color: 'var(--primary)',
+                }}
               >
                 {step.number}
               </span>
-              
+
               <span className="text-3xl block mb-3">{step.icon}</span>
               <h3
                 className="text-lg font-bold mb-2 lowercase"
-                style={{ 
-                  fontFamily: 'var(--font-kindergarten)', 
+                style={{
+                  fontFamily: 'var(--font-kindergarten)',
                   color: COLORS.secondary,
                 }}
               >
                 {step.title}
               </h3>
-              <p 
+              <p
                 className="text-sm font-medium"
-                style={{ 
-                  color: 'var(--foreground)', 
+                style={{
+                  color: 'var(--foreground)',
                   opacity: 0.85,
                   lineHeight: 1.5,
                 }}
@@ -172,8 +186,8 @@ export default function HowItWorksCondensed() {
           <Link
             href="/apply"
             className="inline-block px-8 py-3 rounded-full font-medium text-base transition-all duration-300 hover:shadow-[0_0_30px_var(--glow-secondary)] hover:scale-105"
-            style={{ 
-              background: COLORS.secondary, 
+            style={{
+              background: COLORS.secondary,
               color: 'var(--background)',
               fontFamily: 'var(--font-body)',
               fontWeight: 600,
@@ -186,7 +200,3 @@ export default function HowItWorksCondensed() {
     </section>
   );
 }
-
-
-
-

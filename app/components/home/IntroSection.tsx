@@ -1,11 +1,18 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { EASING, DURATION, COLORS, prefersReducedMotion, getDuration, getStagger } from '@/lib/animations/gsap-config';
-import { MagneticButton, ScroungersBrand } from '../ui';
+import { useEffect, useRef } from 'react';
+import {
+  COLORS,
+  DURATION,
+  EASING,
+  getDuration,
+  getStagger,
+  prefersReducedMotion,
+} from '@/lib/animations/gsap-config';
 import { FloatingParticles } from '../effects/Particles';
+import { MagneticButton, ScroungersBrand } from '../ui';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -27,7 +34,8 @@ export default function IntroSection() {
       // Animate paragraphs with stagger
       const paragraphs = paragraphsRef.current?.querySelectorAll('.intro-paragraph');
       if (paragraphs) {
-        gsap.fromTo(paragraphs,
+        gsap.fromTo(
+          paragraphs,
           { y: 50, opacity: 0 },
           {
             y: 0,
@@ -45,7 +53,8 @@ export default function IntroSection() {
       }
 
       // Animate CTA buttons
-      gsap.fromTo(ctaRef.current,
+      gsap.fromTo(
+        ctaRef.current,
         { y: 30, opacity: 0 },
         {
           y: 0,
@@ -59,7 +68,6 @@ export default function IntroSection() {
           },
         }
       );
-
     }, sectionRef);
 
     return () => ctx.revert();
@@ -75,23 +83,27 @@ export default function IntroSection() {
       <FloatingParticles count={15} color="var(--secondary)" minSize={1} maxSize={3} />
 
       {/* Background gradient */}
-      <div 
+      <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(255, 215, 0, 0.03) 0%, transparent 70%)',
+          background:
+            'radial-gradient(ellipse at center, rgba(255, 215, 0, 0.03) 0%, transparent 70%)',
         }}
       />
 
       <div className="max-w-4xl mx-auto text-center relative z-10">
         {/* Mission statement paragraphs */}
         <div ref={paragraphsRef} className="space-y-4 text-base md:text-lg">
-          <p className="intro-paragraph font-medium" style={{ color: 'var(--foreground)', lineHeight: 1.5 }}>
+          <p
+            className="intro-paragraph font-medium"
+            style={{ color: 'var(--foreground)', lineHeight: 1.5 }}
+          >
             For years, the left media has been owned, controlled, and profited by two friend groups.
           </p>
-          
-          <p 
+
+          <p
             className="intro-paragraph font-bold text-lg md:text-xl"
-            style={{ 
+            style={{
               color: COLORS.secondary,
               textShadow: `0 0 20px ${COLORS.glowSecondary}, 0 2px 4px rgba(0,0,0,0.3)`,
               lineHeight: 1.4,
@@ -100,27 +112,38 @@ export default function IntroSection() {
             We are taking back the media and giving you the keys.
           </p>
 
-          <p className="intro-paragraph font-medium" style={{ color: 'var(--foreground)', lineHeight: 1.5 }}>
+          <p
+            className="intro-paragraph font-medium"
+            style={{ color: 'var(--foreground)', lineHeight: 1.5 }}
+          >
             Want to write an article? Want to make a video? Want to make some art?
           </p>
 
-          <p className="intro-paragraph font-medium" style={{ color: 'var(--foreground)', lineHeight: 1.5 }}>
-            <ScroungersBrand size="xl" glow animated /> is giving real people with skin in the game the opportunity to profit from their own political analysis.
+          <p
+            className="intro-paragraph font-medium"
+            style={{ color: 'var(--foreground)', lineHeight: 1.5 }}
+          >
+            <ScroungersBrand size="xl" glow animated /> is giving real people with skin in the game
+            the opportunity to profit from their own political analysis.
           </p>
 
-          <p className="intro-paragraph font-medium" style={{ color: 'var(--foreground)', lineHeight: 1.5 }}>
+          <p
+            className="intro-paragraph font-medium"
+            style={{ color: 'var(--foreground)', lineHeight: 1.5 }}
+          >
             All posts come with a user-inputted Ko-fi link. Want to support the creator? Go ahead!
           </p>
 
           <p
             className="intro-paragraph font-bold text-lg md:text-xl"
-            style={{ 
+            style={{
               color: COLORS.secondary,
               textShadow: `0 0 20px ${COLORS.glowSecondary}, 0 2px 4px rgba(0,0,0,0.3)`,
               lineHeight: 1.4,
             }}
           >
-            We retain 0% of the creators&apos; intellectual property and we don&apos;t take a penny from their profit.
+            We retain 0% of the creators&apos; intellectual property and we don&apos;t take a penny
+            from their profit.
           </p>
         </div>
 
@@ -136,7 +159,7 @@ export default function IntroSection() {
           >
             Become a Contributor
           </MagneticButton>
-          
+
           <MagneticButton
             href="/articles"
             variant="outline"

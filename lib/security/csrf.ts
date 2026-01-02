@@ -3,8 +3,8 @@
  * Provides token generation and validation
  */
 
+import { createHmac, randomBytes } from 'crypto';
 import { cookies } from 'next/headers';
-import { randomBytes, createHmac } from 'crypto';
 import { logger } from '@/lib/logger';
 
 const CSRF_TOKEN_COOKIE = 'csrf-token';
@@ -17,7 +17,9 @@ const CSRF_TOKEN_EXPIRY = 3600000; // 1 hour
 export function generateCsrfToken(secret: string): string {
   const token = randomBytes(32).toString('hex');
   const timestamp = Date.now().toString();
-  const hmac = createHmac('sha256', secret).update(token + timestamp).digest('hex');
+  const hmac = createHmac('sha256', secret)
+    .update(token + timestamp)
+    .digest('hex');
 
   return `${token}.${timestamp}.${hmac}`;
 }
@@ -62,7 +64,8 @@ export async function getCsrfToken(): Promise<string> {
   const cookieStore = await cookies();
   const existing = cookieStore.get(CSRF_TOKEN_COOKIE);
 
-  const secret = process.env.CSRF_SECRET || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'default-secret';
+  const secret =
+    process.env.CSRF_SECRET || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'default-secret';
 
   if (existing?.value && validateCsrfToken(existing.value, secret)) {
     return existing.value;
@@ -91,7 +94,8 @@ export async function validateCsrfFromRequest(request: Request): Promise<boolean
     return false;
   }
 
-  const secret = process.env.CSRF_SECRET || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'default-secret';
+  const secret =
+    process.env.CSRF_SECRET || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'default-secret';
   return validateCsrfToken(token, secret);
 }
 
@@ -127,7 +131,3 @@ export async function attachCsrfCookie(token: string): Promise<void> {
     path: '/',
   });
 }
-
-
-
-

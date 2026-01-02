@@ -19,11 +19,7 @@ const MAX_METRICS = 10000;
 /**
  * Record a metric
  */
-export function recordMetric(
-  name: string,
-  value: number,
-  tags?: Record<string, string>
-): void {
+export function recordMetric(name: string, value: number, tags?: Record<string, string>): void {
   const metric: Metric = {
     name,
     value,
@@ -58,22 +54,14 @@ export function incrementCounter(
 /**
  * Record a timing metric (duration in milliseconds)
  */
-export function recordTiming(
-  name: string,
-  duration: number,
-  tags?: Record<string, string>
-): void {
+export function recordTiming(name: string, duration: number, tags?: Record<string, string>): void {
   recordMetric(name, duration, { ...tags, type: 'timing' });
 }
 
 /**
  * Record a gauge metric (current value)
  */
-export function recordGauge(
-  name: string,
-  value: number,
-  tags?: Record<string, string>
-): void {
+export function recordGauge(name: string, value: number, tags?: Record<string, string>): void {
   recordMetric(name, value, { ...tags, type: 'gauge' });
 }
 
@@ -81,9 +69,7 @@ export function recordGauge(
  * Get metrics by name
  */
 export function getMetrics(name: string, limit: number = 100): Metric[] {
-  return metricsStore
-    .filter((m) => m.name === name)
-    .slice(-limit);
+  return metricsStore.filter((m) => m.name === name).slice(-limit);
 }
 
 /**
@@ -104,14 +90,14 @@ export function getAggregatedMetrics(name: string): {
   max: number;
 } {
   const metrics = getMetrics(name);
-  
+
   if (metrics.length === 0) {
     return { count: 0, sum: 0, avg: 0, min: 0, max: 0 };
   }
 
   const values = metrics.map((m) => m.value);
   const sum = values.reduce((a, b) => a + b, 0);
-  
+
   return {
     count: metrics.length,
     sum,
@@ -127,12 +113,12 @@ export function getAggregatedMetrics(name: string): {
 export function clearOldMetrics(maxAge: number = 3600000): void {
   const now = Date.now();
   const cutoff = now - maxAge;
-  
+
   const initialLength = metricsStore.length;
   while (metricsStore.length > 0 && metricsStore[0].timestamp < cutoff) {
     metricsStore.shift();
   }
-  
+
   const cleared = initialLength - metricsStore.length;
   if (cleared > 0) {
     logger.debug(`Cleared ${cleared} old metrics`);
@@ -156,7 +142,14 @@ export function getMetricsByName(name: string, limit: number = 100): Metric[] {
  */
 export function getMetricsSummary(): {
   counters: Array<{ name: string; value: number }>;
-  timings: Array<{ name: string; count: number; sum: number; avg: number; min: number; max: number }>;
+  timings: Array<{
+    name: string;
+    count: number;
+    sum: number;
+    avg: number;
+    min: number;
+    max: number;
+  }>;
   gauges: Array<{ name: string; value: number }>;
   uptime: number;
 } {
@@ -169,7 +162,10 @@ export function getMetricsSummary(): {
   for (const m of counterMetrics) {
     counterMap.set(m.name, (counterMap.get(m.name) || 0) + m.value);
   }
-  const counters = Array.from(counterMap.entries()).map(([name, value]) => ({ name, value }));
+  const counters = Array.from(counterMap.entries()).map(([name, value]) => ({
+    name,
+    value,
+  }));
 
   // Aggregate timings by name
   const timingMap = new Map<string, number[]>();
@@ -196,7 +192,10 @@ export function getMetricsSummary(): {
   for (const m of gaugeMetrics) {
     gaugeMap.set(m.name, m.value); // Latest value wins
   }
-  const gauges = Array.from(gaugeMap.entries()).map(([name, value]) => ({ name, value }));
+  const gauges = Array.from(gaugeMap.entries()).map(([name, value]) => ({
+    name,
+    value,
+  }));
 
   return {
     counters,
@@ -205,7 +204,3 @@ export function getMetricsSummary(): {
     uptime: process.uptime(),
   };
 }
-
-
-
-

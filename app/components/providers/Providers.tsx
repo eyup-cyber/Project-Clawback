@@ -33,14 +33,3 @@ export function Providers({ children }: Readonly<{ children: React.ReactNode }>)
     </ThemeProvider>
   );
 }
-
-
-
-
-
-
-
-
-
-
-

@@ -1,4 +1,9 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 // R2 client configuration
@@ -81,7 +86,7 @@ export function generateUniqueFilename(originalFilename: string, folder = 'uploa
   const random = Math.random().toString(36).substring(2, 8);
   const extension = originalFilename.split('.').pop() || '';
   const baseName = originalFilename.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9]/g, '-');
-  
+
   return `${folder}/${timestamp}-${random}-${baseName}.${extension}`;
 }
 
@@ -95,21 +100,10 @@ export async function getFileMetadata(filename: string) {
   });
 
   const response = await r2Client.send(command);
-  
+
   return {
     contentType: response.ContentType,
     contentLength: response.ContentLength,
     lastModified: response.LastModified,
   };
 }
-
-
-
-
-
-
-
-
-
-
-

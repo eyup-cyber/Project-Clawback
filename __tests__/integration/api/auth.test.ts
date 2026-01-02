@@ -36,12 +36,10 @@ describe('Auth API Integration', () => {
       });
 
       const { GET } = await import('@/app/api/auth/callback/route');
-      const request = new Request(
-        'http://localhost:3000/api/auth/callback?code=valid-code'
-      );
-      
+      const request = new Request('http://localhost:3000/api/auth/callback?code=valid-code');
+
       const response = await GET(request);
-      
+
       // Should redirect to dashboard on success
       expect(response.status).toBe(307); // Redirect status
       expect(response.headers.get('Location')).toContain('/dashboard');
@@ -60,12 +58,10 @@ describe('Auth API Integration', () => {
       });
 
       const { GET } = await import('@/app/api/auth/callback/route');
-      const request = new Request(
-        'http://localhost:3000/api/auth/callback?code=invalid-code'
-      );
-      
+      const request = new Request('http://localhost:3000/api/auth/callback?code=invalid-code');
+
       const response = await GET(request);
-      
+
       // Should redirect to login with error
       expect(response.status).toBe(307);
       expect(response.headers.get('Location')).toContain('error');
@@ -74,9 +70,9 @@ describe('Auth API Integration', () => {
     it('should redirect to error page when no code provided', async () => {
       const { GET } = await import('@/app/api/auth/callback/route');
       const request = new Request('http://localhost:3000/api/auth/callback');
-      
+
       const response = await GET(request);
-      
+
       expect(response.status).toBe(307);
       expect(response.headers.get('Location')).toContain('error');
     });
@@ -97,9 +93,9 @@ describe('Auth API Integration', () => {
       const request = new Request(
         'http://localhost:3000/api/auth/callback?code=valid-code&next=/profile'
       );
-      
+
       const response = await GET(request);
-      
+
       expect(response.status).toBe(307);
       expect(response.headers.get('Location')).toContain('/profile');
     });
@@ -120,7 +116,7 @@ describe('Auth API Integration', () => {
 
       const { getAuthUser } = await import('@/lib/api/middleware');
       const result = await getAuthUser();
-      
+
       expect(result.user).toBeNull();
     });
 
@@ -154,7 +150,7 @@ describe('Auth API Integration', () => {
 
       const { getAuthUser } = await import('@/lib/api/middleware');
       const result = await getAuthUser();
-      
+
       expect(result.user).toBeDefined();
       expect(result.user?.id).toBe('user-123');
       expect(result.user?.role).toBe('contributor');
@@ -173,7 +169,7 @@ describe('Auth API Integration', () => {
       });
 
       const { requireAuth } = await import('@/lib/api/middleware');
-      
+
       await expect(requireAuth()).rejects.toThrow();
     });
 
@@ -200,9 +196,8 @@ describe('Auth API Integration', () => {
       });
 
       const { requireRole } = await import('@/lib/api/middleware');
-      
+
       await expect(requireRole('admin')).rejects.toThrow();
     });
   });
 });
-

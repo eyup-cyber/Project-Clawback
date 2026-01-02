@@ -11,9 +11,11 @@ export default function VerifyEmailPage() {
 
   const handleResend = async () => {
     setResending(true);
-    
-    const { data: { user } } = await supabase.auth.getUser();
-    
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     if (user?.email) {
       const { error } = await supabase.auth.resend({
         type: 'signup',
@@ -46,17 +48,14 @@ export default function VerifyEmailPage() {
       >
         <span className="text-3xl">📧</span>
       </div>
-      
-      <h1
-        className="text-2xl font-display mb-4"
-        style={{ color: 'var(--foreground)' }}
-      >
+
+      <h1 className="text-2xl font-display mb-4" style={{ color: 'var(--foreground)' }}>
         Verify Your Email
       </h1>
-      
+
       <p className="mb-6" style={{ color: 'var(--foreground)', opacity: 0.7 }}>
-        We&apos;ve sent a verification link to your email address. 
-        Click the link to activate your account.
+        We&apos;ve sent a verification link to your email address. Click the link to activate your
+        account.
       </p>
 
       <div className="space-y-4">
@@ -90,6 +89,3 @@ export default function VerifyEmailPage() {
     </div>
   );
 }
-
-
-

@@ -3,7 +3,7 @@
  * Debounces a value with configurable delay
  */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * Debounces a value by delaying updates until after wait milliseconds
@@ -43,29 +43,28 @@ export function useDebouncedCallback<T extends (...args: unknown[]) => unknown>(
   func: T,
   delay: number
 ): T {
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
     };
-  }, [timeoutId]);
+  }, []);
 
-  const debouncedFunc = ((...args: Parameters<T>) => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
+  return useCallback(
+    (...args: Parameters<T>) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
 
-    const newTimeoutId = setTimeout(() => {
-      func(...args);
-    }, delay);
-
-    setTimeoutId(newTimeoutId);
-  }) as T;
-
-  return debouncedFunc;
+      timeoutRef.current = setTimeout(() => {
+        func(...args);
+      }, delay);
+    },
+    [func, delay]
+  ) as T;
 }
 
 export default useDebounce;

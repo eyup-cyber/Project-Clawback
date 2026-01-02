@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Post Versions API Routes
  * Phase 1.2.4: Version history API

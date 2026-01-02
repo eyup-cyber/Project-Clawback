@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { type NextRequest } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
@@ -38,7 +40,7 @@ export async function GET(request: NextRequest) {
 
     // Get views over time
     const postIds = posts.map((p) => p.id);
-    
+
     let viewsQuery = supabase
       .from('post_views')
       .select('created_at, post_id')
@@ -51,11 +53,14 @@ export async function GET(request: NextRequest) {
     const { data: views } = await viewsQuery;
 
     // Group views by date
-    const viewsByDate = (views || []).reduce((acc, view) => {
-      const date = view.created_at.split('T')[0];
-      acc[date] = (acc[date] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const viewsByDate = (views || []).reduce(
+      (acc, view) => {
+        const date = view.created_at.split('T')[0];
+        acc[date] = (acc[date] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     // Get reactions over time
     let reactionsQuery = supabase
@@ -70,12 +75,17 @@ export async function GET(request: NextRequest) {
     const { data: reactionsData } = await reactionsQuery;
 
     // Group reactions by type
-    const reactions = reactionsData as { created_at: string; reaction_type: string; post_id: string }[] | null;
-    const reactionsByType = (reactions || []).reduce((acc, r) => {
-      const type = r.reaction_type || 'unknown';
-      acc[type] = (acc[type] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const reactions = reactionsData as
+      | { created_at: string; reaction_type: string; post_id: string }[]
+      | null;
+    const reactionsByType = (reactions || []).reduce(
+      (acc, r) => {
+        const type = r.reaction_type || 'unknown';
+        acc[type] = (acc[type] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     // Get top posts
     const topPosts = [...posts]
@@ -104,4 +114,3 @@ export async function GET(request: NextRequest) {
     return handleApiError(err);
   }
 }
-

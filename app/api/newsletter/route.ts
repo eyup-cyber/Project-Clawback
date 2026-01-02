@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
@@ -33,27 +35,22 @@ export async function POST(request: Request) {
       }
 
       return NextResponse.json(
-        { success: true, message: 'Welcome back! You\'ve been resubscribed.' },
+        { success: true, message: "Welcome back! You've been resubscribed." },
         { status: 200 }
       );
     }
   }
 
   // Create new subscription
-  const { error } = await supabase
-    .from('newsletter_subscribers')
-    .insert({
-      email: email.toLowerCase(),
-      status: 'active',
-      source: source || 'website',
-    });
+  const { error } = await supabase.from('newsletter_subscribers').insert({
+    email: email.toLowerCase(),
+    status: 'active',
+    source: source || 'website',
+  });
 
   if (error) {
     logger.error('Newsletter subscription error', error, { email });
-    return NextResponse.json(
-      { error: 'Failed to subscribe. Please try again.' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to subscribe. Please try again.' }, { status: 500 });
   }
 
   return NextResponse.json(
@@ -95,4 +92,3 @@ export async function DELETE(request: Request) {
     { status: 200 }
   );
 }
-

@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { type NextRequest } from 'next/server';
 import {
   success,
@@ -84,7 +86,11 @@ export async function POST(request: NextRequest) {
       userId: user.id,
     });
 
-    logger.info('Creating post', { method: 'POST', path: '/api/posts', userId: user.id }, requestId);
+    logger.info(
+      'Creating post',
+      { method: 'POST', path: '/api/posts', userId: user.id },
+      requestId
+    );
 
     // Rate limit: 10 posts per hour
     await rateLimitByUser(user.id, { maxRequests: 10, windowMs: 3600000 });
@@ -110,4 +116,3 @@ export async function POST(request: NextRequest) {
     clearContext(requestId);
   }
 }
-

@@ -1,7 +1,7 @@
-import { createClient } from '@/lib/supabase/server';
-import { ApiError } from '@/lib/api/response';
 import type { UserRole } from '@/lib/api/middleware';
+import { ApiError } from '@/lib/api/response';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -60,11 +60,7 @@ export interface UpdateProfileInput {
 export async function getProfileById(id: string): Promise<Profile> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', id)
-    .single();
+  const { data, error } = await supabase.from('profiles').select('*').eq('id', id).single();
 
   if (error || !data) {
     throw ApiError.notFound('User');
@@ -81,7 +77,8 @@ export async function getPublicProfile(id: string): Promise<PublicProfile> {
 
   const { data, error } = await supabase
     .from('profiles')
-    .select(`
+    .select(
+      `
       id,
       username,
       display_name,
@@ -93,7 +90,8 @@ export async function getPublicProfile(id: string): Promise<PublicProfile> {
       location,
       article_count,
       is_featured
-    `)
+    `
+    )
     .eq('id', id)
     .single();
 
@@ -126,10 +124,7 @@ export async function getProfileByUsername(username: string): Promise<Profile> {
 /**
  * Update user profile
  */
-export async function updateProfile(
-  id: string,
-  input: UpdateProfileInput
-): Promise<Profile> {
+export async function updateProfile(id: string, input: UpdateProfileInput): Promise<Profile> {
   const supabase = await createClient();
 
   // Check for username uniqueness if username is being updated
@@ -148,10 +143,7 @@ export async function updateProfile(
     input.username = input.username.toLowerCase();
   }
 
-  const { error } = await supabase
-    .from('profiles')
-    .update(input)
-    .eq('id', id);
+  const { error } = await supabase.from('profiles').update(input).eq('id', id);
 
   if (error) {
     logger.error('[updateProfile] Error', error, { userId: id });
@@ -164,16 +156,10 @@ export async function updateProfile(
 /**
  * Update user role (admin only)
  */
-export async function updateUserRole(
-  id: string,
-  role: UserRole
-): Promise<Profile> {
+export async function updateUserRole(id: string, role: UserRole): Promise<Profile> {
   const supabase = await createClient();
 
-  const { error } = await supabase
-    .from('profiles')
-    .update({ role })
-    .eq('id', id);
+  const { error } = await supabase.from('profiles').update({ role }).eq('id', id);
 
   if (error) {
     logger.error('[updateUserRole] Error', error, { userId: id, role });
@@ -207,7 +193,8 @@ export async function getFeaturedContributors(limit: number = 10): Promise<Publi
   // Query profiles directly instead of view (views need type regeneration)
   const { data, error } = await supabase
     .from('profiles')
-    .select(`
+    .select(
+      `
       id,
       username,
       display_name,
@@ -219,7 +206,8 @@ export async function getFeaturedContributors(limit: number = 10): Promise<Publi
       location,
       article_count,
       is_featured
-    `)
+    `
+    )
     .eq('is_featured', true)
     .in('role', ['contributor', 'editor', 'admin', 'superadmin'])
     .order('article_count', { ascending: false })
@@ -283,7 +271,8 @@ export async function getUsersByIds(ids: string[]): Promise<PublicProfile[]> {
 
   const { data, error } = await supabase
     .from('profiles')
-    .select(`
+    .select(
+      `
       id,
       username,
       display_name,
@@ -295,7 +284,8 @@ export async function getUsersByIds(ids: string[]): Promise<PublicProfile[]> {
       location,
       article_count,
       is_featured
-    `)
+    `
+    )
     .in('id', ids);
 
   if (error) {
@@ -385,4 +375,3 @@ export async function getUserStats(userId: string): Promise<{
     ...aggregatedStats,
   };
 }
-

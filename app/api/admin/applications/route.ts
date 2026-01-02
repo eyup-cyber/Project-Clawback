@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { type NextRequest } from 'next/server';
 import { z } from 'zod';
 import { success, handleApiError, parseParams, requireEditor } from '@/lib/api';
@@ -39,9 +41,3 @@ export async function GET(request: NextRequest) {
     return handleApiError(err);
   }
 }
-
-
-
-
-
-

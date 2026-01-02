@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Compare Post Versions API
  */

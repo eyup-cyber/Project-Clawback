@@ -3,8 +3,8 @@
  * Phase 51: Page creation, management, and rendering
  */
 
-import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -34,7 +34,13 @@ export interface Page {
 
 export type PageStatus = 'draft' | 'published' | 'scheduled' | 'archived';
 export type PageVisibility = 'public' | 'private' | 'password_protected';
-export type PageTemplate = 'default' | 'full_width' | 'sidebar_left' | 'sidebar_right' | 'landing' | 'blank';
+export type PageTemplate =
+  | 'default'
+  | 'full_width'
+  | 'sidebar_left'
+  | 'sidebar_right'
+  | 'landing'
+  | 'blank';
 
 export interface PageContent {
   type: 'blocks' | 'html' | 'markdown';
@@ -170,7 +176,12 @@ export interface BlockData {
   }[];
 
   // Contact Form
-  formFields?: { name: string; type: string; required: boolean; placeholder?: string }[];
+  formFields?: {
+    name: string;
+    type: string;
+    required: boolean;
+    placeholder?: string;
+  }[];
   submitLabel?: string;
   successMessage?: string;
 
@@ -275,11 +286,7 @@ export async function createPage(
     published_at: input.status === 'published' ? new Date().toISOString() : null,
   };
 
-  const { data, error } = await supabase
-    .from('pages')
-    .insert(pageData)
-    .select()
-    .single();
+  const { data, error } = await supabase.from('pages').insert(pageData).select().single();
 
   if (error) {
     logger.error('[Pages] Failed to create page', error);
@@ -432,15 +439,7 @@ export async function getPublishedPage(slug: string): Promise<Page | null> {
 export async function queryPages(query: PageQuery = {}): Promise<{ pages: Page[]; total: number }> {
   const supabase = await createClient();
 
-  const {
-    status,
-    visibility,
-    template,
-    parent_id,
-    search,
-    limit = 50,
-    offset = 0,
-  } = query;
+  const { status, visibility, template, parent_id, search, limit = 50, offset = 0 } = query;
 
   let queryBuilder = supabase.from('pages').select('*', { count: 'exact' });
 
@@ -656,20 +655,20 @@ function renderBlock(block: PageBlock): string {
   const id = settings.id ? `id="${settings.id}"` : '';
 
   switch (type) {
-    case 'heading':
+    case 'heading': {
       const level = data.level || 2;
       return `<h${level} ${id} class="${className}" style="${style}">${escapeHtml(data.text || '')}</h${level}>`;
+    }
 
     case 'paragraph':
       return `<p ${id} class="${className}" style="${style}">${data.content || ''}</p>`;
 
-    case 'image':
-      const imgCaption = data.caption
-        ? `<figcaption>${escapeHtml(data.caption)}</figcaption>`
-        : '';
+    case 'image': {
+      const imgCaption = data.caption ? `<figcaption>${escapeHtml(data.caption)}</figcaption>` : '';
       const imgContent = `<img src="${data.src || ''}" alt="${escapeHtml(data.alt || '')}" loading="lazy" />`;
       const imgLink = data.link ? `<a href="${data.link}">${imgContent}</a>` : imgContent;
       return `<figure ${id} class="${className}" style="${style}">${imgLink}${imgCaption}</figure>`;
+    }
 
     case 'video':
       return `<div ${id} class="video-container ${className}" style="${style}">
@@ -685,29 +684,28 @@ function renderBlock(block: PageBlock): string {
     case 'divider':
       return `<hr ${id} class="${className}" style="${style}" />`;
 
-    case 'quote':
-      const citation = data.citation
-        ? `<cite>${escapeHtml(data.citation)}</cite>`
-        : '';
+    case 'quote': {
+      const citation = data.citation ? `<cite>${escapeHtml(data.citation)}</cite>` : '';
       return `<blockquote ${id} class="${className}" style="${style}">${data.content || ''}${citation}</blockquote>`;
+    }
 
-    case 'list':
+    case 'list': {
       const listTag = data.listType === 'number' ? 'ol' : 'ul';
-      const listItems = (data.items || [])
-        .map((item) => `<li>${escapeHtml(item)}</li>`)
-        .join('');
+      const listItems = (data.items || []).map((item) => `<li>${escapeHtml(item)}</li>`).join('');
       return `<${listTag} ${id} class="${className}" style="${style}">${listItems}</${listTag}>`;
+    }
 
     case 'code':
       return `<pre ${id} class="${className}" style="${style}"><code class="language-${data.language || 'text'}">${escapeHtml(data.content || '')}</code></pre>`;
 
-    case 'columns':
+    case 'columns': {
       const columnContent = (data.children || [])
         .map((col) => `<div class="column">${renderBlocks(col)}</div>`)
         .join('');
       return `<div ${id} class="columns columns-${data.columnCount || 2} ${className}" style="gap: ${data.gap || '1rem'}; ${style}">${columnContent}</div>`;
+    }
 
-    case 'accordion':
+    case 'accordion': {
       const accordionItems = (data.sections || [])
         .map(
           (section, i) => `
@@ -719,8 +717,9 @@ function renderBlock(block: PageBlock): string {
         )
         .join('');
       return `<div ${id} class="accordion ${className}" style="${style}">${accordionItems}</div>`;
+    }
 
-    case 'hero':
+    case 'hero': {
       const heroBg = data.backgroundImage
         ? `background-image: url('${data.backgroundImage}'); background-size: cover;`
         : '';
@@ -736,8 +735,9 @@ function renderBlock(block: PageBlock): string {
         ${data.description ? `<p>${escapeHtml(data.description)}</p>` : ''}
         ${heroButtons ? `<div class="hero-buttons">${heroButtons}</div>` : ''}
       </section>`;
+    }
 
-    case 'cta':
+    case 'cta': {
       const ctaButtons = (data.buttons || [])
         .map(
           (btn) =>
@@ -749,6 +749,7 @@ function renderBlock(block: PageBlock): string {
         ${data.description ? `<p>${escapeHtml(data.description)}</p>` : ''}
         <div class="cta-buttons">${ctaButtons}</div>
       </section>`;
+    }
 
     case 'html':
       return data.html || '';

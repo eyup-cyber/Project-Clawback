@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * GDPR Account Deletion API
  * Delete or anonymize user account

@@ -266,7 +266,7 @@ body {
 
 /* Logo text styles */
 .logo-scroungers {
-	font-family: var(--font-display);
+	font-family: var(--font-body);
 	color: var(--primary);
 	text-shadow:
 		0 0 20px var(--glow-primary),
@@ -275,7 +275,7 @@ body {
 }
 
 .logo-multimedia {
-	font-family: var(--font-display);
+	font-family: var(--font-kindergarten), var(--font-display), cursive;
 	color: var(--secondary);
 	text-shadow: 0 0 10px var(--glow-secondary);
 	letter-spacing: 0.3em;

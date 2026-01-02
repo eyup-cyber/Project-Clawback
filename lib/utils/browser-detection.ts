@@ -95,7 +95,7 @@ export const getPerformanceMetrics = () => {
   }
 
   const nav = navigator as any;
-  const connection = (nav.connection || nav.mozConnection || nav.webkitConnection) || null;
+  const connection = nav.connection || nav.mozConnection || nav.webkitConnection || null;
   const memory = nav.deviceMemory || null;
 
   return {
@@ -147,7 +147,3 @@ export const shouldReduceAnimations = (): boolean => {
 
   return false;
 };
-
-
-
-

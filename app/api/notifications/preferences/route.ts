@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Notification Preferences API
  * Phase 6.6: Notification preferences management

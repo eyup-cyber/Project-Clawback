@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import { useCallback, useEffect, useState } from 'react';
 
 interface GalleryImage {
   id: string;
@@ -82,7 +82,9 @@ export default function ImageGallery({ images, columns = 3 }: ImageGalleryProps)
             />
             <div
               className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end"
-              style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)' }}
+              style={{
+                background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)',
+              }}
             >
               {image.caption && (
                 <p className="p-4 text-white text-sm line-clamp-2">{image.caption}</p>
@@ -107,7 +109,14 @@ export default function ImageGallery({ images, columns = 3 }: ImageGalleryProps)
             className="absolute top-4 right-4 text-white hover:text-[var(--primary)] z-10"
             aria-label="Close lightbox"
           >
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
@@ -122,7 +131,14 @@ export default function ImageGallery({ images, columns = 3 }: ImageGalleryProps)
             className="absolute left-4 text-white hover:text-[var(--primary)] z-10"
             aria-label="Previous image"
           >
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <polyline points="15 18 9 12 15 6" />
             </svg>
           </button>
@@ -136,16 +152,20 @@ export default function ImageGallery({ images, columns = 3 }: ImageGalleryProps)
             className="absolute right-4 text-white hover:text-[var(--primary)] z-10"
             aria-label="Next image"
           >
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </button>
 
           {/* Image container */}
-          <div
-            className="relative max-w-[90vw] max-h-[90vh]"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="relative max-w-[90vw] max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
             <Image
               src={images[activeIndex].src}
               alt={images[activeIndex].alt}
@@ -157,13 +177,19 @@ export default function ImageGallery({ images, columns = 3 }: ImageGalleryProps)
 
             {/* Caption */}
             {images[activeIndex].caption && (
-              <div className="absolute inset-x-0 bottom-0 p-4 text-center" style={{ background: 'rgba(0,0,0,0.7)' }}>
+              <div
+                className="absolute inset-x-0 bottom-0 p-4 text-center"
+                style={{ background: 'rgba(0,0,0,0.7)' }}
+              >
                 <p className="text-white">{images[activeIndex].caption}</p>
               </div>
             )}
 
             {/* Counter */}
-            <div className="absolute top-4 left-4 px-3 py-1 rounded-full text-sm text-white" style={{ background: 'rgba(0,0,0,0.5)' }}>
+            <div
+              className="absolute top-4 left-4 px-3 py-1 rounded-full text-sm text-white"
+              style={{ background: 'rgba(0,0,0,0.5)' }}
+            >
               {activeIndex + 1} / {images.length}
             </div>
           </div>
@@ -172,6 +198,3 @@ export default function ImageGallery({ images, columns = 3 }: ImageGalleryProps)
     </>
   );
 }
-
-
-

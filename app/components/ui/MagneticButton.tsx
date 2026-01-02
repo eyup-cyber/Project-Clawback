@@ -1,8 +1,8 @@
 'use client';
 
-import { forwardRef, useRef, useEffect, type ReactNode } from 'react';
 import gsap from 'gsap';
-import { EASING, COLORS, prefersReducedMotion } from '@/lib/animations/gsap-config';
+import { forwardRef, type ReactNode, useEffect, useRef } from 'react';
+import { COLORS, EASING, prefersReducedMotion } from '@/lib/animations/gsap-config';
 
 interface MagneticButtonProps {
   children: ReactNode;

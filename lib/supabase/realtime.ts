@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -20,7 +20,7 @@ export const subscribeToTable = (
   options: RealtimeSubscriptionOptions = {}
 ): RealtimeChannel => {
   const client = createClient(supabaseUrl, supabaseAnonKey);
-  
+
   const channel = client
     .channel(`${table}-changes`)
     .on(
@@ -50,10 +50,7 @@ export const subscribeToTable = (
 // REALTIME HOOKS
 // ============================================
 
-export const useRealtimeReactions = (
-  postId: string,
-  onUpdate: (count: number) => void
-) => {
+export const useRealtimeReactions = (postId: string, onUpdate: (count: number) => void) => {
   const channel = subscribeToTable('reactions', {
     filter: `post_id=eq.${postId}`,
     onInsert: () => {
@@ -71,10 +68,7 @@ export const useRealtimeReactions = (
   };
 };
 
-export const useRealtimeComments = (
-  postId: string,
-  onNewComment: (comment: any) => void
-) => {
+export const useRealtimeComments = (postId: string, onNewComment: (comment: any) => void) => {
   const channel = subscribeToTable('comments', {
     filter: `post_id=eq.${postId}`,
     onInsert: (payload) => {
@@ -87,10 +81,7 @@ export const useRealtimeComments = (
   };
 };
 
-export const useRealtimeViews = (
-  postId: string,
-  onUpdate: (count: number) => void
-) => {
+export const useRealtimeViews = (postId: string, onUpdate: (count: number) => void) => {
   const channel = subscribeToTable('posts', {
     filter: `id=eq.${postId}`,
     onUpdate: (payload) => {
@@ -151,9 +142,5 @@ export const optimisticAppend = <T>(current: T[], item: T): T[] => {
 };
 
 export const optimisticRemove = <T>(current: T[], predicate: (item: T) => boolean): T[] => {
-  return optimisticUpdate(current, (arr) => arr.filter(item => !predicate(item)));
+  return optimisticUpdate(current, (arr) => arr.filter((item) => !predicate(item)));
 };
-
-
-
-

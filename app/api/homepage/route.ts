@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { type NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { success, ApiError } from '@/lib/api';
@@ -16,7 +18,8 @@ const handler = async (request: NextRequest) => {
   // Fetch latest published posts
   const { data: posts, error: postsError } = await supabase
     .from('posts')
-    .select(`
+    .select(
+      `
       id,
       title,
       slug,
@@ -41,7 +44,8 @@ const handler = async (request: NextRequest) => {
         slug,
         color
       )
-    `)
+    `
+    )
     .eq('status', 'published')
     .order('published_at', { ascending: false })
     .limit(limit);
@@ -59,7 +63,9 @@ const handler = async (request: NextRequest) => {
 
   if (categoriesError) {
     logger.error('Categories fetch error', categoriesError);
-    throw new ApiError('Failed to fetch categories', 'DATABASE_ERROR', { error: categoriesError.message });
+    throw new ApiError('Failed to fetch categories', 'DATABASE_ERROR', {
+      error: categoriesError.message,
+    });
   }
 
   // Get category post counts
@@ -107,7 +113,7 @@ const handler = async (request: NextRequest) => {
         'We are taking back the media and giving you the keys.',
         'Want to write an article? Want to make a video? Want to make some art?',
         'scroungers multimedia is giving real people with skin in the game the opportunity to profit from their own political analysis.',
-        "All posts come with a user-inputted Ko-fi link. Want to support the creator? Go ahead!",
+        'All posts come with a user-inputted Ko-fi link. Want to support the creator? Go ahead!',
         "We retain 0% of the creators' intellectual property and we don't take a penny from their profit.",
       ],
     },
@@ -120,7 +126,8 @@ const handler = async (request: NextRequest) => {
       },
       {
         title: '100% Creator Revenue',
-        description: 'We pass every penny of donations directly to creators. Your work, your profit.',
+        description:
+          'We pass every penny of donations directly to creators. Your work, your profit.',
         icon: '💰',
       },
       {
@@ -130,7 +137,8 @@ const handler = async (request: NextRequest) => {
       },
       {
         title: 'Marginalized Voices First',
-        description: 'Perspectives from those most affected—not commentators watching from the sidelines.',
+        description:
+          'Perspectives from those most affected—not commentators watching from the sidelines.',
         icon: '📢',
       },
     ],
@@ -181,7 +189,3 @@ const handler = async (request: NextRequest) => {
 };
 
 export const GET = withRouteHandler(handler, { logRequest: true });
-
-
-
-

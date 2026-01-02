@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { type NextRequest } from 'next/server';
 import { z } from 'zod';
 import { success, handleApiError, parseParams, rateLimitByIp } from '@/lib/api';

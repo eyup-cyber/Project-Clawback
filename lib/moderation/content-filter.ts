@@ -3,8 +3,8 @@
  * Phase 20: Profanity filter, spam detection, content analysis
  */
 
-import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -85,7 +85,7 @@ const LEETSPEAK_MAP: Record<string, string> = {
   '5': 's',
   '7': 't',
   '@': 'a',
-  '$': 's',
+  $: 's',
 };
 
 /**
@@ -96,7 +96,10 @@ function normalizeText(text: string): string {
 
   // Replace leetspeak
   for (const [leet, char] of Object.entries(LEETSPEAK_MAP)) {
-    normalized = normalized.replace(new RegExp(leet.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), char);
+    normalized = normalized.replace(
+      new RegExp(leet.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+      char
+    );
   }
 
   // Remove repeated characters (e.g., "baaaddd" -> "bad")
@@ -254,7 +257,8 @@ export async function analyzeContent(
   const profanityFlag = checkProfanity(content);
   if (profanityFlag) {
     flags.push(profanityFlag);
-    score += profanityFlag.severity === 'high' ? 0.4 : profanityFlag.severity === 'medium' ? 0.25 : 0.1;
+    score +=
+      profanityFlag.severity === 'high' ? 0.4 : profanityFlag.severity === 'medium' ? 0.25 : 0.1;
   }
 
   // Check spam

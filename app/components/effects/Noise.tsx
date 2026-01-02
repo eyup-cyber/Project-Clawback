@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useId } from "react";
-import { prefersReducedMotion } from "@/lib/animations/gsap-config";
+import { useEffect, useId, useRef } from 'react';
+import { prefersReducedMotion } from '@/lib/animations/gsap-config';
 
 interface NoiseProps {
   opacity?: number;
@@ -15,8 +15,8 @@ export default function Noise({
   opacity = 0.03,
   animate = true,
   speed = 50,
-  className = "",
-  blendMode = "overlay",
+  className = '',
+  blendMode = 'overlay',
 }: NoiseProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef<number | undefined>(undefined);
@@ -25,7 +25,7 @@ export default function Noise({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     const resize = () => {
@@ -75,7 +75,7 @@ export default function Noise({
       className={`fixed inset-0 pointer-events-none z-[9990] ${className}`}
       style={{
         opacity,
-        mixBlendMode: blendMode as React.CSSProperties["mixBlendMode"],
+        mixBlendMode: blendMode as React.CSSProperties['mixBlendMode'],
       }}
       aria-hidden="true"
     >
@@ -83,9 +83,9 @@ export default function Noise({
         ref={canvasRef}
         className="w-full h-full"
         style={{
-          imageRendering: "pixelated",
-          transform: "scale(10)",
-          transformOrigin: "top left",
+          imageRendering: 'pixelated',
+          transform: 'scale(10)',
+          transformOrigin: 'top left',
         }}
       />
     </div>
@@ -96,7 +96,7 @@ export default function Noise({
 export function SVGNoise({
   opacity = 0.03,
   baseFrequency = 0.65,
-  className = "",
+  className = '',
 }: {
   opacity?: number;
   baseFrequency?: number;
@@ -123,7 +123,7 @@ export function SVGNoise({
         style={{
           opacity,
           filter: `url(#${filterId})`,
-          mixBlendMode: "overlay",
+          mixBlendMode: 'overlay',
         }}
         aria-hidden="true"
       />
@@ -141,17 +141,14 @@ interface GradientNoiseProps {
 }
 
 export function GradientNoise({
-  from = "transparent",
-  to = "rgba(0, 0, 0, 0.3)",
-  direction = "to bottom",
+  from = 'transparent',
+  to = 'rgba(0, 0, 0, 0.3)',
+  direction = 'to bottom',
   noiseOpacity = 0.05,
-  className = "",
+  className = '',
 }: GradientNoiseProps) {
   return (
-    <div
-      className={`absolute inset-0 pointer-events-none ${className}`}
-      aria-hidden="true"
-    >
+    <div className={`absolute inset-0 pointer-events-none ${className}`} aria-hidden="true">
       {/* Gradient layer */}
       <div
         className="absolute inset-0"
@@ -172,7 +169,7 @@ interface VignetteProps {
   className?: string;
 }
 
-export function Vignette({ intensity = 0.3, className = "" }: VignetteProps) {
+export function Vignette({ intensity = 0.3, className = '' }: VignetteProps) {
   return (
     <div
       className={`fixed inset-0 pointer-events-none z-[9989] ${className}`}
@@ -194,9 +191,9 @@ interface GridPatternProps {
 
 export function GridPattern({
   size = 50,
-  color = "var(--primary)",
+  color = 'var(--primary)',
   opacity = 0.05,
-  className = "",
+  className = '',
 }: GridPatternProps) {
   const id = useId();
   const patternId = `grid-${id.replace(/:/g, '')}`;
@@ -205,18 +202,8 @@ export function GridPattern({
     <>
       <svg className="fixed" aria-hidden="true" style={{ width: 0, height: 0 }}>
         <defs>
-          <pattern
-            id={patternId}
-            width={size}
-            height={size}
-            patternUnits="userSpaceOnUse"
-          >
-            <path
-              d={`M ${size} 0 L 0 0 0 ${size}`}
-              fill="none"
-              stroke={color}
-              strokeWidth="0.5"
-            />
+          <pattern id={patternId} width={size} height={size} patternUnits="userSpaceOnUse">
+            <path d={`M ${size} 0 L 0 0 0 ${size}`} fill="none" stroke={color} strokeWidth="0.5" />
           </pattern>
         </defs>
       </svg>
@@ -241,9 +228,9 @@ interface AnimatedGradientProps {
 }
 
 export function AnimatedGradient({
-  colors = ["var(--background)", "var(--surface)", "var(--background)"],
+  colors = ['var(--background)', 'var(--surface)', 'var(--background)'],
   speed = 10,
-  className = "",
+  className = '',
 }: AnimatedGradientProps) {
   if (prefersReducedMotion()) {
     return (
@@ -259,8 +246,8 @@ export function AnimatedGradient({
     <div
       className={`absolute inset-0 ${className}`}
       style={{
-        background: `linear-gradient(45deg, ${colors.join(", ")})`,
-        backgroundSize: "400% 400%",
+        background: `linear-gradient(45deg, ${colors.join(', ')})`,
+        backgroundSize: '400% 400%',
         animation: `gradient ${speed}s ease infinite`,
       }}
       aria-hidden="true"
@@ -289,11 +276,7 @@ interface ScanlinesProps {
   className?: string;
 }
 
-export function Scanlines({
-  opacity = 0.03,
-  size = 4,
-  className = "",
-}: ScanlinesProps) {
+export function Scanlines({ opacity = 0.03, size = 4, className = '' }: ScanlinesProps) {
   return (
     <div
       className={`fixed inset-0 pointer-events-none z-[9991] ${className}`}

@@ -24,23 +24,24 @@ export async function fetchPatreonImages(_postUrl: string): Promise<ImageFetchRe
   try {
     // Patreon post URLs typically look like:
     // https://www.patreon.com/posts/[post-id]
-    
+
     // Since Patreon requires authentication for API access,
     // we'll need to either:
     // 1. Use their RSS feed (if public)
     // 2. Scrape the page (may violate ToS)
     // 3. Use manual image URLs
-    
+
     // For now, we'll return a structure that allows manual URL input
     // In production, you'd want to:
     // - Set up Patreon API integration
     // - Or use a service like Zapier/Make to sync images
     // - Or manually provide image URLs
-    
+
     return {
       success: false,
       images: [],
-      error: 'Patreon API integration required. Please provide image URLs manually or set up Patreon API access.',
+      error:
+        'Patreon API integration required. Please provide image URLs manually or set up Patreon API access.',
     };
   } catch (error) {
     return {
@@ -59,9 +60,9 @@ export async function fetchXImages(postUrl: string): Promise<ImageFetchResult> {
   try {
     // Twitter/X oEmbed endpoint
     // Format: https://publish.twitter.com/oembed?url=[tweet-url]
-    
+
     const oembedUrl = `https://publish.twitter.com/oembed?url=${encodeURIComponent(postUrl)}`;
-    
+
     const response = await fetch(oembedUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; ScroungersMedia/1.0)',
@@ -73,12 +74,12 @@ export async function fetchXImages(postUrl: string): Promise<ImageFetchResult> {
     }
 
     const data = await response.json();
-    
+
     // Extract images from the HTML
     const html = data.html || '';
     const imageRegex = /<img[^>]+src="([^"]+)"/g;
     const images: ImageInfo[] = [];
-    
+
     let match;
     while ((match = imageRegex.exec(html)) !== null) {
       const imageUrl = match[1];
@@ -137,7 +138,7 @@ export async function fetchImagesFromUrl(url: string): Promise<ImageFetchResult>
           'User-Agent': 'Mozilla/5.0 (compatible; ScroungersMedia/1.0)',
         },
       });
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch URL: ${response.statusText}`);
       }
@@ -145,15 +146,15 @@ export async function fetchImagesFromUrl(url: string): Promise<ImageFetchResult>
       const html = await response.text();
       const imageRegex = /<img[^>]+src="([^"]+)"/gi;
       const images: ImageInfo[] = [];
-      
+
       let match;
       while ((match = imageRegex.exec(html)) !== null) {
         const imageUrl = match[1];
         // Convert relative URLs to absolute
-        const absoluteUrl = imageUrl.startsWith('http') 
-          ? imageUrl 
+        const absoluteUrl = imageUrl.startsWith('http')
+          ? imageUrl
           : new URL(imageUrl, url).toString();
-        
+
         images.push({
           url: absoluteUrl,
           alt: match[0].match(/alt="([^"]*)"/)?.[1] || 'Image',
@@ -182,7 +183,7 @@ export async function downloadImage(imageUrl: string): Promise<Blob> {
   const headers: HeadersInit = {
     'User-Agent': 'Mozilla/5.0 (compatible; ScroungersMedia/1.0)',
   };
-  
+
   if (imageUrl.includes('twitter.com') || imageUrl.includes('x.com')) {
     headers['Referer'] = 'https://twitter.com';
   }
@@ -199,20 +200,21 @@ export async function downloadImage(imageUrl: string): Promise<Blob> {
 /**
  * Get image dimensions from a URL
  */
-export async function getImageDimensions(imageUrl: string): Promise<{ width: number; height: number } | null> {
+export async function getImageDimensions(
+  imageUrl: string
+): Promise<{ width: number; height: number } | null> {
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    
+
     img.onload = () => {
       resolve({ width: img.width, height: img.height });
     };
-    
+
     img.onerror = () => {
       resolve(null);
     };
-    
+
     img.src = imageUrl;
   });
 }
-

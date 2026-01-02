@@ -1,5 +1,5 @@
-import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/server';
 
 export interface SiteContent {
   mission_statement: {
@@ -30,13 +30,14 @@ const DEFAULT_CONTENT: SiteContent = {
       'Want to write an article? Want to make a video? Want to make some art?',
       'scroungers multimedia is giving real people with skin in the game the opportunity to profit from their own political analysis.',
       'All posts come with a user-inputted Ko-fi link. Want to support the creator? Go ahead!',
-      'We retain 0% of the creators\' intellectual property and we don\'t take a penny from their profit.',
+      "We retain 0% of the creators' intellectual property and we don't take a penny from their profit.",
     ],
   },
   pillars: [
     {
       title: 'No Gatekeepers',
-      description: 'No journalism degrees required. If you have skin in the game and a story to tell, you belong here.',
+      description:
+        'No journalism degrees required. If you have skin in the game and a story to tell, you belong here.',
       icon: '🚪',
     },
     {
@@ -51,7 +52,8 @@ const DEFAULT_CONTENT: SiteContent = {
     },
     {
       title: 'Marginalized Voices First',
-      description: 'Perspectives from those most affected—not commentators watching from the sidelines.',
+      description:
+        'Perspectives from those most affected—not commentators watching from the sidelines.',
       icon: '📢',
     },
   ],
@@ -92,7 +94,7 @@ const DEFAULT_CONTENT: SiteContent = {
  */
 export async function getSiteContent(): Promise<SiteContent> {
   const supabase = await createClient();
-  
+
   const { data: settings, error } = await supabase
     .from('site_settings')
     .select('key, value')
@@ -107,10 +109,8 @@ export async function getSiteContent(): Promise<SiteContent> {
 
   settings?.forEach((setting) => {
     try {
-      const parsed = typeof setting.value === 'string' 
-        ? JSON.parse(setting.value) 
-        : setting.value;
-      
+      const parsed = typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
+
       if (setting.key === 'mission_statement') {
         content.mission_statement = parsed;
       } else if (setting.key === 'pillars') {
@@ -141,21 +141,15 @@ export async function updateSiteContent(
   value: any
 ): Promise<void> {
   const supabase = await createClient();
-  
-  const { error } = await supabase
-    .from('site_settings')
-    .upsert({
-      key,
-      value: typeof value === 'string' ? value : JSON.stringify(value),
-      updated_at: new Date().toISOString(),
-    });
+
+  const { error } = await supabase.from('site_settings').upsert({
+    key,
+    value: typeof value === 'string' ? value : JSON.stringify(value),
+    updated_at: new Date().toISOString(),
+  });
 
   if (error) {
     logger.error('Error updating site content', error, { key });
     throw new Error('Failed to update site content');
   }
 }
-
-
-
-

@@ -4,12 +4,12 @@
 
 'use client';
 
+import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
 import useSWR from 'swr';
-import Link from 'next/link';
-import Image from 'next/image';
-import { formatRelativeTime } from '@/lib/utils';
 import EmptyState from '@/app/components/dashboard/shared/EmptyState';
+import { formatRelativeTime } from '@/lib/utils';
 
 interface Bookmark {
   id: string;

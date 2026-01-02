@@ -1,9 +1,18 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ANIMATION, EASING, DURATION, STAGGER, SCROLL_TRIGGER, prefersReducedMotion, getDuration, getStagger } from '../animations/gsap-config';
+import { useCallback, useEffect, useRef } from 'react';
+import {
+  ANIMATION,
+  DURATION,
+  EASING,
+  getDuration,
+  getStagger,
+  prefersReducedMotion,
+  SCROLL_TRIGGER,
+  STAGGER,
+} from '../animations/gsap-config';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -58,14 +67,14 @@ export function useScrollAnimation(options: ScrollAnimationOptions = {}): UseScr
 
   const triggerAnimation = useCallback(() => {
     if (!ref.current || prefersReducedMotion()) return;
-    
+
     const preset = ANIMATION[animation];
     const fromVars = from || preset.from;
     const toVars = to || preset.to;
 
     animationRef.current = gsap.fromTo(ref.current, fromVars, {
       ...toVars,
-      duration: getDuration(toVars.duration as number || DURATION.medium),
+      duration: getDuration((toVars.duration as number) || DURATION.medium),
       delay,
     });
   }, [animation, from, to, delay]);
@@ -98,7 +107,7 @@ export function useScrollAnimation(options: ScrollAnimationOptions = {}): UseScr
       // Create animation with ScrollTrigger
       animationRef.current = gsap.to(ref.current, {
         ...toVars,
-        duration: getDuration(toVars.duration as number || DURATION.medium),
+        duration: getDuration((toVars.duration as number) || DURATION.medium),
         stagger: stagger ? getStagger(stagger) : undefined,
         delay,
         scrollTrigger: {
@@ -126,9 +135,29 @@ export function useScrollAnimation(options: ScrollAnimationOptions = {}): UseScr
         scrollTriggerRef.current.kill();
       }
     };
-  }, [animation, from, to, start, end, scrub, pin, markers, toggleActions, stagger, delay, onEnter, onLeave, onEnterBack, onLeaveBack]);
+  }, [
+    animation,
+    from,
+    to,
+    start,
+    end,
+    scrub,
+    pin,
+    markers,
+    toggleActions,
+    stagger,
+    delay,
+    onEnter,
+    onLeave,
+    onEnterBack,
+    onLeaveBack,
+  ]);
 
-  return { ref: ref as React.RefObject<HTMLElement | null>, triggerAnimation, reverseAnimation };
+  return {
+    ref: ref as React.RefObject<HTMLElement | null>,
+    triggerAnimation,
+    reverseAnimation,
+  };
 }
 
 // Hook for staggered children animations
@@ -140,7 +169,7 @@ interface StaggerOptions extends ScrollAnimationOptions {
 
 export function useStaggeredScrollAnimation(options: StaggerOptions = {}) {
   const ref = useRef<HTMLElement>(null);
-  
+
   const {
     animation = 'fadeInUp',
     childSelector = '> *',
@@ -171,7 +200,7 @@ export function useStaggeredScrollAnimation(options: StaggerOptions = {}) {
 
       gsap.to(children, {
         ...preset.to,
-        duration: getDuration(preset.to.duration as number || DURATION.medium),
+        duration: getDuration((preset.to.duration as number) || DURATION.medium),
         stagger: {
           amount: getStagger(staggerAmount * children.length),
           from: staggerFrom,
@@ -188,7 +217,17 @@ export function useStaggeredScrollAnimation(options: StaggerOptions = {}) {
     }, ref);
 
     return () => ctx.revert();
-  }, [animation, childSelector, staggerAmount, staggerFrom, start, scrub, markers, toggleActions, delay]);
+  }, [
+    animation,
+    childSelector,
+    staggerAmount,
+    staggerFrom,
+    start,
+    scrub,
+    markers,
+    toggleActions,
+    delay,
+  ]);
 
   return ref;
 }
@@ -203,13 +242,8 @@ interface ParallaxScrollOptions {
 
 export function useParallaxScroll(options: ParallaxScrollOptions = {}) {
   const ref = useRef<HTMLElement>(null);
-  
-  const {
-    speed = 0.5,
-    direction = 'up',
-    start = 'top bottom',
-    end = 'bottom top',
-  } = options;
+
+  const { speed = 0.5, direction = 'up', start = 'top bottom', end = 'bottom top' } = options;
 
   useEffect(() => {
     if (!ref.current || prefersReducedMotion()) return;
@@ -266,9 +300,3 @@ export function useScrollProgress(options: { start?: string; end?: string } = {}
 }
 
 export default useScrollAnimation;
-
-
-
-
-
-

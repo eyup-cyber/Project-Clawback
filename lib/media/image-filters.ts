@@ -370,7 +370,7 @@ export async function applyAdjustments(
 
         // Exposure
         if (adjustments.exposure) {
-          const exposure = Math.pow(2, adjustments.exposure / 50);
+          const exposure = 2 ** (adjustments.exposure / 50);
           r *= exposure;
           g *= exposure;
           b *= exposure;
@@ -449,10 +449,7 @@ export async function applyAdjustments(
 /**
  * Apply transform to an image
  */
-export async function applyTransform(
-  imageUrl: string,
-  transform: ImageTransform
-): Promise<string> {
+export async function applyTransform(imageUrl: string, transform: ImageTransform): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
@@ -503,10 +500,7 @@ export async function applyTransform(
 /**
  * Crop an image
  */
-export async function cropImage(
-  imageUrl: string,
-  crop: CropArea
-): Promise<string> {
+export async function cropImage(imageUrl: string, crop: CropArea): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
@@ -523,17 +517,7 @@ export async function cropImage(
       canvas.width = crop.width;
       canvas.height = crop.height;
 
-      ctx.drawImage(
-        img,
-        crop.x,
-        crop.y,
-        crop.width,
-        crop.height,
-        0,
-        0,
-        crop.width,
-        crop.height
-      );
+      ctx.drawImage(img, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height);
 
       resolve(canvas.toDataURL('image/jpeg', 0.9));
     };
@@ -603,10 +587,7 @@ export async function resizeImage(
 /**
  * Apply a preset filter
  */
-export async function applyFilter(
-  imageUrl: string,
-  filterId: string
-): Promise<string> {
+export async function applyFilter(imageUrl: string, filterId: string): Promise<string> {
   const filter = PRESET_FILTERS.find((f) => f.id === filterId);
   if (!filter || filterId === 'none') {
     return imageUrl;
@@ -628,10 +609,9 @@ export async function generateFilterPreviews(
   const previews: { filterId: string; previewUrl: string }[] = [];
 
   for (const filter of PRESET_FILTERS) {
-    const previewUrl = filter.id === 'none'
-      ? thumbnail
-      : await applyAdjustments(thumbnail, filter.adjustments);
-    
+    const previewUrl =
+      filter.id === 'none' ? thumbnail : await applyAdjustments(thumbnail, filter.adjustments);
+
     previews.push({
       filterId: filter.id,
       previewUrl,
@@ -719,10 +699,7 @@ export function createEditorState(imageUrl: string): ImageEditorState {
 /**
  * Add to history
  */
-export function addToHistory(
-  state: ImageEditorState,
-  action: string
-): ImageEditorState {
+export function addToHistory(state: ImageEditorState, action: string): ImageEditorState {
   const entry: ImageHistoryEntry = {
     timestamp: Date.now(),
     action,

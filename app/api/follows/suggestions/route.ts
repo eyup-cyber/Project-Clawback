@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Get Suggested Follows API
  */

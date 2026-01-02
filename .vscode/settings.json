@@ -1,3 +1,22 @@
 {
-  "todo-tree.tree.scanMode": "open files"
+  "yaml.schemas": {
+    "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/schemas/v3.1/schema.json": "docs/openapi.yaml"
+  },
+  "todo-tree.tree.scanMode": "open files",
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "never"
+  },
+  "markdownlint.run": "onSave",
+  "markdownlint.config": {
+    "default": false
+  },
+  "biome.enabled": false,
+  "css.lint.unknownAtRules": "ignore",
+  "editor.formatOnSave": false,
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "[markdown]": {
+    "editor.defaultFormatter": null,
+    "editor.formatOnSave": false
+  },
+  "editor.microsoft-editor.enable": false
 }

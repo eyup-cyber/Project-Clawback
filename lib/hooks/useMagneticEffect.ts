@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useCallback, type RefObject } from 'react';
 import gsap from 'gsap';
+import { type RefObject, useCallback, useEffect, useRef } from 'react';
 import { EASING, prefersReducedMotion } from '../animations/gsap-config';
 
 interface MagneticOptions {

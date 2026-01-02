@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import Nav from '../components/Nav';
-import Footer from '../components/layout/Footer';
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
+import Footer from '../components/layout/Footer';
+import Nav from '../components/Nav';
 
 export default function DonatePage() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -29,45 +29,87 @@ export default function DonatePage() {
             <span className="text-6xl block mb-4">💚</span>
             <h1
               className="text-5xl font-bold mb-4"
-              style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--primary)' }}
+              style={{
+                fontFamily: 'var(--font-kindergarten)',
+                color: 'var(--primary)',
+              }}
             >
               support scroungers
             </h1>
             <p
               className="text-xl max-w-2xl mx-auto"
-              style={{ color: 'var(--foreground)', opacity: 0.8, fontFamily: 'var(--font-body)' }}
+              style={{
+                color: 'var(--foreground)',
+                opacity: 0.8,
+                fontFamily: 'var(--font-body)',
+              }}
             >
-              Your donations help keep this platform running and ensure we can continue amplifying marginalized voices.
+              Your donations help keep this platform running and ensure we can continue amplifying
+              marginalized voices.
             </p>
           </div>
 
           {/* Our model */}
           <div
             className="p-8 rounded-lg mb-12"
-            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+            }}
           >
             <h2
               className="text-2xl font-bold mb-4"
-              style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--secondary)' }}
+              style={{
+                fontFamily: 'var(--font-kindergarten)',
+                color: 'var(--secondary)',
+              }}
             >
               Our Revenue Model
             </h2>
-            <p className="mb-4" style={{ color: 'var(--foreground)', opacity: 0.85, fontFamily: 'var(--font-body)' }}>
-              Scroungers Multimedia is built on a radical principle: <strong style={{ color: 'var(--primary)' }}>0% platform fees</strong>. 
-              Every donation made to a contributor through their Ko-fi link goes directly to them—we don&apos;t take a cut.
+            <p
+              className="mb-4"
+              style={{
+                color: 'var(--foreground)',
+                opacity: 0.85,
+                fontFamily: 'var(--font-body)',
+              }}
+            >
+              Scroungers Multimedia is built on a radical principle:{' '}
+              <strong style={{ color: 'var(--primary)' }}>0% platform fees</strong>. Every donation
+              made to a contributor through their Ko-fi link goes directly to them—we don&apos;t
+              take a cut.
             </p>
-            <p className="mb-4" style={{ color: 'var(--foreground)', opacity: 0.85, fontFamily: 'var(--font-body)' }}>
-              So how do we keep the lights on? Through direct donations to the platform itself, and eventually through optional membership tiers that provide cosmetic benefits while keeping all content free and open.
+            <p
+              className="mb-4"
+              style={{
+                color: 'var(--foreground)',
+                opacity: 0.85,
+                fontFamily: 'var(--font-body)',
+              }}
+            >
+              So how do we keep the lights on? Through direct donations to the platform itself, and
+              eventually through optional membership tiers that provide cosmetic benefits while
+              keeping all content free and open.
             </p>
-            <p style={{ color: 'var(--foreground)', opacity: 0.85, fontFamily: 'var(--font-body)' }}>
-              We believe media platforms shouldn&apos;t profit from the labor of the people who create the content.
+            <p
+              style={{
+                color: 'var(--foreground)',
+                opacity: 0.85,
+                fontFamily: 'var(--font-body)',
+              }}
+            >
+              We believe media platforms shouldn&apos;t profit from the labor of the people who
+              create the content.
             </p>
           </div>
 
           {/* Ways to support */}
           <h2
             className="text-2xl font-bold mb-6 text-center"
-            style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--primary)' }}
+            style={{
+              fontFamily: 'var(--font-kindergarten)',
+              color: 'var(--primary)',
+            }}
           >
             Ways to Support
           </h2>
@@ -76,24 +118,34 @@ export default function DonatePage() {
             {/* Support the platform */}
             <div
               className="p-8 rounded-lg text-center"
-              style={{ background: 'var(--surface)', border: '2px solid var(--primary)' }}
+              style={{
+                background: 'var(--surface)',
+                border: '2px solid var(--primary)',
+              }}
             >
               <span className="text-4xl block mb-4">🏛️</span>
               <h3
                 className="text-xl font-bold mb-3"
-                style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--primary)' }}
+                style={{
+                  fontFamily: 'var(--font-kindergarten)',
+                  color: 'var(--primary)',
+                }}
               >
                 Support the Platform
               </h3>
               <p className="mb-6" style={{ color: 'var(--foreground)', opacity: 0.8 }}>
-                Donations to Scroungers Multimedia help cover hosting, development, and moderation costs.
+                Donations to Scroungers Multimedia help cover hosting, development, and moderation
+                costs.
               </p>
               <a
                 href="https://ko-fi.com/scroungers"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-transform hover:scale-105"
-                style={{ background: 'var(--primary)', color: 'var(--background)' }}
+                style={{
+                  background: 'var(--primary)',
+                  color: 'var(--background)',
+                }}
               >
                 ☕ Ko-fi/Scroungers
               </a>
@@ -102,22 +154,32 @@ export default function DonatePage() {
             {/* Support contributors */}
             <div
               className="p-8 rounded-lg text-center"
-              style={{ background: 'var(--surface)', border: '2px solid var(--secondary)' }}
+              style={{
+                background: 'var(--surface)',
+                border: '2px solid var(--secondary)',
+              }}
             >
               <span className="text-4xl block mb-4">✍️</span>
               <h3
                 className="text-xl font-bold mb-3"
-                style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--secondary)' }}
+                style={{
+                  fontFamily: 'var(--font-kindergarten)',
+                  color: 'var(--secondary)',
+                }}
               >
                 Support Contributors
               </h3>
               <p className="mb-6" style={{ color: 'var(--foreground)', opacity: 0.8 }}>
-                Love a specific contributor&apos;s work? Donate directly to them through their Ko-fi link.
+                Love a specific contributor&apos;s work? Donate directly to them through their Ko-fi
+                link.
               </p>
               <Link
                 href="/contributors"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-transform hover:scale-105"
-                style={{ background: 'var(--secondary)', color: 'var(--background)' }}
+                style={{
+                  background: 'var(--secondary)',
+                  color: 'var(--background)',
+                }}
               >
                 Browse Contributors →
               </Link>
@@ -127,11 +189,17 @@ export default function DonatePage() {
           {/* Other ways to help */}
           <div
             className="p-8 rounded-lg"
-            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+            }}
           >
             <h2
               className="text-2xl font-bold mb-4 text-center"
-              style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--secondary)' }}
+              style={{
+                fontFamily: 'var(--font-kindergarten)',
+                color: 'var(--secondary)',
+              }}
             >
               Other Ways to Help
             </h2>
@@ -160,7 +228,11 @@ export default function DonatePage() {
                   Contribute
                 </h4>
                 <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.7 }}>
-                  Have a story? <Link href="/apply" style={{ color: 'var(--primary)' }}>Apply to become a contributor</Link>.
+                  Have a story?{' '}
+                  <Link href="/apply" style={{ color: 'var(--primary)' }}>
+                    Apply to become a contributor
+                  </Link>
+                  .
                 </p>
               </div>
             </div>
@@ -169,7 +241,11 @@ export default function DonatePage() {
           {/* Transparency */}
           <div className="mt-12 text-center">
             <p style={{ color: 'var(--foreground)', opacity: 0.6 }}>
-              We&apos;re committed to transparency. Questions about how funds are used? <Link href="/contact" style={{ color: 'var(--primary)' }}>Contact us</Link>.
+              We&apos;re committed to transparency. Questions about how funds are used?{' '}
+              <Link href="/contact" style={{ color: 'var(--primary)' }}>
+                Contact us
+              </Link>
+              .
             </p>
           </div>
         </div>

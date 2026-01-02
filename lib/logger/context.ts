@@ -70,10 +70,7 @@ export function getContext(requestId?: string): RequestContext | undefined {
 /**
  * Update context with additional data.
  */
-export function updateContext(
-  requestId: string,
-  data: Partial<RequestContext>
-): void {
+export function updateContext(requestId: string, data: Partial<RequestContext>): void {
   const context = contextStore.get(requestId) || asyncContext.getStore();
   if (context) {
     Object.assign(context, data);

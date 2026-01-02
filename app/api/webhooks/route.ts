@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Webhooks API
  * CRUD operations for webhook subscriptions

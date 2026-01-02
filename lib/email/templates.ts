@@ -28,7 +28,7 @@ function baseTemplate(content: string, previewText: string = ''): string {
 </head>
 <body style="margin: 0; padding: 0; width: 100%; background-color: #0D0D0D; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
   ${previewText ? `<div style="display: none; max-height: 0; overflow: hidden;">${previewText}</div>` : ''}
-  
+
   <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #0D0D0D;">
     <tr>
       <td align="center" style="padding: 40px 20px;">
@@ -42,14 +42,14 @@ function baseTemplate(content: string, previewText: string = ''): string {
               </a>
             </td>
           </tr>
-          
+
           <!-- Content -->
           <tr>
             <td style="background-color: #1A1A1A; border-radius: 12px; padding: 40px; border: 1px solid #2A2A2A;">
               ${content}
             </td>
           </tr>
-          
+
           <!-- Footer -->
           <tr>
             <td align="center" style="padding: 30px 0; color: #666666; font-size: 12px;">
@@ -118,7 +118,10 @@ export function welcomeEmail(name: string): { html: string; subject: string } {
 // ============================================================================
 // APPLICATION APPROVED EMAIL
 // ============================================================================
-export function applicationApprovedEmail(name: string): { html: string; subject: string } {
+export function applicationApprovedEmail(name: string): {
+  html: string;
+  subject: string;
+} {
   const content = `
     <h1 style="margin: 0 0 20px; color: #ffffff; font-size: 24px; font-weight: 600;">
       Congratulations, ${name}! 🎊
@@ -152,7 +155,10 @@ export function applicationApprovedEmail(name: string): { html: string; subject:
 // ============================================================================
 // APPLICATION REJECTED EMAIL
 // ============================================================================
-export function applicationRejectedEmail(name: string): { html: string; subject: string } {
+export function applicationRejectedEmail(name: string): {
+  html: string;
+  subject: string;
+} {
   const content = `
     <h1 style="margin: 0 0 20px; color: #ffffff; font-size: 24px; font-weight: 600;">
       Application Update
@@ -256,7 +262,10 @@ export function newCommentEmail(
 // ============================================================================
 // NEWSLETTER WELCOME EMAIL
 // ============================================================================
-export function newsletterWelcomeEmail(_email: string): { html: string; subject: string } {
+export function newsletterWelcomeEmail(_email: string): {
+  html: string;
+  subject: string;
+} {
   const content = `
     <h1 style="margin: 0 0 20px; color: #ffffff; font-size: 24px; font-weight: 600;">
       You're Subscribed! 📬
@@ -290,7 +299,10 @@ export function newsletterWelcomeEmail(_email: string): { html: string; subject:
 // ============================================================================
 // PASSWORD RESET EMAIL
 // ============================================================================
-export function passwordResetEmail(resetUrl: string): { html: string; subject: string } {
+export function passwordResetEmail(resetUrl: string): {
+  html: string;
+  subject: string;
+} {
   const content = `
     <h1 style="margin: 0 0 20px; color: #ffffff; font-size: 24px; font-weight: 600;">
       Reset Your Password
@@ -330,13 +342,17 @@ export function postRejectedEmail(
     <p style="margin: 0 0 20px; color: #cccccc; font-size: 16px; line-height: 1.6;">
       Your post "<strong style="color: #ffffff;">${postTitle}</strong>" has been reviewed but wasn't approved for publication at this time.
     </p>
-    ${reason ? `
+    ${
+      reason
+        ? `
     <div style="margin: 0 0 20px; padding: 15px; background-color: #252525; border-radius: 8px; border-left: 3px solid ${ACCENT_COLOR};">
       <p style="margin: 0; color: #cccccc; font-size: 14px;">
         <strong style="color: #ffffff;">Feedback:</strong> ${reason}
       </p>
     </div>
-    ` : ''}
+    `
+        : ''
+    }
     <p style="margin: 0 0 20px; color: #cccccc; font-size: 16px; line-height: 1.6;">
       You can revise your post based on the feedback and resubmit for review.
     </p>
@@ -423,10 +439,7 @@ export function reactionMilestoneEmail(
 // ============================================================================
 // ROLE CHANGED EMAIL
 // ============================================================================
-export function roleChangedEmail(
-  name: string,
-  newRole: string
-): { html: string; subject: string } {
+export function roleChangedEmail(name: string, newRole: string): { html: string; subject: string } {
   const roleDescriptions: Record<string, string> = {
     contributor: 'You can now create and submit content for review.',
     editor: 'You can now review, edit, and publish content from other contributors.',
@@ -460,9 +473,10 @@ export function roleChangedEmail(
 // ============================================================================
 // APPLICATION RECEIVED EMAIL
 // ============================================================================
-export function applicationReceivedEmail(
-  name: string
-): { html: string; subject: string } {
+export function applicationReceivedEmail(name: string): {
+  html: string;
+  subject: string;
+} {
   const content = `
     <h1 style="margin: 0 0 20px; color: #ffffff; font-size: 24px; font-weight: 600;">
       Application Received! ✅
@@ -534,9 +548,3 @@ export function contactAdminNotificationEmail(
     subject: `New Contact: ${subject}`,
   };
 }
-
-
-
-
-
-

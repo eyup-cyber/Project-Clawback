@@ -1,44 +1,73 @@
 # Staging environment template
+# Copy this file to .env.staging.local and fill in your staging values
+# ⚠️ NEVER commit actual staging secrets to version control!
 
-# Core
+# ============================================================================
+# CORE CONFIGURATION
+# ============================================================================
 NODE_ENV=staging
 NEXT_PUBLIC_SITE_URL=https://staging.scroungers.co
 NEXT_PUBLIC_APP_NAME=Scroungers Multimedia (Staging)
 
-# Supabase
+# ============================================================================
+# SUPABASE (Required)
+# ============================================================================
+# Get these values from: https://app.supabase.com → Your Staging Project → Settings → API
+# - Project URL → NEXT_PUBLIC_SUPABASE_URL (format: https://xxxxx.supabase.co)
+# - anon/public key → NEXT_PUBLIC_SUPABASE_ANON_KEY (safe for client-side use)
+# - service_role key → SUPABASE_SERVICE_ROLE_KEY (SERVER-SIDE ONLY - never expose to browser!)
 NEXT_PUBLIC_SUPABASE_URL=https://YOUR-STAGING-PROJECT.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 
-# Cloudflare R2
+# ============================================================================
+# CLOUDFLARE R2 STORAGE (Recommended for staging)
+# ============================================================================
+# Configure in Cloudflare Dashboard → R2 → Create Staging Bucket
+# Create API tokens with R2 read/write permissions
 R2_ACCOUNT_ID=
 R2_ACCESS_KEY_ID=
 R2_SECRET_ACCESS_KEY=
 R2_BUCKET_NAME=scroungers-media-staging
 R2_PUBLIC_URL=https://media-staging.scroungers.co
 
-# Email (Resend)
+# ============================================================================
+# EMAIL SERVICE (Resend) - Recommended for staging
+# ============================================================================
+# Get your API key from: https://resend.com/api-keys
 RESEND_API_KEY=
 FROM_EMAIL="Scroungers <hello@staging.scroungers.co>"
 ADMIN_EMAIL=admin@scroungers.co
 
-# Redis (optional cache)
+# ============================================================================
+# REDIS CACHE (Optional but recommended for staging)
+# ============================================================================
+# Use managed Redis service or self-hosted
 REDIS_URL=
 
-# Security
+# ============================================================================
+# SECURITY KEYS (Required)
+# ============================================================================
+# Generate secure random strings (use different values from production!):
+#   CSRF_SECRET: openssl rand -hex 16 (minimum 32 characters)
+#   JWT_SECRET: openssl rand -hex 32 (minimum 64 characters)
 CSRF_SECRET=change_me_32_chars_min
 JWT_SECRET=change_me_64_chars_min
 
-# Monitoring / Analytics (optional)
+# ============================================================================
+# MONITORING & ANALYTICS (Recommended for staging)
+# ============================================================================
 SENTRY_DSN=
 LOGROCKET_APP_ID=
 NEXT_PUBLIC_GA_ID=
 PLAUSIBLE_DOMAIN=staging.scroungers.co
 
-# Feature flags / logging
+# ============================================================================
+# FEATURE FLAGS & LOGGING
+# ============================================================================
 FEATURE_EMAIL_NOTIFICATIONS=true
 FEATURE_REDIS_CACHE=false
 FEATURE_MONITORING=true
 RATE_LIMIT_ENABLED=false
-LOG_LEVEL=debug
+LOG_LEVEL=debug  # debug, info, warn, error
 

@@ -18,7 +18,7 @@ export function Skeleton({
   animation = 'shimmer',
 }: SkeletonProps) {
   const baseStyles = 'relative overflow-hidden';
-  
+
   const variantStyles = {
     text: 'rounded',
     circular: 'rounded-full',
@@ -40,12 +40,7 @@ export function Skeleton({
 
   return (
     <div
-      className={cn(
-        baseStyles,
-        variantStyles[variant],
-        animationStyles[animation],
-        className
-      )}
+      className={cn(baseStyles, variantStyles[variant], animationStyles[animation], className)}
       style={style}
     >
       {animation === 'shimmer' && (
@@ -76,45 +71,36 @@ export function SkeletonText({ lines = 3, className }: { lines?: number; classNa
   return (
     <div className={cn('space-y-2', className)}>
       {Array.from({ length: lines }).map((_, i) => (
-        <Skeleton
-          key={i}
-          variant="text"
-          height="1rem"
-          width={i === lines - 1 ? '70%' : '100%'}
-        />
+        <Skeleton key={i} variant="text" height="1rem" width={i === lines - 1 ? '70%' : '100%'} />
       ))}
     </div>
   );
 }
 
 export function SkeletonAvatar({ size = 40, className }: { size?: number; className?: string }) {
-  return (
-    <Skeleton
-      variant="circular"
-      width={size}
-      height={size}
-      className={className}
-    />
-  );
+  return <Skeleton variant="circular" width={size} height={size} className={className} />;
 }
 
 export function SkeletonCard({ className }: { className?: string }) {
   return (
     <div
       className={cn('rounded-xl overflow-hidden', className)}
-      style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+      style={{
+        background: 'var(--surface)',
+        border: '1px solid var(--border)',
+      }}
     >
       {/* Image placeholder */}
       <Skeleton variant="rectangular" height={200} />
-      
+
       {/* Content */}
       <div className="p-4 space-y-3">
         {/* Title */}
         <Skeleton variant="text" height="1.5rem" width="80%" />
-        
+
         {/* Description */}
         <SkeletonText lines={2} />
-        
+
         {/* Footer */}
         <div className="flex items-center gap-3 pt-2">
           <SkeletonAvatar size={32} />
@@ -152,24 +138,26 @@ export function SkeletonTable({ rows = 5, columns = 4 }: { rows?: number; column
   return (
     <div
       className="rounded-xl overflow-hidden"
-      style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+      style={{
+        background: 'var(--surface)',
+        border: '1px solid var(--border)',
+      }}
     >
       {/* Header */}
-      <div
-        className="flex gap-4 p-4"
-        style={{ borderBottom: '1px solid var(--border)' }}
-      >
+      <div className="flex gap-4 p-4" style={{ borderBottom: '1px solid var(--border)' }}>
         {Array.from({ length: columns }).map((_, i) => (
           <Skeleton key={i} variant="text" height="1rem" className="flex-1" />
         ))}
       </div>
-      
+
       {/* Rows */}
       {Array.from({ length: rows }).map((_, rowIdx) => (
         <div
           key={rowIdx}
           className="flex gap-4 p-4"
-          style={{ borderBottom: rowIdx < rows - 1 ? '1px solid var(--border)' : 'none' }}
+          style={{
+            borderBottom: rowIdx < rows - 1 ? '1px solid var(--border)' : 'none',
+          }}
         >
           {Array.from({ length: columns }).map((_, colIdx) => (
             <Skeleton
@@ -197,16 +185,10 @@ export function SkeletonPage() {
           <Skeleton variant="text" height="3rem" width="60%" />
           <Skeleton variant="text" height="1.25rem" width="80%" />
         </div>
-        
+
         {/* Content grid */}
         <SkeletonArticleList count={8} />
       </div>
     </div>
   );
 }
-
-
-
-
-
-

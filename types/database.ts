@@ -1,34 +1,12 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[];
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
-export type UserRole =
-  | "reader"
-  | "contributor"
-  | "editor"
-  | "admin"
-  | "superadmin";
-export type UserStatus = "active" | "suspended" | "banned";
-export type PostStatus =
-  | "draft"
-  | "pending"
-  | "scheduled"
-  | "published"
-  | "archived"
-  | "rejected";
-export type ContentType = "written" | "video" | "audio" | "visual";
-export type ApplicationStatus =
-  | "pending"
-  | "reviewing"
-  | "approved"
-  | "rejected"
-  | "waitlisted";
-export type CommentStatus = "visible" | "hidden" | "flagged" | "deleted";
-export type ReactionType = "star" | "fire" | "heart" | "clap" | "think";
+export type UserRole = 'reader' | 'contributor' | 'editor' | 'admin' | 'superadmin';
+export type UserStatus = 'active' | 'suspended' | 'banned';
+export type PostStatus = 'draft' | 'pending' | 'scheduled' | 'published' | 'archived' | 'rejected';
+export type ContentType = 'written' | 'video' | 'audio' | 'visual';
+export type ApplicationStatus = 'pending' | 'reviewing' | 'approved' | 'rejected' | 'waitlisted';
+export type CommentStatus = 'visible' | 'hidden' | 'flagged' | 'deleted';
+export type ReactionType = 'star' | 'fire' | 'heart' | 'clap' | 'think';
 
 export interface Database {
   public: {
@@ -153,19 +131,19 @@ export interface Database {
         };
         Relationships: [
           {
-            foreignKeyName: "contributor_applications_user_id_fkey";
-            columns: ["user_id"];
+            foreignKeyName: 'contributor_applications_user_id_fkey';
+            columns: ['user_id'];
             isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
           },
           {
-            foreignKeyName: "contributor_applications_reviewer_id_fkey";
-            columns: ["reviewer_id"];
+            foreignKeyName: 'contributor_applications_reviewer_id_fkey';
+            columns: ['reviewer_id'];
             isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          }
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
         ];
       };
       categories: {
@@ -208,12 +186,12 @@ export interface Database {
         };
         Relationships: [
           {
-            foreignKeyName: "categories_parent_id_fkey";
-            columns: ["parent_id"];
+            foreignKeyName: 'categories_parent_id_fkey';
+            columns: ['parent_id'];
             isOneToOne: false;
-            referencedRelation: "categories";
-            referencedColumns: ["id"];
-          }
+            referencedRelation: 'categories';
+            referencedColumns: ['id'];
+          },
         ];
       };
       tags: {
@@ -349,19 +327,19 @@ export interface Database {
         };
         Relationships: [
           {
-            foreignKeyName: "posts_author_id_fkey";
-            columns: ["author_id"];
+            foreignKeyName: 'posts_author_id_fkey';
+            columns: ['author_id'];
             isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
           },
           {
-            foreignKeyName: "posts_category_id_fkey";
-            columns: ["category_id"];
+            foreignKeyName: 'posts_category_id_fkey';
+            columns: ['category_id'];
             isOneToOne: false;
-            referencedRelation: "categories";
-            referencedColumns: ["id"];
-          }
+            referencedRelation: 'categories';
+            referencedColumns: ['id'];
+          },
         ];
       };
       post_tags: {
@@ -379,19 +357,19 @@ export interface Database {
         };
         Relationships: [
           {
-            foreignKeyName: "post_tags_post_id_fkey";
-            columns: ["post_id"];
+            foreignKeyName: 'post_tags_post_id_fkey';
+            columns: ['post_id'];
             isOneToOne: false;
-            referencedRelation: "posts";
-            referencedColumns: ["id"];
+            referencedRelation: 'posts';
+            referencedColumns: ['id'];
           },
           {
-            foreignKeyName: "post_tags_tag_id_fkey";
-            columns: ["tag_id"];
+            foreignKeyName: 'post_tags_tag_id_fkey';
+            columns: ['tag_id'];
             isOneToOne: false;
-            referencedRelation: "tags";
-            referencedColumns: ["id"];
-          }
+            referencedRelation: 'tags';
+            referencedColumns: ['id'];
+          },
         ];
       };
       reactions: {
@@ -416,19 +394,19 @@ export interface Database {
         };
         Relationships: [
           {
-            foreignKeyName: "reactions_user_id_fkey";
-            columns: ["user_id"];
+            foreignKeyName: 'reactions_user_id_fkey';
+            columns: ['user_id'];
             isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
           },
           {
-            foreignKeyName: "reactions_post_id_fkey";
-            columns: ["post_id"];
+            foreignKeyName: 'reactions_post_id_fkey';
+            columns: ['post_id'];
             isOneToOne: false;
-            referencedRelation: "posts";
-            referencedColumns: ["id"];
-          }
+            referencedRelation: 'posts';
+            referencedColumns: ['id'];
+          },
         ];
       };
       comments: {
@@ -470,26 +448,26 @@ export interface Database {
         };
         Relationships: [
           {
-            foreignKeyName: "comments_post_id_fkey";
-            columns: ["post_id"];
+            foreignKeyName: 'comments_post_id_fkey';
+            columns: ['post_id'];
             isOneToOne: false;
-            referencedRelation: "posts";
-            referencedColumns: ["id"];
+            referencedRelation: 'posts';
+            referencedColumns: ['id'];
           },
           {
-            foreignKeyName: "comments_author_id_fkey";
-            columns: ["author_id"];
+            foreignKeyName: 'comments_author_id_fkey';
+            columns: ['author_id'];
             isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
           },
           {
-            foreignKeyName: "comments_parent_id_fkey";
-            columns: ["parent_id"];
+            foreignKeyName: 'comments_parent_id_fkey';
+            columns: ['parent_id'];
             isOneToOne: false;
-            referencedRelation: "comments";
-            referencedColumns: ["id"];
-          }
+            referencedRelation: 'comments';
+            referencedColumns: ['id'];
+          },
         ];
       };
       comment_reactions: {
@@ -497,36 +475,36 @@ export interface Database {
           id: string;
           user_id: string;
           comment_id: string;
-          reaction_type: "like" | "dislike";
+          reaction_type: 'like' | 'dislike';
           created_at: string;
         };
         Insert: {
           id?: string;
           user_id: string;
           comment_id: string;
-          reaction_type: "like" | "dislike";
+          reaction_type: 'like' | 'dislike';
           created_at?: string;
         };
         Update: {
           user_id?: string;
           comment_id?: string;
-          reaction_type?: "like" | "dislike";
+          reaction_type?: 'like' | 'dislike';
         };
         Relationships: [
           {
-            foreignKeyName: "comment_reactions_user_id_fkey";
-            columns: ["user_id"];
+            foreignKeyName: 'comment_reactions_user_id_fkey';
+            columns: ['user_id'];
             isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
           },
           {
-            foreignKeyName: "comment_reactions_comment_id_fkey";
-            columns: ["comment_id"];
+            foreignKeyName: 'comment_reactions_comment_id_fkey';
+            columns: ['comment_id'];
             isOneToOne: false;
-            referencedRelation: "comments";
-            referencedColumns: ["id"];
-          }
+            referencedRelation: 'comments';
+            referencedColumns: ['id'];
+          },
         ];
       };
       post_views: {
@@ -562,19 +540,19 @@ export interface Database {
         };
         Relationships: [
           {
-            foreignKeyName: "post_views_post_id_fkey";
-            columns: ["post_id"];
+            foreignKeyName: 'post_views_post_id_fkey';
+            columns: ['post_id'];
             isOneToOne: false;
-            referencedRelation: "posts";
-            referencedColumns: ["id"];
+            referencedRelation: 'posts';
+            referencedColumns: ['id'];
           },
           {
-            foreignKeyName: "post_views_viewer_id_fkey";
-            columns: ["viewer_id"];
+            foreignKeyName: 'post_views_viewer_id_fkey';
+            columns: ['viewer_id'];
             isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          }
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
         ];
       };
       media: {
@@ -587,7 +565,7 @@ export interface Database {
           file_size: number;
           url: string;
           storage_key: string | null;
-          media_type: "video" | "audio" | "image" | null;
+          media_type: 'video' | 'audio' | 'image' | null;
           thumbnail_url: string | null;
           width: number | null;
           height: number | null;
@@ -595,12 +573,7 @@ export interface Database {
           folder: string;
           alt_text: string | null;
           caption: string | null;
-          processing_status:
-            | "pending"
-            | "processing"
-            | "ready"
-            | "failed"
-            | "uploading";
+          processing_status: 'pending' | 'processing' | 'ready' | 'failed' | 'uploading';
           created_at: string;
         };
         Insert: {
@@ -612,7 +585,7 @@ export interface Database {
           file_size: number;
           url: string;
           storage_key?: string | null;
-          media_type?: "video" | "audio" | "image" | null;
+          media_type?: 'video' | 'audio' | 'image' | null;
           thumbnail_url?: string | null;
           width?: number | null;
           height?: number | null;
@@ -620,35 +593,25 @@ export interface Database {
           folder?: string;
           alt_text?: string | null;
           caption?: string | null;
-          processing_status?:
-            | "pending"
-            | "processing"
-            | "ready"
-            | "failed"
-            | "uploading";
+          processing_status?: 'pending' | 'processing' | 'ready' | 'failed' | 'uploading';
           created_at?: string;
         };
         Update: {
           thumbnail_url?: string | null;
           alt_text?: string | null;
           caption?: string | null;
-          processing_status?:
-            | "pending"
-            | "processing"
-            | "ready"
-            | "failed"
-            | "uploading";
+          processing_status?: 'pending' | 'processing' | 'ready' | 'failed' | 'uploading';
           storage_key?: string | null;
-          media_type?: "video" | "audio" | "image" | null;
+          media_type?: 'video' | 'audio' | 'image' | null;
         };
         Relationships: [
           {
-            foreignKeyName: "media_uploader_id_fkey";
-            columns: ["uploader_id"];
+            foreignKeyName: 'media_uploader_id_fkey';
+            columns: ['uploader_id'];
             isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          }
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
         ];
       };
       newsletter_subscribers: {
@@ -656,7 +619,7 @@ export interface Database {
           id: string;
           email: string;
           user_id: string | null;
-          status: "active" | "unsubscribed" | "bounced";
+          status: 'active' | 'unsubscribed' | 'bounced';
           source: string;
           subscribed_at: string;
           unsubscribed_at: string | null;
@@ -665,23 +628,23 @@ export interface Database {
           id?: string;
           email: string;
           user_id?: string | null;
-          status?: "active" | "unsubscribed" | "bounced";
+          status?: 'active' | 'unsubscribed' | 'bounced';
           source?: string;
           subscribed_at?: string;
           unsubscribed_at?: string | null;
         };
         Update: {
-          status?: "active" | "unsubscribed" | "bounced";
+          status?: 'active' | 'unsubscribed' | 'bounced';
           unsubscribed_at?: string | null;
         };
         Relationships: [
           {
-            foreignKeyName: "newsletter_subscribers_user_id_fkey";
-            columns: ["user_id"];
+            foreignKeyName: 'newsletter_subscribers_user_id_fkey';
+            columns: ['user_id'];
             isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          }
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
         ];
       };
       contact_submissions: {
@@ -691,7 +654,7 @@ export interface Database {
           email: string;
           subject: string;
           message: string;
-          status: "new" | "read" | "replied" | "archived";
+          status: 'new' | 'read' | 'replied' | 'archived';
           created_at: string;
         };
         Insert: {
@@ -700,11 +663,11 @@ export interface Database {
           email: string;
           subject: string;
           message: string;
-          status?: "new" | "read" | "replied" | "archived";
+          status?: 'new' | 'read' | 'replied' | 'archived';
           created_at?: string;
         };
         Update: {
-          status?: "new" | "read" | "replied" | "archived";
+          status?: 'new' | 'read' | 'replied' | 'archived';
         };
         Relationships: [];
       };
@@ -728,12 +691,12 @@ export interface Database {
         };
         Relationships: [
           {
-            foreignKeyName: "site_settings_updated_by_fkey";
-            columns: ["updated_by"];
+            foreignKeyName: 'site_settings_updated_by_fkey';
+            columns: ['updated_by'];
             isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          }
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
         ];
       };
     };
@@ -753,12 +716,12 @@ export interface Database {
 }
 
 // Helper types
-export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
-export type Post = Database["public"]["Tables"]["posts"]["Row"];
-export type Category = Database["public"]["Tables"]["categories"]["Row"];
-export type Tag = Database["public"]["Tables"]["tags"]["Row"];
-export type Comment = Database["public"]["Tables"]["comments"]["Row"];
-export type Reaction = Database["public"]["Tables"]["reactions"]["Row"];
+export type Profile = Database['public']['Tables']['profiles']['Row'];
+export type Post = Database['public']['Tables']['posts']['Row'];
+export type Category = Database['public']['Tables']['categories']['Row'];
+export type Tag = Database['public']['Tables']['tags']['Row'];
+export type Comment = Database['public']['Tables']['comments']['Row'];
+export type Reaction = Database['public']['Tables']['reactions']['Row'];
 export type ContributorApplication =
-  Database["public"]["Tables"]["contributor_applications"]["Row"];
-export type Media = Database["public"]["Tables"]["media"]["Row"];
+  Database['public']['Tables']['contributor_applications']['Row'];
+export type Media = Database['public']['Tables']['media']['Row'];

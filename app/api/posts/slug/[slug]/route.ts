@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { type NextRequest } from 'next/server';
 import { success, handleApiError } from '@/lib/api';
 import { getPostBySlug, incrementViewCount } from '@/lib/db';

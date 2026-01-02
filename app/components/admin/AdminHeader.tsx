@@ -38,26 +38,23 @@ export default function AdminHeader({ user, profile }: AdminHeaderProps) {
       className="fixed top-0 left-0 right-0 h-16 z-50 flex items-center justify-between px-4 lg:px-6"
       style={{
         background: 'var(--surface)',
-        borderBottom: '1px solid var(--border)'
+        borderBottom: '1px solid var(--border)',
       }}
     >
-      <Link
-        href="/admin"
-        className="flex items-center gap-3"
-      >
+      <Link href="/admin" className="flex items-center gap-3">
         <div className="flex flex-col items-center">
-          <span 
+          <span
             className="text-lg sm:text-xl font-bold tracking-wider"
-            style={{ 
+            style={{
               fontFamily: 'var(--font-kindergarten)',
-              color: 'var(--primary)' 
+              color: 'var(--primary)',
             }}
           >
             scroungers
           </span>
-          <span 
+          <span
             className="text-[7px] sm:text-[9px] uppercase tracking-[0.25em] -mt-1"
-            style={{ 
+            style={{
               fontFamily: 'var(--font-body)',
               color: 'var(--accent)',
               fontWeight: 500,
@@ -66,10 +63,10 @@ export default function AdminHeader({ user, profile }: AdminHeaderProps) {
             MULTIMEDIA
           </span>
         </div>
-        <span 
-          className="text-xs sm:text-sm px-2 py-0.5 rounded hidden sm:inline-block" 
-          style={{ 
-            background: 'var(--accent)', 
+        <span
+          className="text-xs sm:text-sm px-2 py-0.5 rounded hidden sm:inline-block"
+          style={{
+            background: 'var(--accent)',
             color: 'var(--background)',
             fontFamily: 'var(--font-body)',
             fontWeight: 500,
@@ -86,7 +83,9 @@ export default function AdminHeader({ user, profile }: AdminHeaderProps) {
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors hover:bg-[var(--surface-elevated)]"
           style={{ border: '1px solid var(--secondary)' }}
         >
-          <span className="text-sm" style={{ color: 'var(--secondary)' }}>⏳ Pending Review</span>
+          <span className="text-sm" style={{ color: 'var(--secondary)' }}>
+            ⏳ Pending Review
+          </span>
         </Link>
 
         <div ref={dropdownRef} className="relative">
@@ -99,7 +98,6 @@ export default function AdminHeader({ user, profile }: AdminHeaderProps) {
               style={{ background: 'var(--accent)', color: 'var(--background)' }}
             >
               {profile.avatar_url ? (
-                 
                 <img
                   src={profile.avatar_url}
                   alt={displayName}
@@ -124,7 +122,7 @@ export default function AdminHeader({ user, profile }: AdminHeaderProps) {
               className="absolute right-0 top-full mt-2 w-48 rounded-lg shadow-lg py-2"
               style={{
                 background: 'var(--surface-elevated)',
-                border: '1px solid var(--border)'
+                border: '1px solid var(--border)',
               }}
             >
               <Link
@@ -158,6 +156,3 @@ export default function AdminHeader({ user, profile }: AdminHeaderProps) {
     </header>
   );
 }
-
-
-

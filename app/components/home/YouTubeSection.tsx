@@ -1,9 +1,15 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { EASING, COLORS, prefersReducedMotion, getDuration, DURATION } from '@/lib/animations/gsap-config';
+import { useEffect, useRef } from 'react';
+import {
+  COLORS,
+  DURATION,
+  EASING,
+  getDuration,
+  prefersReducedMotion,
+} from '@/lib/animations/gsap-config';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,7 +25,7 @@ const podcastEpisodes = [
     id: 'episode-2',
     title: 'Episode 11: Housing Crisis Special',
     videoId: 'dQw4w9WgXcQ', // Placeholder
-    description: 'Stories from the frontlines of Britain\'s housing emergency.',
+    description: "Stories from the frontlines of Britain's housing emergency.",
   },
   {
     id: 'episode-3',
@@ -42,7 +48,8 @@ export default function YouTubeSection() {
 
     const ctx = gsap.context(() => {
       // Heading animation
-      gsap.fromTo(headingRef.current,
+      gsap.fromTo(
+        headingRef.current,
         { y: 50, opacity: 0 },
         {
           y: 0,
@@ -60,7 +67,8 @@ export default function YouTubeSection() {
       // Videos stagger animation
       const videoCards = videosRef.current?.querySelectorAll('.video-card');
       if (videoCards) {
-        gsap.fromTo(videoCards,
+        gsap.fromTo(
+          videoCards,
           { y: 40, opacity: 0 },
           {
             y: 0,
@@ -101,10 +109,7 @@ export default function YouTubeSection() {
           >
             scroungers podcast
           </h2>
-          <p 
-            className="text-base font-medium"
-            style={{ color: 'var(--foreground)', opacity: 0.8 }}
-          >
+          <p className="text-base font-medium" style={{ color: 'var(--foreground)', opacity: 0.8 }}>
             Listen to our conversations with those who live it.
           </p>
           <a
@@ -115,7 +120,7 @@ export default function YouTubeSection() {
             style={{ color: COLORS.secondary }}
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
             </svg>
             Subscribe on YouTube →
           </a>
@@ -123,42 +128,43 @@ export default function YouTubeSection() {
 
         {/* Featured Episode - Main embed */}
         <div className="mb-8">
-          <div 
+          <div
             className="relative aspect-video rounded-xl overflow-hidden border"
-            style={{ 
+            style={{
               borderColor: 'var(--border)',
               boxShadow: `0 0 40px ${COLORS.glowSecondary}`,
             }}
           >
             {/* YouTube embed placeholder - replace with actual embed */}
-            <div 
+            <div
               className="absolute inset-0 flex items-center justify-center"
               style={{ background: 'var(--background)' }}
             >
               <div className="text-center">
-                <div 
+                <div
                   className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center"
-                  style={{ 
+                  style={{
                     background: 'rgba(255, 0, 0, 0.1)',
                     border: '2px solid rgba(255, 0, 0, 0.3)',
                   }}
                 >
-                  <svg className="w-10 h-10 text-red-500 ml-1" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z"/>
+                  <svg
+                    className="w-10 h-10 text-red-500 ml-1"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M8 5v14l11-7z" />
                   </svg>
                 </div>
                 <p className="font-medium" style={{ color: 'var(--foreground)' }}>
                   Latest Episode
                 </p>
-                <p 
-                  className="text-sm mt-1"
-                  style={{ color: 'var(--foreground)', opacity: 0.7 }}
-                >
+                <p className="text-sm mt-1" style={{ color: 'var(--foreground)', opacity: 0.7 }}>
                   Click to watch on YouTube
                 </p>
               </div>
             </div>
-            
+
             {/* Uncomment this for actual YouTube embed:
             <iframe
               className="absolute inset-0 w-full h-full"
@@ -180,33 +186,37 @@ export default function YouTubeSection() {
               target="_blank"
               rel="noopener noreferrer"
               className="video-card group p-4 rounded-lg border transition-all duration-300 hover:border-[var(--primary)] hover:shadow-[0_0_20px_var(--glow-primary)]"
-              style={{ 
-                background: 'var(--background)', 
+              style={{
+                background: 'var(--background)',
                 borderColor: 'var(--border)',
               }}
             >
               {/* Thumbnail placeholder */}
-              <div 
+              <div
                 className="aspect-video rounded-md mb-3 flex items-center justify-center relative overflow-hidden"
                 style={{ background: 'rgba(0,0,0,0.3)' }}
               >
-                <svg className="w-10 h-10 text-red-500 opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M8 5v14l11-7z"/>
+                <svg
+                  className="w-10 h-10 text-red-500 opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M8 5v14l11-7z" />
                 </svg>
               </div>
-              
+
               <h3
                 className="text-sm font-bold mb-1 line-clamp-2 group-hover:text-[var(--primary)] transition-colors"
-                style={{ 
+                style={{
                   color: 'var(--foreground)',
                 }}
               >
                 {episode.title}
               </h3>
-              <p 
+              <p
                 className="text-xs font-medium line-clamp-2"
-                style={{ 
-                  color: 'var(--foreground)', 
+                style={{
+                  color: 'var(--foreground)',
                   opacity: 0.7,
                 }}
               >
@@ -219,7 +229,3 @@ export default function YouTubeSection() {
     </section>
   );
 }
-
-
-
-

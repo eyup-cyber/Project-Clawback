@@ -3,8 +3,8 @@
  * Provides detailed system health information
  */
 
-import { createClient } from '@/lib/supabase/server';
 import { config } from '@/lib/config';
+import { createClient } from '@/lib/supabase/server';
 
 export interface HealthStatus {
   status: 'healthy' | 'degraded' | 'unhealthy';
@@ -42,13 +42,13 @@ async function checkDatabase(): Promise<{
   error?: string;
 }> {
   const startTime = Date.now();
-  
+
   try {
     const supabase = await createClient();
     const { error } = await supabase.from('profiles').select('id').limit(1);
-    
+
     const responseTime = Date.now() - startTime;
-    
+
     if (error) {
       return {
         status: 'unhealthy',
@@ -56,7 +56,7 @@ async function checkDatabase(): Promise<{
         error: error.message,
       };
     }
-    
+
     return {
       status: 'healthy',
       responseTime,
@@ -82,7 +82,7 @@ async function checkStorage(): Promise<{
       error: 'R2 not configured',
     };
   }
-  
+
   // Basic check - verify configuration exists
   return {
     status: 'healthy',
@@ -113,14 +113,14 @@ function checkEmail(): {
   error?: string;
 } {
   const configured = !!config.resendApiKey;
-  
+
   if (!configured) {
     return {
       status: 'healthy', // Not required, but note it's not configured
       configured: false,
     };
   }
-  
+
   return {
     status: 'healthy',
     configured: true,
@@ -137,16 +137,16 @@ export async function getHealthStatus(): Promise<HealthStatus> {
     checkCache(),
     Promise.resolve(checkEmail()),
   ]);
-  
+
   // Determine overall status
   let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
-  
+
   if (database.status === 'unhealthy') {
     status = 'unhealthy';
   } else if (storage.status === 'unhealthy' || cache.status === 'unhealthy') {
     status = 'degraded';
   }
-  
+
   return {
     status,
     timestamp: new Date().toISOString(),
@@ -160,4 +160,3 @@ export async function getHealthStatus(): Promise<HealthStatus> {
     uptime: process.uptime ? Math.floor(process.uptime()) : undefined,
   };
 }
-

@@ -1,15 +1,21 @@
-"use client";
-import { useEffect, useRef, useState, Suspense, useMemo } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, Environment } from "@react-three/drei";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import * as THREE from "three";
+'use client';
+import { useEffect, useRef, useState, Suspense, useMemo } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Float, Environment } from '@react-three/drei';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import * as THREE from 'three';
 
 gsap.registerPlugin(ScrollTrigger);
 
 // Ballot Box Component
-function BallotBox({ position, scrollProgress }: { position: [number, number, number]; scrollProgress: number }) {
+function BallotBox({
+  position,
+  scrollProgress,
+}: {
+  position: [number, number, number];
+  scrollProgress: number;
+}) {
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
@@ -25,20 +31,12 @@ function BallotBox({ position, scrollProgress }: { position: [number, number, nu
         {/* Main box */}
         <mesh>
           <boxGeometry args={[0.8, 1, 0.6]} />
-          <meshStandardMaterial
-            color="#1a1a1a"
-            metalness={0.3}
-            roughness={0.7}
-          />
+          <meshStandardMaterial color="#1a1a1a" metalness={0.3} roughness={0.7} />
         </mesh>
         {/* Slot */}
         <mesh position={[0, 0.51, 0]}>
           <boxGeometry args={[0.5, 0.02, 0.05]} />
-          <meshStandardMaterial
-            color="#32CD32"
-            emissive="#32CD32"
-            emissiveIntensity={0.5}
-          />
+          <meshStandardMaterial color="#32CD32" emissive="#32CD32" emissiveIntensity={0.5} />
         </mesh>
         {/* Edge glow */}
         <lineSegments>
@@ -51,7 +49,13 @@ function BallotBox({ position, scrollProgress }: { position: [number, number, nu
 }
 
 // Megaphone Component
-function Megaphone({ position, scrollProgress }: { position: [number, number, number]; scrollProgress: number }) {
+function Megaphone({
+  position,
+  scrollProgress,
+}: {
+  position: [number, number, number];
+  scrollProgress: number;
+}) {
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
@@ -67,11 +71,7 @@ function Megaphone({ position, scrollProgress }: { position: [number, number, nu
         {/* Cone */}
         <mesh>
           <coneGeometry args={[0.5, 1.2, 32]} />
-          <meshStandardMaterial
-            color="#1a1a1a"
-            metalness={0.4}
-            roughness={0.6}
-          />
+          <meshStandardMaterial color="#1a1a1a" metalness={0.4} roughness={0.6} />
         </mesh>
         {/* Inner glow */}
         <mesh position={[0, 0.4, 0]}>
@@ -94,13 +94,20 @@ function Megaphone({ position, scrollProgress }: { position: [number, number, nu
 }
 
 // CCTV Camera Component
-function CCTVCamera({ position, scrollProgress }: { position: [number, number, number]; scrollProgress: number }) {
+function CCTVCamera({
+  position,
+  scrollProgress,
+}: {
+  position: [number, number, number];
+  scrollProgress: number;
+}) {
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
     if (groupRef.current) {
       // Panning effect
-      groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.4) * 0.3 + scrollProgress * Math.PI * 0.3;
+      groupRef.current.rotation.y =
+        Math.sin(state.clock.elapsedTime * 0.4) * 0.3 + scrollProgress * Math.PI * 0.3;
     }
   });
 
@@ -120,11 +127,7 @@ function CCTVCamera({ position, scrollProgress }: { position: [number, number, n
         {/* Recording light */}
         <mesh position={[0.15, 0.1, 0.31]}>
           <sphereGeometry args={[0.03, 16, 16]} />
-          <meshStandardMaterial
-            color="#FF00FF"
-            emissive="#FF00FF"
-            emissiveIntensity={2}
-          />
+          <meshStandardMaterial color="#FF00FF" emissive="#FF00FF" emissiveIntensity={2} />
         </mesh>
         {/* Mount */}
         <mesh position={[0, 0.25, -0.2]}>
@@ -137,7 +140,13 @@ function CCTVCamera({ position, scrollProgress }: { position: [number, number, n
 }
 
 // Burning Pound Note Component
-function BurningNote({ position, scrollProgress }: { position: [number, number, number]; scrollProgress: number }) {
+function BurningNote({
+  position,
+  scrollProgress,
+}: {
+  position: [number, number, number];
+  scrollProgress: number;
+}) {
   const groupRef = useRef<THREE.Group>(null);
   const particlesRef = useRef<THREE.Points>(null);
 
@@ -159,7 +168,7 @@ function BurningNote({ position, scrollProgress }: { position: [number, number, 
     for (let i = 0; i < particleCount; i++) {
       const seed = i * 0.1;
       positions[i * 3] = (Math.sin(seed * 12.9898) * 0.5 - 0.25) * 0.4;
-      positions[i * 3 + 1] = ((Math.sin(seed * 78.233) + 1) * 0.3) + 0.2;
+      positions[i * 3 + 1] = (Math.sin(seed * 78.233) + 1) * 0.3 + 0.2;
       positions[i * 3 + 2] = (Math.sin(seed * 43.758) * 0.5 - 0.25) * 0.1;
     }
     return positions;
@@ -181,17 +190,9 @@ function BurningNote({ position, scrollProgress }: { position: [number, number, 
         {/* Fire particles */}
         <points ref={particlesRef} position={[0, 0.1, 0]}>
           <bufferGeometry>
-            <bufferAttribute
-              attach="attributes-position"
-              args={[particlePositions, 3]}
-            />
+            <bufferAttribute attach="attributes-position" args={[particlePositions, 3]} />
           </bufferGeometry>
-          <pointsMaterial
-            size={0.05}
-            color="#FF4500"
-            transparent
-            opacity={0.8}
-          />
+          <pointsMaterial size={0.05} color="#FF4500" transparent opacity={0.8} />
         </points>
       </group>
     </Float>
@@ -233,23 +234,17 @@ function Scene({ scrollProgress }: { scrollProgress: number }) {
       <pointLight position={[10, 10, 10]} intensity={1.5} color="#32CD32" />
       <pointLight position={[-10, -10, -10]} intensity={0.5} color="#FFD700" />
       <pointLight position={[0, -10, 5]} intensity={0.3} color="#013220" />
-      <spotLight
-        position={[0, 10, 0]}
-        angle={0.3}
-        penumbra={1}
-        intensity={0.5}
-        color="#32CD32"
-      />
-      
+      <spotLight position={[0, 10, 0]} angle={0.3} penumbra={1} intensity={0.5} color="#32CD32" />
+
       {/* Central shape */}
       <CentralShape scrollProgress={scrollProgress} />
-      
+
       {/* Political artifacts floating around */}
       <BallotBox position={[-3, 1, -2]} scrollProgress={scrollProgress} />
       <Megaphone position={[3, -0.5, -1.5]} scrollProgress={scrollProgress} />
       <CCTVCamera position={[-2.5, -1.5, -1]} scrollProgress={scrollProgress} />
       <BurningNote position={[2.5, 1.5, -2]} scrollProgress={scrollProgress} />
-      
+
       <Environment preset="night" />
     </>
   );
@@ -275,8 +270,8 @@ export default function Showcase3D() {
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: sectionRef.current,
-        start: "top bottom",
-        end: "bottom top",
+        start: 'top bottom',
+        end: 'bottom top',
         onUpdate: (self) => {
           setScrollProgress(self.progress);
         },
@@ -289,11 +284,11 @@ export default function Showcase3D() {
           y: 0,
           opacity: 1,
           duration: 1,
-          ease: "power3.out",
+          ease: 'power3.out',
           scrollTrigger: {
             trigger: textRef.current,
-            start: "top 80%",
-            toggleActions: "play none none reverse",
+            start: 'top 80%',
+            toggleActions: 'play none none reverse',
           },
         }
       );
@@ -317,36 +312,33 @@ export default function Showcase3D() {
       </div>
 
       {/* Gradient overlays for depth */}
-      <div 
+      <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse at center, transparent 30%, var(--background) 80%)",
+          background: 'radial-gradient(ellipse at center, transparent 30%, var(--background) 80%)',
         }}
       />
-      <div 
+      <div
         className="absolute inset-x-0 top-0 h-32 pointer-events-none"
         style={{
-          background: "linear-gradient(to bottom, var(--background), transparent)",
+          background: 'linear-gradient(to bottom, var(--background), transparent)',
         }}
       />
-      <div 
+      <div
         className="absolute inset-x-0 bottom-0 h-32 pointer-events-none"
         style={{
-          background: "linear-gradient(to top, var(--background), transparent)",
+          background: 'linear-gradient(to top, var(--background), transparent)',
         }}
       />
 
       {/* Overlay text */}
-      <div
-        ref={textRef}
-        className="relative z-10 text-center pointer-events-none px-4"
-      >
+      <div ref={textRef} className="relative z-10 text-center pointer-events-none px-4">
         <p
           className="text-xs sm:text-sm uppercase tracking-[0.2em] mb-3 sm:mb-4 italic font-light"
-          style={{ 
-            fontFamily: "var(--font-body)",
-            color: "var(--accent)",
-            letterSpacing: "-0.02em",
+          style={{
+            fontFamily: 'var(--font-body)',
+            color: 'var(--accent)',
+            letterSpacing: '-0.02em',
           }}
         >
           A View From The Sewer
@@ -354,19 +346,19 @@ export default function Showcase3D() {
         <h2
           className="text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-bold"
           style={{
-            fontFamily: "var(--font-kindergarten)",
-            color: "var(--accent)",
-            textShadow: "0 0 40px var(--glow-accent), 0 0 80px var(--glow-accent)",
+            fontFamily: 'var(--font-kindergarten)',
+            color: 'var(--accent)',
+            textShadow: '0 0 40px var(--glow-accent), 0 0 80px var(--glow-accent)',
           }}
         >
           EXPLORE
         </h2>
-        <p 
+        <p
           className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg max-w-xs sm:max-w-sm md:max-w-md mx-auto font-medium"
-          style={{ 
-            fontFamily: "var(--font-body)",
-            color: "var(--accent)",
-            letterSpacing: "-0.02em",
+          style={{
+            fontFamily: 'var(--font-body)',
+            color: 'var(--accent)',
+            letterSpacing: '-0.02em',
           }}
         >
           Ballot boxes, megaphones, surveillance — the symbols of our political world

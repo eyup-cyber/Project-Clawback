@@ -179,9 +179,7 @@ export function announceFormErrors(errors: string[]): void {
   if (errors.length === 0) return;
 
   const message =
-    errors.length === 1
-      ? `Error: ${errors[0]}`
-      : `${errors.length} errors: ${errors.join('. ')}`;
+    errors.length === 1 ? `Error: ${errors[0]}` : `${errors.length} errors: ${errors.join('. ')}`;
 
   announce(message, { priority: 'assertive' });
 }
@@ -200,10 +198,7 @@ export function generateId(prefix: string = 'a11y'): string {
 /**
  * Set up aria-describedby for an element
  */
-export function setAriaDescribedBy(
-  element: HTMLElement,
-  descriptionElement: HTMLElement
-): string {
+export function setAriaDescribedBy(element: HTMLElement, descriptionElement: HTMLElement): string {
   const id = descriptionElement.id || generateId('desc');
   descriptionElement.id = id;
   element.setAttribute('aria-describedby', id);
@@ -213,10 +208,7 @@ export function setAriaDescribedBy(
 /**
  * Set up aria-labelledby for an element
  */
-export function setAriaLabelledBy(
-  element: HTMLElement,
-  labelElement: HTMLElement
-): string {
+export function setAriaLabelledBy(element: HTMLElement, labelElement: HTMLElement): string {
   const id = labelElement.id || generateId('label');
   labelElement.id = id;
   element.setAttribute('aria-labelledby', id);
@@ -262,12 +254,7 @@ export function createListNavigation(
     onSelect?: (element: HTMLElement) => void;
   }
 ): () => void {
-  const {
-    itemSelector,
-    orientation = 'vertical',
-    wrap = true,
-    onSelect,
-  } = options;
+  const { itemSelector, orientation = 'vertical', wrap = true, onSelect } = options;
 
   function getItems(): HTMLElement[] {
     return Array.from(containerEl.querySelectorAll(itemSelector));
@@ -347,10 +334,7 @@ export function createListNavigation(
 /**
  * Create roving tabindex for tab-like navigation
  */
-export function createRovingTabindex(
-  containerEl: HTMLElement,
-  itemSelector: string
-): () => void {
+export function createRovingTabindex(containerEl: HTMLElement, itemSelector: string): () => void {
   function getItems(): HTMLElement[] {
     return Array.from(containerEl.querySelectorAll(itemSelector));
   }
@@ -413,7 +397,7 @@ export function getAnimationDuration(normalDuration: number): number {
 function getLuminance(r: number, g: number, b: number): number {
   const [rs, gs, bs] = [r, g, b].map((c) => {
     c = c / 255;
-    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
   });
   return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
 }
@@ -465,7 +449,10 @@ export function meetsContrastAAA(
 /**
  * Create a skip link element
  */
-export function createSkipLink(targetId: string, text: string = 'Skip to main content'): HTMLAnchorElement {
+export function createSkipLink(
+  targetId: string,
+  text: string = 'Skip to main content'
+): HTMLAnchorElement {
   const link = document.createElement('a');
   link.href = `#${targetId}`;
   link.textContent = text;

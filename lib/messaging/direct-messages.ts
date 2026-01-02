@@ -3,8 +3,8 @@
  * Phase 36: Private conversations between users
  */
 
-import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -273,19 +273,23 @@ export async function getConversation(
   // Get participants with user details
   const { data: participants } = await supabase
     .from('conversation_participants')
-    .select(`
+    .select(
+      `
       *,
       user:profiles(id, username, display_name, avatar_url)
-    `)
+    `
+    )
     .eq('conversation_id', conversationId);
 
   // Get last message
   const { data: lastMessage } = await supabase
     .from('messages')
-    .select(`
+    .select(
+      `
       *,
       sender:profiles!sender_id(id, username, display_name, avatar_url)
-    `)
+    `
+    )
     .eq('conversation_id', conversationId)
     .eq('is_deleted', false)
     .order('created_at', { ascending: false })
@@ -341,9 +345,7 @@ export async function getUserConversations(
   const conversationIds = participations.map((p) => p.conversation_id);
 
   // Get conversations with details
-  const conversations = await Promise.all(
-    conversationIds.map((id) => getConversation(id, userId))
-  );
+  const conversations = await Promise.all(conversationIds.map((id) => getConversation(id, userId)));
 
   // Filter nulls and sort by last message
   const validConversations = conversations
@@ -435,16 +437,14 @@ export async function sendMessage(
 async function sendSystemMessage(conversationId: string, content: string): Promise<void> {
   const supabase = await createServiceClient();
 
-  await supabase
-    .from('messages')
-    .insert({
-      conversation_id: conversationId,
-      sender_id: null,
-      content,
-      content_type: 'system',
-      attachments: [],
-      read_by: [],
-    });
+  await supabase.from('messages').insert({
+    conversation_id: conversationId,
+    sender_id: null,
+    content,
+    content_type: 'system',
+    attachments: [],
+    read_by: [],
+  });
 }
 
 /**
@@ -472,10 +472,12 @@ export async function getMessages(
 
   let query = supabase
     .from('messages')
-    .select(`
+    .select(
+      `
       *,
       sender:profiles!sender_id(id, username, display_name, avatar_url)
-    `)
+    `
+    )
     .eq('conversation_id', conversationId)
     .eq('is_deleted', false)
     .order('created_at', { ascending: false })
@@ -501,20 +503,23 @@ export async function getMessages(
 
   // Get reply messages if needed
   const replyIds = messages.filter((m) => m.reply_to_id).map((m) => m.reply_to_id);
-  let replyMessages: Record<string, Message & { sender: { id: string; username: string; display_name: string } }> = {};
+  let replyMessages: Record<
+    string,
+    Message & { sender: { id: string; username: string; display_name: string } }
+  > = {};
 
   if (replyIds.length) {
     const { data: replies } = await supabase
       .from('messages')
-      .select(`
+      .select(
+        `
         *,
         sender:profiles!sender_id(id, username, display_name)
-      `)
+      `
+      )
       .in('id', replyIds);
 
-    replyMessages = Object.fromEntries(
-      (replies || []).map((r) => [r.id, r])
-    );
+    replyMessages = Object.fromEntries((replies || []).map((r) => [r.id, r]));
   }
 
   const messagesWithReplies = messages.map((m) => ({
@@ -583,10 +588,7 @@ export async function deleteMessage(messageId: string, userId: string): Promise<
 /**
  * Mark messages as read
  */
-export async function markAsRead(
-  conversationId: string,
-  userId: string
-): Promise<void> {
+export async function markAsRead(conversationId: string, userId: string): Promise<void> {
   const supabase = await createClient();
 
   // Update participant's last_read_at
@@ -609,10 +611,7 @@ export async function markAsRead(
   if (unread?.length) {
     for (const message of unread) {
       const readBy = [...(message.read_by || []), userId];
-      await supabase
-        .from('messages')
-        .update({ read_by: readBy })
-        .eq('id', message.id);
+      await supabase.from('messages').update({ read_by: readBy }).eq('id', message.id);
     }
   }
 }
@@ -644,15 +643,13 @@ export async function addParticipant(
   }
 
   // Add participant
-  const { error } = await supabase
-    .from('conversation_participants')
-    .insert({
-      conversation_id: conversationId,
-      user_id: userId,
-      role: 'member',
-      notifications_enabled: true,
-      is_muted: false,
-    });
+  const { error } = await supabase.from('conversation_participants').insert({
+    conversation_id: conversationId,
+    user_id: userId,
+    role: 'member',
+    notifications_enabled: true,
+    is_muted: false,
+  });
 
   if (error) {
     logger.error('[DM] Failed to add participant', error);

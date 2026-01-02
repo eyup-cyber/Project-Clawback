@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { type NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { success, ApiError } from '@/lib/api';
@@ -51,7 +53,3 @@ const handler = async (request: NextRequest) => {
 };
 
 export const GET = withRouteHandler(handler, { logRequest: true });
-
-
-
-

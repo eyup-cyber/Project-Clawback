@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Bookmarks API Routes
  * Phase 1.1.3: Complete bookmark system API

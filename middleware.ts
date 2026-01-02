@@ -1,11 +1,11 @@
-import { type NextRequest } from 'next/server';
-import { updateSession } from '@/lib/supabase/middleware';
+import type { NextRequest } from 'next/server';
 import { applySecurityHeaders } from '@/lib/security/headers';
+import { updateSession } from '@/lib/supabase/middleware';
 
 export async function middleware(request: NextRequest) {
   // Update Supabase session
   const response = await updateSession(request);
-  
+
   // Apply security headers to all responses
   return applySecurityHeaders(response);
 }
@@ -22,11 +22,3 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
-
-
-
-
-
-
-
-

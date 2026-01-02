@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Ko-fi Webhook Handler
  * Receives and processes Ko-fi donation notifications

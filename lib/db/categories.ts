@@ -1,6 +1,6 @@
-import { createClient } from '@/lib/supabase/server';
-import { type Database } from '@/types/database';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/server';
+import type { Database } from '@/types/database';
 
 type Category = Database['public']['Tables']['categories']['Row'];
 type CategoryWithCount = Category & { post_count: number };
@@ -10,7 +10,7 @@ type CategoryWithCount = Category & { post_count: number };
  */
 export async function getCategories(): Promise<Category[]> {
   const supabase = await createClient();
-  
+
   const { data, error } = await supabase
     .from('categories')
     .select('*')
@@ -29,7 +29,7 @@ export async function getCategories(): Promise<Category[]> {
  */
 export async function getCategoriesWithCounts(): Promise<CategoryWithCount[]> {
   const supabase = await createClient();
-  
+
   const { data: categories, error } = await supabase
     .from('categories')
     .select('*')
@@ -45,7 +45,7 @@ export async function getCategoriesWithCounts(): Promise<CategoryWithCount[]> {
   }
 
   // Get post counts for each category
-  const categoryIds = categories.map(c => c.id);
+  const categoryIds = categories.map((c) => c.id);
   const { data: posts } = await supabase
     .from('posts')
     .select('category_id')
@@ -55,10 +55,7 @@ export async function getCategoriesWithCounts(): Promise<CategoryWithCount[]> {
   const countMap = new Map<string, number>();
   posts?.forEach((post) => {
     if (post.category_id) {
-      countMap.set(
-        post.category_id,
-        (countMap.get(post.category_id) || 0) + 1
-      );
+      countMap.set(post.category_id, (countMap.get(post.category_id) || 0) + 1);
     }
   });
 
@@ -73,12 +70,8 @@ export async function getCategoriesWithCounts(): Promise<CategoryWithCount[]> {
  */
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
   const supabase = await createClient();
-  
-  const { data, error } = await supabase
-    .from('categories')
-    .select('*')
-    .eq('slug', slug)
-    .single();
+
+  const { data, error } = await supabase.from('categories').select('*').eq('slug', slug).single();
 
   if (error) {
     if (error.code === 'PGRST116') {
@@ -90,7 +83,3 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
 
   return data;
 }
-
-
-
-

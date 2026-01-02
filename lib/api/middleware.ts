@@ -45,7 +45,7 @@ export async function getAuthUser(): Promise<{
   supabase: Awaited<ReturnType<typeof createClient>>;
 }> {
   const supabase = await createClient();
-  
+
   const {
     data: { user },
     error,
@@ -94,16 +94,12 @@ export async function requireAuth(): Promise<AuthContext> {
 /**
  * Require a specific role - throws if user doesn't have sufficient permissions
  */
-export async function requireRole(
-  ...allowedRoles: UserRole[]
-): Promise<AuthContext> {
+export async function requireRole(...allowedRoles: UserRole[]): Promise<AuthContext> {
   const { user, supabase } = await requireAuth();
 
   // Check if user has any of the allowed roles
   if (!allowedRoles.includes(user.role)) {
-    throw ApiError.forbidden(
-      `This action requires one of these roles: ${allowedRoles.join(', ')}`
-    );
+    throw ApiError.forbidden(`This action requires one of these roles: ${allowedRoles.join(', ')}`);
   }
 
   return { user, supabase };
@@ -112,18 +108,14 @@ export async function requireRole(
 /**
  * Require minimum role level (uses hierarchy)
  */
-export async function requireMinRole(
-  minRole: UserRole
-): Promise<AuthContext> {
+export async function requireMinRole(minRole: UserRole): Promise<AuthContext> {
   const { user, supabase } = await requireAuth();
 
   const userLevel = ROLE_HIERARCHY[user.role];
   const requiredLevel = ROLE_HIERARCHY[minRole];
 
   if (userLevel < requiredLevel) {
-    throw ApiError.forbidden(
-      `This action requires at least ${minRole} role`
-    );
+    throw ApiError.forbidden(`This action requires at least ${minRole} role`);
   }
 
   return { user, supabase };
@@ -157,9 +149,7 @@ export async function requireContributor(): Promise<AuthContext> {
 /**
  * Check if user owns a resource or is admin
  */
-export async function requireOwnershipOrAdmin(
-  resourceOwnerId: string
-): Promise<AuthContext> {
+export async function requireOwnershipOrAdmin(resourceOwnerId: string): Promise<AuthContext> {
   const { user, supabase } = await requireAuth();
 
   if (user.id !== resourceOwnerId && user.role !== 'admin') {
@@ -264,10 +254,7 @@ export function checkRateLimit(
 /**
  * Rate limit by IP address
  */
-export function rateLimitByIp(
-  request: Request,
-  options?: RateLimitOptions
-): boolean {
+export function rateLimitByIp(request: Request, options?: RateLimitOptions): boolean {
   const ip = getClientIp(request);
   return checkRateLimit(`ip:${ip}`, options);
 }
@@ -275,10 +262,7 @@ export function rateLimitByIp(
 /**
  * Rate limit by user ID
  */
-export function rateLimitByUser(
-  userId: string,
-  options?: RateLimitOptions
-): boolean {
+export function rateLimitByUser(userId: string, options?: RateLimitOptions): boolean {
   return checkRateLimit(`user:${userId}`, options);
 }
 
@@ -290,12 +274,12 @@ function getClientIp(request: Request): string {
   if (forwarded) {
     return forwarded.split(',')[0].trim();
   }
-  
+
   const realIp = request.headers.get('x-real-ip');
   if (realIp) {
     return realIp;
   }
-  
+
   return 'unknown';
 }
 
@@ -314,4 +298,3 @@ if (typeof setInterval !== 'undefined') {
     }
   }, 60000);
 }
-

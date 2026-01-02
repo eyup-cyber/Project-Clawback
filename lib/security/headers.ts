@@ -3,7 +3,7 @@
  * Phase 27: CSP, CORS, XSS protection, security headers
  */
 
-import { NextResponse, type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 // ============================================================================
 // CONTENT SECURITY POLICY
@@ -40,20 +40,12 @@ const DEFAULT_CSP_DIRECTIVES: CSPDirectives = {
     'https://www.google-analytics.com',
     'https://vercel.live',
   ],
-  scriptSrcElem: [
-    "'self'",
-    "'unsafe-inline'",
-    'https://www.googletagmanager.com',
-  ],
+  scriptSrcElem: ["'self'", "'unsafe-inline'", 'https://www.googletagmanager.com'],
   styleSrc: [
     "'self'",
     "'unsafe-inline'", // Required for styled components/CSS-in-JS
   ],
-  styleSrcElem: [
-    "'self'",
-    "'unsafe-inline'",
-    'https://fonts.googleapis.com',
-  ],
+  styleSrcElem: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
   imgSrc: [
     "'self'",
     'data:',
@@ -63,11 +55,7 @@ const DEFAULT_CSP_DIRECTIVES: CSPDirectives = {
     '*.cloudflare.com',
     'https://www.google-analytics.com',
   ],
-  fontSrc: [
-    "'self'",
-    'data:',
-    'https://fonts.gstatic.com',
-  ],
+  fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
   connectSrc: [
     "'self'",
     '*.supabase.co',
@@ -76,12 +64,7 @@ const DEFAULT_CSP_DIRECTIVES: CSPDirectives = {
     'https://vitals.vercel-insights.com',
     'https://vercel.live',
   ],
-  mediaSrc: [
-    "'self'",
-    'blob:',
-    'https:',
-    '*.cloudflare.com',
-  ],
+  mediaSrc: ["'self'", 'blob:', 'https:', '*.cloudflare.com'],
   objectSrc: ["'none'"],
   frameSrc: [
     "'self'",
@@ -174,9 +157,7 @@ export interface CORSConfig {
 }
 
 const DEFAULT_CORS_CONFIG: CORSConfig = {
-  allowedOrigins: [
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://scroungersmultimedia.com',
-  ],
+  allowedOrigins: [process.env.NEXT_PUBLIC_SITE_URL || 'https://scroungersmultimedia.com'],
   allowedMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: [
     'Content-Type',
@@ -185,11 +166,7 @@ const DEFAULT_CORS_CONFIG: CORSConfig = {
     'X-CSRF-Token',
     'X-API-Key',
   ],
-  exposedHeaders: [
-    'X-RateLimit-Limit',
-    'X-RateLimit-Remaining',
-    'X-RateLimit-Reset',
-  ],
+  exposedHeaders: ['X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset'],
   maxAge: 86400, // 24 hours
   credentials: true,
 };
@@ -316,9 +293,10 @@ export function applySecurityHeaders(
 ): NextResponse {
   // Content Security Policy
   if (config.contentSecurityPolicy) {
-    const csp = typeof config.contentSecurityPolicy === 'object'
-      ? buildCSP(config.contentSecurityPolicy)
-      : buildCSP();
+    const csp =
+      typeof config.contentSecurityPolicy === 'object'
+        ? buildCSP(config.contentSecurityPolicy)
+        : buildCSP();
     response.headers.set('Content-Security-Policy', csp);
   }
 

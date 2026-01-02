@@ -32,10 +32,12 @@ export default async function ApplicationsPage() {
 
   const { data: applications } = await supabase
     .from('contributor_applications')
-    .select(`
+    .select(
+      `
       *,
       user:profiles!contributor_applications_user_id_fkey(id, display_name, username, email, avatar_url)
-    `)
+    `
+    )
     .order('created_at', { ascending: false });
 
   const statusColors: Record<string, { bg: string; text: string }> = {
@@ -107,7 +109,6 @@ export default async function ApplicationsPage() {
                     style={{ background: 'var(--primary)', color: 'var(--background)' }}
                   >
                     {app.user?.avatar_url ? (
-                       
                       <img
                         src={app.user.avatar_url}
                         alt={app.user.display_name}
@@ -125,10 +126,7 @@ export default async function ApplicationsPage() {
                     >
                       {app.full_name || app.user?.display_name || 'Unknown User'}
                     </h3>
-                    <p
-                      className="text-sm"
-                      style={{ color: 'var(--foreground)', opacity: 0.6 }}
-                    >
+                    <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.6 }}>
                       {app.email || app.user?.email} • Applied {formatRelativeTime(app.created_at)}
                     </p>
                   </div>
@@ -148,41 +146,26 @@ export default async function ApplicationsPage() {
               {/* Application details */}
               <div className="mt-4 space-y-3">
                 <div>
-                  <h4
-                    className="text-sm font-medium mb-1"
-                    style={{ color: 'var(--primary)' }}
-                  >
+                  <h4 className="text-sm font-medium mb-1" style={{ color: 'var(--primary)' }}>
                     Why Scroungers Multimedia?
                   </h4>
-                  <p
-                    className="text-sm"
-                    style={{ color: 'var(--foreground)', opacity: 0.8 }}
-                  >
+                  <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.8 }}>
                     {app.why_scroungers || 'No response provided'}
                   </p>
                 </div>
 
                 <div>
-                  <h4
-                    className="text-sm font-medium mb-1"
-                    style={{ color: 'var(--primary)' }}
-                  >
+                  <h4 className="text-sm font-medium mb-1" style={{ color: 'var(--primary)' }}>
                     First Piece Pitch
                   </h4>
-                  <p
-                    className="text-sm"
-                    style={{ color: 'var(--foreground)', opacity: 0.8 }}
-                  >
+                  <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.8 }}>
                     {app.first_piece_pitch || 'No response provided'}
                   </p>
                 </div>
 
                 {app.topics && app.topics.length > 0 && (
                   <div>
-                    <h4
-                      className="text-sm font-medium mb-1"
-                      style={{ color: 'var(--primary)' }}
-                    >
+                    <h4 className="text-sm font-medium mb-1" style={{ color: 'var(--primary)' }}>
                       Topics of Interest
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -201,10 +184,7 @@ export default async function ApplicationsPage() {
 
                 {app.content_types && app.content_types.length > 0 && (
                   <div>
-                    <h4
-                      className="text-sm font-medium mb-1"
-                      style={{ color: 'var(--primary)' }}
-                    >
+                    <h4 className="text-sm font-medium mb-1" style={{ color: 'var(--primary)' }}>
                       Content Types
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -223,10 +203,7 @@ export default async function ApplicationsPage() {
 
                 {app.portfolio_url && (
                   <div>
-                    <h4
-                      className="text-sm font-medium mb-1"
-                      style={{ color: 'var(--primary)' }}
-                    >
+                    <h4 className="text-sm font-medium mb-1" style={{ color: 'var(--primary)' }}>
                       Portfolio / Sample Work
                     </h4>
                     <a

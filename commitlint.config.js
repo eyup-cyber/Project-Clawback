@@ -5,16 +5,16 @@ module.exports = {
       2,
       'always',
       [
-        'feat',     // New feature
-        'fix',      // Bug fix
-        'docs',     // Documentation
-        'style',    // Formatting, no code change
+        'feat', // New feature
+        'fix', // Bug fix
+        'docs', // Documentation
+        'style', // Formatting, no code change
         'refactor', // Code change that neither fixes a bug nor adds a feature
-        'perf',     // Performance improvement
-        'test',     // Adding or updating tests
-        'chore',    // Build process, auxiliary tools
-        'revert',   // Revert a previous commit
-        'ci',       // CI/CD changes
+        'perf', // Performance improvement
+        'test', // Adding or updating tests
+        'chore', // Build process, auxiliary tools
+        'revert', // Revert a previous commit
+        'ci', // CI/CD changes
       ],
     ],
     'type-case': [2, 'always', 'lower-case'],
@@ -24,4 +24,3 @@ module.exports = {
     'header-max-length': [2, 'always', 100],
   },
 };
-

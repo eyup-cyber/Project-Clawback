@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Experiment Results API
  * Get results and statistics for an experiment

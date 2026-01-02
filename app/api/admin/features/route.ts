@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Feature Flags Admin API
  * CRUD operations for feature flags

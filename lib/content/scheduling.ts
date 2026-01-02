@@ -3,8 +3,8 @@
  * Phase 23: Scheduled publishing, content queue, calendar view
  */
 
-import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -371,7 +371,10 @@ export async function addToQueue(
     throw error;
   }
 
-  logger.info('[Queue] Post added to queue', { postId, position: insertPosition });
+  logger.info('[Queue] Post added to queue', {
+    postId,
+    position: insertPosition,
+  });
 
   return data as unknown as ContentQueueItem;
 }
@@ -395,9 +398,7 @@ export async function removeFromQueue(queueItemId: string): Promise<void> {
 /**
  * Reorder the content queue
  */
-export async function reorderQueue(
-  items: { id: string; position: number }[]
-): Promise<void> {
+export async function reorderQueue(items: { id: string; position: number }[]): Promise<void> {
   const supabase = await createClient();
 
   // Update positions
@@ -448,10 +449,7 @@ export async function scheduleNextInQueue(
 /**
  * Get calendar events for a date range
  */
-export async function getCalendarEvents(
-  startDate: Date,
-  endDate: Date
-): Promise<CalendarEvent[]> {
+export async function getCalendarEvents(startDate: Date, endDate: Date): Promise<CalendarEvent[]> {
   const supabase = await createClient();
 
   // Get scheduled posts
@@ -503,8 +501,18 @@ export async function getCalendarEvents(
       type: 'scheduled',
       postId: post.id,
       slug: post.slug,
-      authorName: (post.author as { display_name: string })?.display_name || 'Unknown',
-      categoryName: (post.category as { name: string })?.name || null,
+      authorName:
+        (
+          (Array.isArray(post.author) ? post.author[0] : post.author) as
+            | { display_name: string }
+            | undefined
+        )?.display_name || 'Unknown',
+      categoryName:
+        (
+          (Array.isArray(post.category) ? post.category[0] : post.category) as
+            | { name: string }
+            | undefined
+        )?.name || null,
       priority: post.priority,
     });
   }
@@ -520,8 +528,18 @@ export async function getCalendarEvents(
       type: 'published',
       postId: post.id,
       slug: post.slug,
-      authorName: (post.author as { display_name: string })?.display_name || 'Unknown',
-      categoryName: (post.category as { name: string })?.name || null,
+      authorName:
+        (
+          (Array.isArray(post.author) ? post.author[0] : post.author) as
+            | { display_name: string }
+            | undefined
+        )?.display_name || 'Unknown',
+      categoryName:
+        (
+          (Array.isArray(post.category) ? post.category[0] : post.category) as
+            | { name: string }
+            | undefined
+        )?.name || null,
       priority: post.priority,
     });
   }
@@ -642,7 +660,10 @@ export async function processScheduledPosts(): Promise<number> {
         .eq('id', post.id);
 
       if (publishError) {
-        logger.error('[Scheduling] Failed to publish post', { postId: post.id, error: publishError });
+        logger.error('[Scheduling] Failed to publish post', {
+          postId: post.id,
+          error: publishError,
+        });
         continue;
       }
 
@@ -652,9 +673,15 @@ export async function processScheduledPosts(): Promise<number> {
       // }
 
       published++;
-      logger.info('[Scheduling] Post published', { postId: post.id, title: post.title });
+      logger.info('[Scheduling] Post published', {
+        postId: post.id,
+        title: post.title,
+      });
     } catch (err) {
-      logger.error('[Scheduling] Error publishing post', { postId: post.id, error: err });
+      logger.error('[Scheduling] Error publishing post', {
+        postId: post.id,
+        error: err,
+      });
     }
   }
 

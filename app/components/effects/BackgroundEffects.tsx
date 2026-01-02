@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { EASING, prefersReducedMotion, getDuration, DURATION } from '@/lib/animations/gsap-config';
+import { useEffect, useRef } from 'react';
+import { DURATION, EASING, getDuration, prefersReducedMotion } from '@/lib/animations/gsap-config';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -31,7 +31,11 @@ export default function BackgroundEffects({
 
   // Animated gradient mesh
   useEffect(() => {
-    if ((variant !== 'gradient-mesh' && variant !== 'all') || !gradientMeshRef.current || prefersReducedMotion()) {
+    if (
+      (variant !== 'gradient-mesh' && variant !== 'all') ||
+      !gradientMeshRef.current ||
+      prefersReducedMotion()
+    ) {
       return;
     }
 
@@ -67,7 +71,7 @@ export default function BackgroundEffects({
       for (let i = 0; i < points; i++) {
         const x = (canvas.width / points) * i + Math.sin(time + i) * 20;
         const y = (canvas.height / points) * i + Math.cos(time + i) * 20;
-        
+
         ctx.beginPath();
         ctx.arc(x, y, 2, 0, Math.PI * 2);
         ctx.fillStyle = color;
@@ -87,7 +91,11 @@ export default function BackgroundEffects({
 
   // Particle system with physics
   useEffect(() => {
-    if ((variant !== 'particles' && variant !== 'all') || !particlesRef.current || prefersReducedMotion()) {
+    if (
+      (variant !== 'particles' && variant !== 'all') ||
+      !particlesRef.current ||
+      prefersReducedMotion()
+    ) {
       return;
     }
 
@@ -145,7 +153,7 @@ export default function BackgroundEffects({
 
     return () => {
       cancelAnimationFrame(animationId);
-      particles.forEach(p => p.element.remove());
+      particles.forEach((p) => p.element.remove());
     };
   }, [variant, intensity, color]);
 
@@ -156,7 +164,7 @@ export default function BackgroundEffects({
     }
 
     const noise = noiseRef.current;
-    
+
     gsap.to(noise, {
       opacity: 0.03 * intensity,
       duration: getDuration(DURATION.slow),
@@ -165,7 +173,9 @@ export default function BackgroundEffects({
 
     // Animated noise pattern
     const animateNoise = () => {
-      const pattern = Array.from({ length: 1000 }, () => Math.random() > 0.5 ? '█' : '░').join('');
+      const pattern = Array.from({ length: 1000 }, () => (Math.random() > 0.5 ? '█' : '░')).join(
+        ''
+      );
       noise.textContent = pattern;
     };
 
@@ -196,7 +206,11 @@ export default function BackgroundEffects({
 
   // Liquid/morphing shapes
   useEffect(() => {
-    if ((variant !== 'liquid' && variant !== 'all') || !liquidRef.current || prefersReducedMotion()) {
+    if (
+      (variant !== 'liquid' && variant !== 'all') ||
+      !liquidRef.current ||
+      prefersReducedMotion()
+    ) {
       return;
     }
 
@@ -206,7 +220,7 @@ export default function BackgroundEffects({
     const morph = () => {
       morphValue += 0.01 * intensity;
       const borderRadius = `${50 + Math.sin(morphValue) * 20}% ${50 - Math.sin(morphValue) * 20}% ${50 + Math.cos(morphValue) * 20}% ${50 - Math.cos(morphValue) * 20}%`;
-      
+
       gsap.to(liquid, {
         borderRadius,
         duration: getDuration(DURATION.medium),
@@ -236,10 +250,7 @@ export default function BackgroundEffects({
 
       {/* Particles */}
       {(variant === 'particles' || variant === 'all') && (
-        <div
-          ref={particlesRef}
-          className="absolute inset-0 w-full h-full"
-        />
+        <div ref={particlesRef} className="absolute inset-0 w-full h-full" />
       )}
 
       {/* Noise overlay */}
@@ -284,7 +295,3 @@ export default function BackgroundEffects({
     </div>
   );
 }
-
-
-
-

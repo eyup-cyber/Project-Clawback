@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Prometheus Metrics Endpoint
  * Exposes application metrics in Prometheus format

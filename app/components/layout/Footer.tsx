@@ -1,26 +1,30 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useState } from 'react';
 import { FOOTER_LINKS, SOCIAL_LINKS } from '@/lib/constants';
 
 // Animated link component with underline draw effect
-function AnimatedLink({ href, children, external = false }: { 
-  href: string; 
+function AnimatedLink({
+  href,
+  children,
+  external = false,
+}: {
+  href: string;
   children: React.ReactNode;
   external?: boolean;
 }) {
   const [isHovered, setIsHovered] = useState(false);
-  
+
   const Component = external ? 'a' : Link;
   const externalProps = external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
-  
+
   return (
     <Component
       href={href}
       {...externalProps}
       className="relative inline-block text-sm transition-colors duration-200 py-1"
-      style={{ 
+      style={{
         color: isHovered ? 'var(--primary)' : 'var(--foreground)',
         opacity: isHovered ? 1 : 0.7,
         fontFamily: 'var(--font-body)',
@@ -42,26 +46,26 @@ function AnimatedLink({ href, children, external = false }: {
 }
 
 // Social icon with glow effect
-function SocialIcon({ 
-  href, 
-  label, 
+function SocialIcon({
+  href,
+  label,
   children,
   glowColor = 'var(--primary)',
-}: { 
-  href: string; 
-  label: string; 
+}: {
+  href: string;
+  label: string;
   children: React.ReactNode;
   glowColor?: string;
 }) {
   const [isHovered, setIsHovered] = useState(false);
-  
+
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
       className="relative w-11 h-11 rounded-full flex items-center justify-center transition-all duration-300"
-      style={{ 
+      style={{
         border: `1px solid ${isHovered ? glowColor : 'var(--border)'}`,
         color: isHovered ? glowColor : 'var(--foreground)',
         background: isHovered ? `${glowColor}15` : 'transparent',
@@ -80,7 +84,10 @@ function SocialIcon({
 // Wave SVG component
 function WaveBorder() {
   return (
-    <div className="absolute top-0 left-0 right-0 overflow-hidden" style={{ height: '60px', marginTop: '-59px' }}>
+    <div
+      className="absolute top-0 left-0 right-0 overflow-hidden"
+      style={{ height: '60px', marginTop: '-59px' }}
+    >
       <svg
         viewBox="0 0 1440 60"
         fill="none"
@@ -107,15 +114,12 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer
-      className="relative py-20 px-4 md:px-8"
-      style={{ background: 'var(--background)' }}
-    >
+    <footer className="relative py-20 px-4 md:px-8" style={{ background: 'var(--background)' }}>
       {/* Wave border at top */}
       <WaveBorder />
-      
+
       {/* Subtle gradient overlay */}
-      <div 
+      <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background: 'linear-gradient(180deg, rgba(50, 205, 50, 0.02) 0%, transparent 50%)',
@@ -130,7 +134,7 @@ export default function Footer() {
             <Link href="/" className="inline-block mb-6 group">
               <span
                 className="text-3xl block transition-all duration-300 group-hover:text-shadow-glow"
-                style={{ 
+                style={{
                   fontFamily: 'var(--font-display)',
                   color: 'var(--primary)',
                 }}
@@ -139,7 +143,7 @@ export default function Footer() {
               </span>
               <span
                 className="text-xs tracking-[0.25em] uppercase block -mt-1"
-                style={{ 
+                style={{
                   fontFamily: 'var(--font-body)',
                   color: 'var(--accent)',
                   fontWeight: 500,
@@ -148,28 +152,32 @@ export default function Footer() {
                 MULTIMEDIA
               </span>
             </Link>
-            <p 
-              className="text-sm mb-6 leading-relaxed" 
-              style={{ 
+            <p
+              className="text-sm mb-6 leading-relaxed"
+              style={{
                 fontFamily: 'var(--font-body)',
-                color: 'var(--foreground)', 
-                opacity: 0.6 
+                color: 'var(--foreground)',
+                opacity: 0.6,
               }}
             >
-              Political journalism from the people who live it. 
-              No credentials required. 100% your revenue.
+              Political journalism from the people who live it. No credentials required. 100% your
+              revenue.
             </p>
-            
+
             {/* Social links */}
             <div className="flex gap-3">
-              <SocialIcon href={SOCIAL_LINKS.twitter} label="X (Twitter)" glowColor="var(--foreground)">
+              <SocialIcon
+                href={SOCIAL_LINKS.twitter}
+                label="X (Twitter)"
+                glowColor="var(--foreground)"
+              >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                 </svg>
               </SocialIcon>
               <SocialIcon href={SOCIAL_LINKS.patreon} label="Patreon" glowColor="#FF424D">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M14.82 2.41c3.96 0 7.18 3.24 7.18 7.21 0 3.96-3.22 7.18-7.18 7.18-3.97 0-7.21-3.22-7.21-7.18 0-3.97 3.24-7.21 7.21-7.21M2 21.6h3.5V2.41H2V21.6z"/>
+                  <path d="M14.82 2.41c3.96 0 7.18 3.24 7.18 7.21 0 3.96-3.22 7.18-7.18 7.18-3.97 0-7.21-3.22-7.21-7.18 0-3.97 3.24-7.21 7.21-7.21M2 21.6h3.5V2.41H2V21.6z" />
                 </svg>
               </SocialIcon>
               <SocialIcon href={SOCIAL_LINKS.kofi} label="Ko-fi" glowColor="var(--secondary)">
@@ -182,7 +190,7 @@ export default function Footer() {
           <div>
             <h4
               className="text-sm font-bold uppercase tracking-wider mb-6"
-              style={{ 
+              style={{
                 fontFamily: 'var(--font-body)',
                 color: 'var(--foreground)',
               }}
@@ -202,7 +210,7 @@ export default function Footer() {
           <div>
             <h4
               className="text-sm font-bold uppercase tracking-wider mb-6"
-              style={{ 
+              style={{
                 fontFamily: 'var(--font-body)',
                 color: 'var(--foreground)',
               }}
@@ -222,7 +230,7 @@ export default function Footer() {
           <div>
             <h4
               className="text-sm font-bold uppercase tracking-wider mb-6"
-              style={{ 
+              style={{
                 fontFamily: 'var(--font-body)',
                 color: 'var(--foreground)',
               }}
@@ -240,7 +248,7 @@ export default function Footer() {
         </div>
 
         {/* Divider with gradient */}
-        <div 
+        <div
           className="h-px mb-8"
           style={{
             background: 'linear-gradient(90deg, transparent, var(--border), transparent)',
@@ -249,22 +257,22 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <p 
-            className="text-sm" 
-            style={{ 
+          <p
+            className="text-sm"
+            style={{
               fontFamily: 'var(--font-body)',
-              color: 'var(--foreground)', 
-              opacity: 0.5 
+              color: 'var(--foreground)',
+              opacity: 0.5,
             }}
           >
             © {currentYear} Scroungers Multimedia. All rights reserved.
           </p>
-          <p 
-            className="text-sm flex items-center gap-2" 
-            style={{ 
+          <p
+            className="text-sm flex items-center gap-2"
+            style={{
               fontFamily: 'var(--font-body)',
-              color: 'var(--foreground)', 
-              opacity: 0.5 
+              color: 'var(--foreground)',
+              opacity: 0.5,
             }}
           >
             <span>Built for the margins, by the margins</span>

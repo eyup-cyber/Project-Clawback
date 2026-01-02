@@ -1,6 +1,6 @@
-import { createClient } from '@/lib/supabase/server';
 import { ApiError } from '@/lib/api/response';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -53,7 +53,10 @@ export async function togglePostReaction(
   postId: string,
   userId: string,
   reactionType: ReactionType
-): Promise<{ action: 'added' | 'removed' | 'changed'; type: ReactionType | null }> {
+): Promise<{
+  action: 'added' | 'removed' | 'changed';
+  type: ReactionType | null;
+}> {
   const supabase = await createClient();
 
   // Check if user already has a reaction of this type on this post
@@ -70,7 +73,10 @@ export async function togglePostReaction(
     const { error } = await supabase.from('reactions').delete().eq('id', existing.id);
 
     if (error) {
-      logger.error('[togglePostReaction] Delete error', error, { postId, userId });
+      logger.error('[togglePostReaction] Delete error', error, {
+        postId,
+        userId,
+      });
       throw ApiError.badRequest('Failed to remove reaction');
     }
 
@@ -84,7 +90,11 @@ export async function togglePostReaction(
     });
 
     if (error) {
-      logger.error('[togglePostReaction] Insert error', error, { postId, userId, reactionType });
+      logger.error('[togglePostReaction] Insert error', error, {
+        postId,
+        userId,
+        reactionType,
+      });
       throw ApiError.badRequest('Failed to add reaction');
     }
 
@@ -202,7 +212,10 @@ export async function toggleCommentReaction(
   commentId: string,
   userId: string,
   reactionType: CommentReactionType
-): Promise<{ action: 'added' | 'removed' | 'changed'; type: CommentReactionType | null }> {
+): Promise<{
+  action: 'added' | 'removed' | 'changed';
+  type: CommentReactionType | null;
+}> {
   const supabase = await createClient();
 
   // Check if user already has a reaction on this comment (only one per user per comment)
@@ -219,7 +232,10 @@ export async function toggleCommentReaction(
       const { error } = await supabase.from('comment_reactions').delete().eq('id', existing.id);
 
       if (error) {
-        logger.error('[toggleCommentReaction] Delete error', error, { commentId, userId });
+        logger.error('[toggleCommentReaction] Delete error', error, {
+          commentId,
+          userId,
+        });
         throw ApiError.badRequest('Failed to remove reaction');
       }
 

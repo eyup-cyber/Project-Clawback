@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Individual Experiment Admin API
  * Get, update, delete individual experiments

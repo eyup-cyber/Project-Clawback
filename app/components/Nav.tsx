@@ -22,7 +22,6 @@ const navLinks: NavLink[] = [
   { label: 'Home', id: 'hero' },
   { label: 'About', href: '/about' },
   { label: 'Explore', href: '/articles' },
-  { label: 'How It Works', href: '/how-it-works' },
   { label: 'Apply', href: '/apply' },
 ];
 
@@ -347,7 +346,7 @@ export default function Nav() {
             <div className="flex items-center gap-3">
               <Link
                 href="/login"
-                className="text-sm font-medium px-4 py-2 rounded-full border transition-all hover:border-[var(--secondary)] hover:text-[var(--secondary)] hover:shadow-[0_0_15px_var(--glow-secondary)]"
+                className="group relative text-sm font-medium px-5 py-2.5 rounded-full border-2 transition-all duration-300 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:shadow-[0_0_20px_var(--glow-primary)] overflow-hidden"
                 style={{
                   borderColor: 'var(--border)',
                   color: 'var(--foreground)',
@@ -355,19 +354,29 @@ export default function Nav() {
                   fontWeight: 500,
                 }}
               >
-                Sign In
+                <span className="relative z-10">Sign In</span>
+                <span
+                  className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300"
+                  style={{ background: COLORS.primary }}
+                />
               </Link>
               <Link
                 href="/register"
-                className="text-sm font-medium px-4 py-2 rounded-full transition-all hover:shadow-[0_0_20px_var(--glow-secondary)]"
+                className="group relative text-sm font-medium px-5 py-2.5 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_var(--glow-secondary)] overflow-hidden"
                 style={{
-                  background: COLORS.secondary,
+                  background: `linear-gradient(135deg, ${COLORS.secondary} 0%, #FFA500 100%)`,
                   color: 'var(--background)',
                   fontFamily: 'var(--font-body)',
-                  fontWeight: 500,
+                  fontWeight: 600,
                 }}
               >
-                Sign Up
+                <span className="relative z-10">Sign Up</span>
+                <span
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{
+                    background: `linear-gradient(135deg, #FFA500 0%, ${COLORS.secondary} 100%)`,
+                  }}
+                />
               </Link>
             </div>
           )}

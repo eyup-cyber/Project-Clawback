@@ -89,10 +89,10 @@ export const embedProviders: EmbedProvider[] = [
       const videoId = data.metadata?.videoId;
       return `
         <div class="embed-container embed-youtube" style="aspect-ratio: 16/9">
-          <iframe 
-            src="https://www.youtube.com/embed/${videoId}?rel=0" 
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          <iframe
+            src="https://www.youtube.com/embed/${videoId}?rel=0"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
             loading="lazy"
           ></iframe>
@@ -111,7 +111,9 @@ export const embedProviders: EmbedProvider[] = [
     transform: async (url, match) => {
       const videoId = match[1];
       // Fetch oEmbed for additional data
-      const oembed = await fetchOEmbed(`https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`);
+      const oembed = await fetchOEmbed(
+        `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`
+      );
       return {
         provider: 'vimeo',
         type: 'video',
@@ -126,10 +128,10 @@ export const embedProviders: EmbedProvider[] = [
       const videoId = data.metadata?.videoId;
       return `
         <div class="embed-container embed-vimeo" style="aspect-ratio: 16/9">
-          <iframe 
-            src="https://player.vimeo.com/video/${videoId}?dnt=1" 
-            frameborder="0" 
-            allow="autoplay; fullscreen; picture-in-picture" 
+          <iframe
+            src="https://player.vimeo.com/video/${videoId}?dnt=1"
+            frameborder="0"
+            allow="autoplay; fullscreen; picture-in-picture"
             allowfullscreen
             loading="lazy"
           ></iframe>
@@ -141,9 +143,7 @@ export const embedProviders: EmbedProvider[] = [
   // Twitter/X
   {
     name: 'twitter',
-    patterns: [
-      /(?:https?:\/\/)?(?:www\.)?(?:twitter|x)\.com\/\w+\/status\/(\d+)/,
-    ],
+    patterns: [/(?:https?:\/\/)?(?:www\.)?(?:twitter|x)\.com\/\w+\/status\/(\d+)/],
     transform: async (url, match) => {
       const tweetId = match[1];
       return {
@@ -168,9 +168,7 @@ export const embedProviders: EmbedProvider[] = [
   // Instagram
   {
     name: 'instagram',
-    patterns: [
-      /(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:p|reel)\/([a-zA-Z0-9_-]+)/,
-    ],
+    patterns: [/(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:p|reel)\/([a-zA-Z0-9_-]+)/],
     transform: async (url, match) => {
       const postId = match[1];
       return {
@@ -183,9 +181,9 @@ export const embedProviders: EmbedProvider[] = [
     render: (data) => {
       return `
         <div class="embed-container embed-instagram">
-          <blockquote 
-            class="instagram-media" 
-            data-instgrm-captioned 
+          <blockquote
+            class="instagram-media"
+            data-instgrm-captioned
             data-instgrm-permalink="${data.url}"
           >
             <a href="${data.url}">View on Instagram</a>
@@ -216,9 +214,9 @@ export const embedProviders: EmbedProvider[] = [
     render: (data) => {
       return `
         <div class="embed-container embed-tiktok">
-          <blockquote 
-            class="tiktok-embed" 
-            cite="${data.url}" 
+          <blockquote
+            class="tiktok-embed"
+            cite="${data.url}"
             data-video-id="${data.metadata?.videoId}"
           >
             <a href="${data.url}">View on TikTok</a>
@@ -249,12 +247,12 @@ export const embedProviders: EmbedProvider[] = [
       const height = spotifyType === 'track' ? 152 : 352;
       return `
         <div class="embed-container embed-spotify">
-          <iframe 
-            src="https://open.spotify.com/embed/${spotifyType}/${spotifyId}?utm_source=generator&theme=0" 
-            width="100%" 
-            height="${height}" 
-            frameBorder="0" 
-            allowfullscreen="" 
+          <iframe
+            src="https://open.spotify.com/embed/${spotifyType}/${spotifyId}?utm_source=generator&theme=0"
+            width="100%"
+            height="${height}"
+            frameBorder="0"
+            allowfullscreen=""
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
             loading="lazy"
           ></iframe>
@@ -266,9 +264,7 @@ export const embedProviders: EmbedProvider[] = [
   // SoundCloud
   {
     name: 'soundcloud',
-    patterns: [
-      /(?:https?:\/\/)?(?:www\.)?soundcloud\.com\/[\w-]+\/[\w-]+/,
-    ],
+    patterns: [/(?:https?:\/\/)?(?:www\.)?soundcloud\.com\/[\w-]+\/[\w-]+/],
     transform: async (url) => {
       const oembed = await fetchOEmbed(
         `https://soundcloud.com/oembed?format=json&url=${encodeURIComponent(url)}`
@@ -297,9 +293,7 @@ export const embedProviders: EmbedProvider[] = [
   // CodePen
   {
     name: 'codepen',
-    patterns: [
-      /(?:https?:\/\/)?codepen\.io\/([\w-]+)\/pen\/([\w-]+)/,
-    ],
+    patterns: [/(?:https?:\/\/)?codepen\.io\/([\w-]+)\/pen\/([\w-]+)/],
     transform: async (url, match) => {
       const [, user, penId] = match;
       return {
@@ -314,10 +308,10 @@ export const embedProviders: EmbedProvider[] = [
       const { user, penId } = data.metadata || {};
       return `
         <div class="embed-container embed-codepen" style="aspect-ratio: 16/9">
-          <iframe 
-            src="https://codepen.io/${user}/embed/${penId}?default-tab=result&theme-id=dark" 
-            frameborder="0" 
-            loading="lazy" 
+          <iframe
+            src="https://codepen.io/${user}/embed/${penId}?default-tab=result&theme-id=dark"
+            frameborder="0"
+            loading="lazy"
             allowfullscreen="true"
           ></iframe>
         </div>
@@ -346,9 +340,9 @@ export const embedProviders: EmbedProvider[] = [
       const { sandboxId } = data.metadata || {};
       return `
         <div class="embed-container embed-codesandbox" style="aspect-ratio: 16/9">
-          <iframe 
-            src="https://codesandbox.io/embed/${sandboxId}?fontsize=14&hidenavigation=1&theme=dark" 
-            frameborder="0" 
+          <iframe
+            src="https://codesandbox.io/embed/${sandboxId}?fontsize=14&hidenavigation=1&theme=dark"
+            frameborder="0"
             loading="lazy"
             allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
             sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
@@ -361,9 +355,7 @@ export const embedProviders: EmbedProvider[] = [
   // GitHub Gist
   {
     name: 'gist',
-    patterns: [
-      /(?:https?:\/\/)?gist\.github\.com\/([\w-]+)\/([\w]+)/,
-    ],
+    patterns: [/(?:https?:\/\/)?gist\.github\.com\/([\w-]+)\/([\w]+)/],
     transform: async (url, match) => {
       const [, user, gistId] = match;
       return {
@@ -386,9 +378,7 @@ export const embedProviders: EmbedProvider[] = [
   // Figma
   {
     name: 'figma',
-    patterns: [
-      /(?:https?:\/\/)?(?:www\.)?figma\.com\/(file|proto)\/([a-zA-Z0-9]+)/,
-    ],
+    patterns: [/(?:https?:\/\/)?(?:www\.)?figma\.com\/(file|proto)\/([a-zA-Z0-9]+)/],
     transform: async (url, match) => {
       const [, type, fileId] = match;
       return {
@@ -402,8 +392,8 @@ export const embedProviders: EmbedProvider[] = [
     render: (data) => {
       return `
         <div class="embed-container embed-figma" style="aspect-ratio: 16/9">
-          <iframe 
-            src="https://www.figma.com/embed?embed_host=share&url=${encodeURIComponent(data.url)}" 
+          <iframe
+            src="https://www.figma.com/embed?embed_host=share&url=${encodeURIComponent(data.url)}"
             frameborder="0"
             loading="lazy"
             allowfullscreen
@@ -416,9 +406,7 @@ export const embedProviders: EmbedProvider[] = [
   // Loom
   {
     name: 'loom',
-    patterns: [
-      /(?:https?:\/\/)?(?:www\.)?loom\.com\/share\/([a-zA-Z0-9]+)/,
-    ],
+    patterns: [/(?:https?:\/\/)?(?:www\.)?loom\.com\/share\/([a-zA-Z0-9]+)/],
     transform: async (url, match) => {
       const videoId = match[1];
       return {
@@ -433,11 +421,11 @@ export const embedProviders: EmbedProvider[] = [
       const { videoId } = data.metadata || {};
       return `
         <div class="embed-container embed-loom" style="aspect-ratio: 16/9">
-          <iframe 
-            src="https://www.loom.com/embed/${videoId}" 
-            frameborder="0" 
-            webkitallowfullscreen 
-            mozallowfullscreen 
+          <iframe
+            src="https://www.loom.com/embed/${videoId}"
+            frameborder="0"
+            webkitallowfullscreen
+            mozallowfullscreen
             allowfullscreen
             loading="lazy"
           ></iframe>
@@ -466,10 +454,10 @@ export const embedProviders: EmbedProvider[] = [
       if (data.url.includes('/maps/embed')) {
         return `
           <div class="embed-container embed-google-maps" style="aspect-ratio: 4/3">
-            <iframe 
-              src="${data.url}" 
-              frameborder="0" 
-              allowfullscreen="" 
+            <iframe
+              src="${data.url}"
+              frameborder="0"
+              allowfullscreen=""
               loading="lazy"
             ></iframe>
           </div>
@@ -478,10 +466,10 @@ export const embedProviders: EmbedProvider[] = [
       // Otherwise create embed URL
       return `
         <div class="embed-container embed-google-maps" style="aspect-ratio: 4/3">
-          <iframe 
-            src="https://maps.google.com/maps?q=${encodeURIComponent(data.url)}&output=embed" 
-            frameborder="0" 
-            allowfullscreen="" 
+          <iframe
+            src="https://maps.google.com/maps?q=${encodeURIComponent(data.url)}&output=embed"
+            frameborder="0"
+            allowfullscreen=""
             loading="lazy"
           ></iframe>
         </div>
@@ -716,9 +704,7 @@ export function getEmbedStyles(): string {
  * Check if URL is embeddable
  */
 export function isEmbeddable(url: string): boolean {
-  return embedProviders.some((provider) =>
-    provider.patterns.some((pattern) => pattern.test(url))
-  );
+  return embedProviders.some((provider) => provider.patterns.some((pattern) => pattern.test(url)));
 }
 
 /**

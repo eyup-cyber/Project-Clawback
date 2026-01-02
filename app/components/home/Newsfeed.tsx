@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Link from 'next/link';
-import { formatRelativeTime, getContentTypeIcon } from '@/lib/utils';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FloatingParticles } from '@/app/components/effects/Particles';
+import { formatRelativeTime, getContentTypeIcon } from '@/lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -162,11 +162,12 @@ function PostCard({ post, featured = false }: PostCardProps) {
       {/* Image */}
       <div
         className={`relative overflow-hidden ${featured ? 'aspect-[16/10]' : 'aspect-video'}`}
-        style={{ background: 'linear-gradient(135deg, var(--background), var(--surface))' }}
+        style={{
+          background: 'linear-gradient(135deg, var(--background), var(--surface))',
+        }}
       >
         {/* Featured Image */}
         {post.featured_image_url && (
-           
           <img
             src={post.featured_image_url}
             alt={post.title}
@@ -208,7 +209,10 @@ function PostCard({ post, featured = false }: PostCardProps) {
         {'reading_time' in post && post.reading_time && (
           <span
             className="absolute bottom-3 right-3 px-2 py-1 rounded text-xs font-medium"
-            style={{ background: 'rgba(0,0,0,0.7)', color: 'var(--foreground)' }}
+            style={{
+              background: 'rgba(0,0,0,0.7)',
+              color: 'var(--foreground)',
+            }}
           >
             {post.reading_time} min read
           </span>
@@ -216,7 +220,10 @@ function PostCard({ post, featured = false }: PostCardProps) {
         {'media_duration' in post && post.media_duration && (
           <span
             className="absolute bottom-3 right-3 px-2 py-1 rounded text-xs font-medium"
-            style={{ background: 'rgba(0,0,0,0.7)', color: 'var(--foreground)' }}
+            style={{
+              background: 'rgba(0,0,0,0.7)',
+              color: 'var(--foreground)',
+            }}
           >
             {formatDuration(post.media_duration)}
           </span>
@@ -280,7 +287,6 @@ function PostCard({ post, featured = false }: PostCardProps) {
               }}
             >
               {post.author.avatar_url ? (
-                 
                 <img
                   src={post.author.avatar_url}
                   alt={post.author.display_name}

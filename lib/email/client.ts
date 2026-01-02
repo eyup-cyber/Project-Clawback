@@ -28,7 +28,7 @@ const RESEND_API_URL = 'https://api.resend.com/emails';
  */
 export async function sendEmail(options: EmailOptions): Promise<EmailResult> {
   const { logger } = await import('@/lib/logger');
-  
+
   if (!RESEND_API_KEY) {
     logger.warn('RESEND_API_KEY not configured, skipping email');
     return { success: false, error: 'Email not configured' };
@@ -54,15 +54,24 @@ export async function sendEmail(options: EmailOptions): Promise<EmailResult> {
 
     if (!response.ok) {
       const error = await response.json();
-      logger.error('Email send failed', error, { to: options.to, subject: options.subject });
+      logger.error('Email send failed', error, {
+        to: options.to,
+        subject: options.subject,
+      });
       return { success: false, error: error.message || 'Failed to send email' };
     }
 
     const result = await response.json();
-    logger.info('Email sent successfully', { emailId: result.id, to: options.to });
+    logger.info('Email sent successfully', {
+      emailId: result.id,
+      to: options.to,
+    });
     return { success: true, id: result.id };
   } catch (err) {
-    logger.error('Email send error', err, { to: options.to, subject: options.subject });
+    logger.error('Email send error', err, {
+      to: options.to,
+      subject: options.subject,
+    });
     return { success: false, error: 'Failed to send email' };
   }
 }
@@ -81,9 +90,7 @@ export async function sendBulkEmail(
   const batchSize = 10;
   for (let i = 0; i < recipients.length; i += batchSize) {
     const batch = recipients.slice(i, i + batchSize);
-    const results = await Promise.all(
-      batch.map((to) => sendEmail({ ...options, to }))
-    );
+    const results = await Promise.all(batch.map((to) => sendEmail({ ...options, to })));
 
     results.forEach((result) => {
       if (result.success) sent++;
@@ -98,6 +105,3 @@ export async function sendBulkEmail(
 
   return { sent, failed };
 }
-
-
-

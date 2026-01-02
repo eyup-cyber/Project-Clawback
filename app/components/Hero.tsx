@@ -342,7 +342,7 @@ export default function Hero() {
   const [_hoveredLetter, setHoveredLetter] = useState<number | null>(null);
 
   const scroungers = 'scroungers'.split('');
-  const tagline = 'Political journalism from the people who live it.';
+  const tagline = 'Are you enjoying the show?';
 
   // Track mouse for parallax and WebGL
   useEffect(() => {
@@ -589,13 +589,15 @@ export default function Hero() {
         style={parallaxStyle(8)}
         onMouseEnter={initializeAudio}
       >
-        {/* scroungers - split letters */}
+        {/* scroungers - stacked above multimedia */}
         <h1
           ref={scroungerRef}
-          className="logo-scroungers text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-medium leading-none lowercase mb-2"
+          className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-medium leading-none lowercase mb-2"
           style={{
             fontFamily: 'var(--font-body)',
             fontWeight: 500,
+            color: 'var(--primary)',
+            textShadow: `0 0 20px ${COLORS.glowPrimary}`,
             perspective: '1200px',
           }}
         >
@@ -611,28 +613,18 @@ export default function Hero() {
           ))}
         </h1>
 
-        {/* MULTIMEDIA */}
+        {/* multimedia - Kindergarten font below scroungers */}
         <span
           ref={multimediaRef}
-          className="logo-multimedia block text-xl sm:text-2xl md:text-3xl lowercase tracking-[0.2em]"
+          className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl lowercase tracking-[0.15em]"
           style={{
-            fontFamily: 'var(--font-display)',
+            fontFamily: 'var(--font-kindergarten)',
             color: COLORS.secondary,
-            textShadow: `0 0 20px ${COLORS.glowSecondary}`,
+            textShadow: `0 0 15px ${COLORS.glowSecondary}`,
             willChange: 'transform, opacity',
           }}
         >
-          {'multimedia'.split('').map((char, i) => (
-            <span
-              key={i}
-              className="inline-block hover:scale-110 transition-transform duration-200"
-              style={{
-                animationDelay: `${1.5 + i * 0.1}s`,
-              }}
-            >
-              {char}
-            </span>
-          ))}
+          multimedia
         </span>
 
         {/* Tagline with typewriter */}

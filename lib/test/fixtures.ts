@@ -55,7 +55,3 @@ export const mockCategory = {
   post_count: 1,
   created_at: new Date().toISOString(),
 };
-
-
-
-

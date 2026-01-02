@@ -1,7 +1,7 @@
-import { createClient } from '@/lib/supabase/server';
 import { ApiError } from '@/lib/api/response';
-import type { ContentType } from '@/types/database';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/server';
+import type { ContentType } from '@/types/database';
 
 // ============================================================================
 // TYPES
@@ -104,7 +104,10 @@ export async function createApplication(
     .single();
 
   if (error) {
-    logger.error('[createApplication] Error', error, { userId: input.user_id, email: input.email });
+    logger.error('[createApplication] Error', error, {
+      userId: input.user_id,
+      email: input.email,
+    });
     throw ApiError.badRequest('Failed to submit application');
   }
 
@@ -114,21 +117,21 @@ export async function createApplication(
 /**
  * Get an application by ID
  */
-export async function getApplicationById(
-  id: string
-): Promise<ApplicationWithReviewer> {
+export async function getApplicationById(id: string): Promise<ApplicationWithReviewer> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('contributor_applications')
-    .select(`
+    .select(
+      `
       *,
       reviewer:profiles!contributor_applications_reviewer_id_fkey (
         id,
         username,
         display_name
       )
-    `)
+    `
+    )
     .eq('id', id)
     .single();
 
@@ -151,10 +154,8 @@ export async function listApplications(options: {
   const supabase = await createClient();
   const { status, page = 1, limit = 20, search } = options;
 
-  let query = supabase
-    .from('contributor_applications')
-    .select(
-      `
+  let query = supabase.from('contributor_applications').select(
+    `
       *,
       reviewer:profiles!contributor_applications_reviewer_id_fkey (
         id,
@@ -162,17 +163,15 @@ export async function listApplications(options: {
         display_name
       )
     `,
-      { count: 'exact' }
-    );
+    { count: 'exact' }
+  );
 
   if (status) {
     query = query.eq('status', status);
   }
 
   if (search) {
-    query = query.or(
-      `full_name.ilike.%${search}%,email.ilike.%${search}%`
-    );
+    query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%`);
   }
 
   const from = (page - 1) * limit;
@@ -183,7 +182,12 @@ export async function listApplications(options: {
     .range(from, to);
 
   if (error) {
-    logger.error('[listApplications] Error', error, { status, search, page, limit });
+    logger.error('[listApplications] Error', error, {
+      status,
+      search,
+      page,
+      limit,
+    });
     throw ApiError.badRequest('Failed to fetch applications');
   }
 
@@ -232,7 +236,9 @@ export async function approveApplication(
     .eq('id', id);
 
   if (updateError) {
-    logger.error('[approveApplication] Update error', updateError, { applicationId: id });
+    logger.error('[approveApplication] Update error', updateError, {
+      applicationId: id,
+    });
     throw ApiError.badRequest('Failed to approve application');
   }
 
@@ -244,7 +250,9 @@ export async function approveApplication(
       .eq('id', application.user_id);
 
     if (roleError) {
-      logger.error('[approveApplication] Role update error', roleError, { userId: application.user_id });
+      logger.error('[approveApplication] Role update error', roleError, {
+        userId: application.user_id,
+      });
       // Don't throw - application is approved, role update can be done manually
     }
   }
@@ -335,7 +343,10 @@ export async function canUserApply(userId: string): Promise<{
     .single();
 
   if (pending) {
-    return { canApply: false, reason: 'You already have a pending application' };
+    return {
+      canApply: false,
+      reason: 'You already have a pending application',
+    };
   }
 
   return { canApply: true };
@@ -352,9 +363,7 @@ export async function getApplicationStats(): Promise<{
 }> {
   const supabase = await createClient();
 
-  const { data: applications } = await supabase
-    .from('contributor_applications')
-    .select('status');
+  const { data: applications } = await supabase.from('contributor_applications').select('status');
 
   const stats = {
     total: 0,
@@ -372,4 +381,3 @@ export async function getApplicationStats(): Promise<{
 
   return stats;
 }
-

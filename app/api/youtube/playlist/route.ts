@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { type NextRequest } from 'next/server';
 import { success } from '@/lib/api';
 import { withRouteHandler } from '@/lib/api/route-wrapper';
@@ -97,7 +99,8 @@ const handler = async (request: NextRequest) => {
                 videoId: item.snippet.resourceId.videoId,
                 title: item.snippet.title,
                 description: item.snippet.description,
-                thumbnail: item.snippet.thumbnails?.maxres?.url || item.snippet.thumbnails?.high?.url,
+                thumbnail:
+                  item.snippet.thumbnails?.maxres?.url || item.snippet.thumbnails?.high?.url,
                 publishedAt: item.snippet.publishedAt,
               })) || [];
           }
@@ -115,7 +118,3 @@ const handler = async (request: NextRequest) => {
 };
 
 export const GET = withRouteHandler(handler, { logRequest: true });
-
-
-
-

@@ -3,8 +3,8 @@
  * Phase 30: Health checks, metrics, alerting, status page
  */
 
-import { createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -162,7 +162,10 @@ export async function checkHealth(): Promise<HealthStatus> {
 /**
  * Check a single service
  */
-async function checkService(service: { name: string; endpoint: string | null }): Promise<ServiceStatus> {
+async function checkService(service: {
+  name: string;
+  endpoint: string | null;
+}): Promise<ServiceStatus> {
   const startTime = Date.now();
 
   try {
@@ -351,7 +354,11 @@ export async function createAlert(options: {
     throw error;
   }
 
-  logger.warn('[Monitoring] Alert created', { alertId: data.id, type, severity });
+  logger.warn('[Monitoring] Alert created', {
+    alertId: data.id,
+    type,
+    severity,
+  });
 
   // Send notifications
   await sendAlertNotifications(data as Alert);
@@ -455,7 +462,10 @@ async function sendAlertNotifications(alert: Alert): Promise<void> {
     try {
       await sendNotification(channel, alert);
     } catch (error) {
-      logger.error('[Monitoring] Failed to send notification', { channel, error });
+      logger.error('[Monitoring] Failed to send notification', {
+        channel,
+        error,
+      });
     }
   }
 }
@@ -466,7 +476,9 @@ async function sendNotification(channel: string, alert: Alert): Promise<void> {
   switch (channel) {
     case 'email':
       // Send email notification
-      logger.info('[Monitoring] Email notification sent', { alertId: alert.id });
+      logger.info('[Monitoring] Email notification sent', {
+        alertId: alert.id,
+      });
       break;
 
     case 'slack':

@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { createClient } from '@/lib/supabase/server';
 import { r2Client } from '@/lib/r2/client';
 import { PutObjectCommand } from '@aws-sdk/client-s3';

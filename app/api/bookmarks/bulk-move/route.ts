@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Bulk Move Bookmarks API
  */

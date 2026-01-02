@@ -1,6 +1,6 @@
-import { createClient } from '@/lib/supabase/server';
 import { ApiError } from '@/lib/api/response';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/server';
 
 // Note: The notifications table is created by migration 002_notifications.sql
 // These functions will work once the migration is applied.
@@ -46,10 +46,10 @@ export interface NotificationWithDetails extends Notification {
 
 // Helper to get an untyped supabase client for notifications table
 // (until the migration is applied and types are regenerated)
- 
+
 async function getNotificationsTable(): Promise<any> {
   const supabase = await createClient();
-   
+
   return (supabase as any).from('notifications');
 }
 
@@ -65,17 +65,24 @@ export async function getNotifications(options: {
   page?: number;
   limit?: number;
   unreadOnly?: boolean;
-}): Promise<{ notifications: NotificationWithDetails[]; total: number; unreadCount: number }> {
+}): Promise<{
+  notifications: NotificationWithDetails[];
+  total: number;
+  unreadCount: number;
+}> {
   const { userId, page = 1, limit = 20, unreadOnly = false } = options;
 
   const table = await getNotificationsTable();
-  
+
   let query = table
-    .select(`
+    .select(
+      `
       *,
       post:posts!notifications_post_id_fkey (title, slug),
       actor:profiles!notifications_actor_id_fkey (username, display_name, avatar_url)
-    `, { count: 'exact' })
+    `,
+      { count: 'exact' }
+    )
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
 
@@ -90,7 +97,12 @@ export async function getNotifications(options: {
   const { data, error, count } = await query;
 
   if (error) {
-    logger.error('[getNotifications] Error', error, { userId, page, limit, unreadOnly });
+    logger.error('[getNotifications] Error', error, {
+      userId,
+      page,
+      limit,
+      unreadOnly,
+    });
     throw ApiError.badRequest('Failed to fetch notifications');
   }
 
@@ -102,7 +114,7 @@ export async function getNotifications(options: {
     .eq('is_read', false);
 
   // Transform the data to match expected shape
-   
+
   const notifications = (data || []).map((n: any) => ({
     ...n,
     post_title: n.post?.title || null,
@@ -138,7 +150,10 @@ export async function markNotificationsRead(
     .select();
 
   if (error) {
-    logger.error('[markNotificationsRead] Error', error, { userId, notificationIds });
+    logger.error('[markNotificationsRead] Error', error, {
+      userId,
+      notificationIds,
+    });
     throw ApiError.badRequest('Failed to mark notifications as read');
   }
 
@@ -171,19 +186,16 @@ export async function markAllNotificationsRead(userId: string): Promise<number> 
 /**
  * Delete a notification
  */
-export async function deleteNotification(
-  userId: string,
-  notificationId: string
-): Promise<void> {
+export async function deleteNotification(userId: string, notificationId: string): Promise<void> {
   const table = await getNotificationsTable();
 
-  const { error } = await table
-    .delete()
-    .eq('user_id', userId)
-    .eq('id', notificationId);
+  const { error } = await table.delete().eq('user_id', userId).eq('id', notificationId);
 
   if (error) {
-    logger.error('[deleteNotification] Error', error, { userId, notificationId });
+    logger.error('[deleteNotification] Error', error, {
+      userId,
+      notificationId,
+    });
     throw ApiError.badRequest('Failed to delete notification');
   }
 }
@@ -194,9 +206,7 @@ export async function deleteNotification(
 export async function deleteAllNotifications(userId: string): Promise<void> {
   const table = await getNotificationsTable();
 
-  const { error } = await table
-    .delete()
-    .eq('user_id', userId);
+  const { error } = await table.delete().eq('user_id', userId);
 
   if (error) {
     logger.error('[deleteAllNotifications] Error', error, { userId });
@@ -246,7 +256,9 @@ export async function createSystemNotification(options: {
     .single();
 
   if (error) {
-    logger.error('[createSystemNotification] Error', error, { userId: options.userId });
+    logger.error('[createSystemNotification] Error', error, {
+      userId: options.userId,
+    });
     throw ApiError.badRequest('Failed to create notification');
   }
 
@@ -265,10 +277,13 @@ export async function broadcastSystemNotification(options: {
 
   // Get users to notify
   let query = supabase.from('profiles').select('id');
-  
+
   if (options.roles && options.roles.length > 0) {
     // Cast to satisfy type checker - database roles: reader, contributor, editor, admin, superadmin
-    query = query.in('role', options.roles as ('reader' | 'contributor' | 'editor' | 'admin' | 'superadmin')[]);
+    query = query.in(
+      'role',
+      options.roles as ('reader' | 'contributor' | 'editor' | 'admin' | 'superadmin')[]
+    );
   }
 
   const { data: users, error: usersError } = await query;
@@ -288,9 +303,7 @@ export async function broadcastSystemNotification(options: {
     metadata: {},
   }));
 
-  const { data, error } = await table
-    .insert(notifications)
-    .select();
+  const { data, error } = await table.insert(notifications).select();
 
   if (error) {
     logger.error('[broadcastSystemNotification] Insert error', error);

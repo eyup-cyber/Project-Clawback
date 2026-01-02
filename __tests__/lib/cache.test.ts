@@ -1,5 +1,6 @@
 /**
  * Tests for caching utilities
+ * @jest-environment node
  */
 
 import {
@@ -8,84 +9,19 @@ import {
   cacheDelete,
   cacheInvalidateByPattern,
   cacheAside,
+  cacheClear,
   CacheNamespaces,
   CacheTags,
 } from '@/lib/cache';
 
-// Mock Redis client
-jest.mock('@/lib/cache', () => {
-  const actualModule = jest.requireActual('@/lib/cache');
-
-  // In-memory cache for testing
-  const memoryCache = new Map<string, { value: string; expiry: number }>();
-  const tagMappings = new Map<string, Set<string>>();
-
-  return {
-    ...actualModule,
-    cacheGet: jest.fn(async (namespace: string, key: string) => {
-      const fullKey = `${namespace}:${key}`;
-      const cached = memoryCache.get(fullKey);
-      if (!cached) return null;
-      if (cached.expiry < Date.now()) {
-        memoryCache.delete(fullKey);
-        return null;
-      }
-      return { data: JSON.parse(cached.value), isStale: false };
-    }),
-    cacheSet: jest.fn(
-      async (
-        namespace: string,
-        key: string,
-        data: unknown,
-        options: { ttl?: number; tags?: string[] } = {}
-      ) => {
-        const fullKey = `${namespace}:${key}`;
-        const ttl = options.ttl || 3600;
-        memoryCache.set(fullKey, {
-          value: JSON.stringify(data),
-          expiry: Date.now() + ttl * 1000,
-        });
-
-        if (options.tags) {
-          for (const tag of options.tags) {
-            if (!tagMappings.has(tag)) {
-              tagMappings.set(tag, new Set());
-            }
-            tagMappings.get(tag)!.add(fullKey);
-          }
-        }
-      }
-    ),
-    cacheDelete: jest.fn(async (namespace: string, key: string) => {
-      const fullKey = `${namespace}:${key}`;
-      memoryCache.delete(fullKey);
-    }),
-    cacheInvalidateByPattern: jest.fn(async (pattern: string) => {
-      for (const key of memoryCache.keys()) {
-        if (key.includes(pattern.replace('*', ''))) {
-          memoryCache.delete(key);
-        }
-      }
-    }),
-    cacheInvalidateByTag: jest.fn(async (tag: string) => {
-      const keys = tagMappings.get(tag);
-      if (keys) {
-        for (const key of keys) {
-          memoryCache.delete(key);
-        }
-        tagMappings.delete(tag);
-      }
-    }),
-    cacheClear: jest.fn(async () => {
-      memoryCache.clear();
-      tagMappings.clear();
-    }),
-  };
-});
-
 describe('Cache Module', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+  beforeEach(async () => {
+    // Clear cache before each test
+    await cacheClear();
+  });
+
+  afterAll(async () => {
+    await cacheClear();
   });
 
   describe('cacheGet', () => {
@@ -99,7 +35,8 @@ describe('Cache Module', () => {
       await cacheSet('test', 'mykey', testData);
 
       const result = await cacheGet('test', 'mykey');
-      expect(result).toEqual({ data: testData, isStale: false });
+      expect(result?.data).toEqual(testData);
+      expect(result?.isStale).toBe(false);
     });
   });
 
@@ -108,24 +45,22 @@ describe('Cache Module', () => {
       const testData = { name: 'test', value: 123 };
       await cacheSet('posts', 'post-1', testData);
 
-      expect(cacheSet).toHaveBeenCalledWith('posts', 'post-1', testData);
+      const result = await cacheGet('posts', 'post-1');
+      expect(result?.data).toEqual(testData);
     });
 
     it('should support TTL option', async () => {
       await cacheSet('test', 'short-lived', { data: true }, { ttl: 60 });
 
-      expect(cacheSet).toHaveBeenCalledWith('test', 'short-lived', { data: true }, { ttl: 60 });
+      const result = await cacheGet('test', 'short-lived');
+      expect(result?.data).toEqual({ data: true });
     });
 
     it('should support tags option', async () => {
       await cacheSet('posts', 'post-1', { title: 'Test' }, { tags: ['posts', 'user:123'] });
 
-      expect(cacheSet).toHaveBeenCalledWith(
-        'posts',
-        'post-1',
-        { title: 'Test' },
-        { tags: ['posts', 'user:123'] }
-      );
+      const result = await cacheGet('posts', 'post-1');
+      expect(result?.data).toEqual({ title: 'Test' });
     });
   });
 
@@ -134,7 +69,8 @@ describe('Cache Module', () => {
       await cacheSet('test', 'to-delete', { data: true });
       await cacheDelete('test', 'to-delete');
 
-      expect(cacheDelete).toHaveBeenCalledWith('test', 'to-delete');
+      const result = await cacheGet('test', 'to-delete');
+      expect(result).toBeNull();
     });
   });
 
@@ -146,7 +82,11 @@ describe('Cache Module', () => {
 
       await cacheInvalidateByPattern('posts', '*');
 
-      expect(cacheInvalidateByPattern).toHaveBeenCalledWith('posts', '*');
+      // Posts should be invalidated
+      const post1 = await cacheGet('posts', 'post-1');
+      const post2 = await cacheGet('posts', 'post-2');
+      expect(post1).toBeNull();
+      expect(post2).toBeNull();
     });
   });
 
@@ -170,6 +110,14 @@ describe('Cache Module', () => {
 });
 
 describe('cacheAside', () => {
+  beforeEach(async () => {
+    await cacheClear();
+  });
+
+  afterAll(async () => {
+    await cacheClear();
+  });
+
   it('should call fetcher when cache miss', async () => {
     const fetcher = jest.fn().mockResolvedValue({ data: 'from-fetcher' });
 
@@ -181,10 +129,12 @@ describe('cacheAside', () => {
 
   it('should return cached value on cache hit', async () => {
     const cachedData = { data: 'cached' };
-    await cacheSet('test', 'cached-key', cachedData);
+    // First call populates cache
+    await cacheAside('test', 'cached-key', async () => cachedData);
 
     const fetcher = jest.fn().mockResolvedValue({ data: 'from-fetcher' });
 
+    // Second call should use cache
     const result = await cacheAside('test', 'cached-key', fetcher);
 
     // Cached value should be returned without calling fetcher

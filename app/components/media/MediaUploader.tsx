@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { formatFileSize } from '@/lib/utils';
 
@@ -66,7 +66,9 @@ export default function MediaUploader({
 
       const acceptedTypes = ACCEPT_TYPES[mediaType].split(',');
       if (!acceptedTypes.includes(file.type)) {
-        toast.error(`Invalid file type. Please upload a ${TYPE_LABELS[mediaType].toLowerCase()} file.`);
+        toast.error(
+          `Invalid file type. Please upload a ${TYPE_LABELS[mediaType].toLowerCase()} file.`
+        );
         return false;
       }
 
@@ -124,7 +126,7 @@ export default function MediaUploader({
 
       // 2. Upload to R2
       const xhr = new XMLHttpRequest();
-      
+
       xhr.upload.addEventListener('progress', (e) => {
         if (e.lengthComputable) {
           setProgress(Math.round((e.loaded / e.total) * 100));
@@ -134,7 +136,7 @@ export default function MediaUploader({
       await new Promise<void>((resolve, reject) => {
         xhr.open('PUT', uploadUrl);
         xhr.setRequestHeader('Content-Type', selectedFile.type);
-        
+
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) {
             resolve();
@@ -142,7 +144,7 @@ export default function MediaUploader({
             reject(new Error('Upload failed'));
           }
         };
-        
+
         xhr.onerror = () => reject(new Error('Upload failed'));
         xhr.send(selectedFile);
       });
@@ -238,7 +240,14 @@ export default function MediaUploader({
                 className="p-2 hover:text-[var(--accent)]"
                 style={{ color: 'var(--foreground)' }}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <line x1="18" y1="6" x2="6" y2="18" />
                   <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
@@ -276,6 +285,3 @@ export default function MediaUploader({
     </div>
   );
 }
-
-
-

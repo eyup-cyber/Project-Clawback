@@ -1,4 +1,4 @@
-import { type MetadataRoute } from 'next';
+import type { MetadataRoute } from 'next';
 import { createClient } from '@/lib/supabase/server';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://scroungers.media';
@@ -91,9 +91,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // Dynamic category pages
-  const { data: categories } = await supabase
-    .from('categories')
-    .select('slug');
+  const { data: categories } = await supabase.from('categories').select('slug');
 
   const categoryPages: MetadataRoute.Sitemap = (categories || []).map((category) => ({
     url: `${SITE_URL}/categories/${category.slug}`,
@@ -118,12 +116,3 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [...staticPages, ...articlePages, ...categoryPages, ...contributorPages];
 }
-
-
-
-
-
-
-
-
-

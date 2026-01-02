@@ -3,8 +3,8 @@
  * Phase 31: Template creation, management, and application
  */
 
-import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -26,7 +26,15 @@ export interface ContentTemplate {
   updated_at: string;
 }
 
-export type TemplateType = 'article' | 'review' | 'tutorial' | 'news' | 'opinion' | 'interview' | 'listicle' | 'custom';
+export type TemplateType =
+  | 'article'
+  | 'review'
+  | 'tutorial'
+  | 'news'
+  | 'opinion'
+  | 'interview'
+  | 'listicle'
+  | 'custom';
 
 export interface TemplateContent {
   title_placeholder: string;
@@ -62,7 +70,10 @@ export interface TemplateCategory {
 // BUILT-IN TEMPLATES
 // ============================================================================
 
-export const BUILTIN_TEMPLATES: Omit<ContentTemplate, 'id' | 'created_by' | 'created_at' | 'updated_at' | 'usage_count'>[] = [
+export const BUILTIN_TEMPLATES: Omit<
+  ContentTemplate,
+  'id' | 'created_by' | 'created_at' | 'updated_at' | 'usage_count'
+>[] = [
   {
     name: 'Standard Article',
     description: 'A classic article structure with introduction, body, and conclusion',
@@ -74,14 +85,39 @@ export const BUILTIN_TEMPLATES: Omit<ContentTemplate, 'id' | 'created_by' | 'cre
     content: {
       title_placeholder: 'Enter your article title...',
       excerpt_placeholder: 'Write a compelling summary of your article...',
-      body: '<h2>Introduction</h2><p>Start with a hook that grabs the reader\'s attention...</p><h2>Main Content</h2><p>Develop your key points here...</p><h2>Conclusion</h2><p>Summarize and provide a call to action...</p>',
+      body: "<h2>Introduction</h2><p>Start with a hook that grabs the reader's attention...</p><h2>Main Content</h2><p>Develop your key points here...</p><h2>Conclusion</h2><p>Summarize and provide a call to action...</p>",
       suggested_word_count: 1500,
       sections: [
-        { id: 'intro', name: 'Introduction', description: 'Hook and context', placeholder: 'Start with a hook...', required: true, order: 1 },
-        { id: 'body', name: 'Main Content', description: 'Core arguments', placeholder: 'Develop your points...', required: true, order: 2 },
-        { id: 'conclusion', name: 'Conclusion', description: 'Summary and CTA', placeholder: 'Wrap up your article...', required: true, order: 3 },
+        {
+          id: 'intro',
+          name: 'Introduction',
+          description: 'Hook and context',
+          placeholder: 'Start with a hook...',
+          required: true,
+          order: 1,
+        },
+        {
+          id: 'body',
+          name: 'Main Content',
+          description: 'Core arguments',
+          placeholder: 'Develop your points...',
+          required: true,
+          order: 2,
+        },
+        {
+          id: 'conclusion',
+          name: 'Conclusion',
+          description: 'Summary and CTA',
+          placeholder: 'Wrap up your article...',
+          required: true,
+          order: 3,
+        },
       ],
-      metadata: { tags: [], reading_time_estimate: 7, difficulty_level: 'beginner' },
+      metadata: {
+        tags: [],
+        reading_time_estimate: 7,
+        difficulty_level: 'beginner',
+      },
     },
   },
   {
@@ -98,13 +134,52 @@ export const BUILTIN_TEMPLATES: Omit<ContentTemplate, 'id' | 'created_by' | 'cre
       body: '<h2>Overview</h2><p>What is this product and who is it for?</p><h2>Features</h2><p>Key features and specifications...</p><h2>Pros</h2><ul><li>Pro 1</li><li>Pro 2</li></ul><h2>Cons</h2><ul><li>Con 1</li><li>Con 2</li></ul><h2>Verdict</h2><p>Final thoughts and rating...</p>',
       suggested_word_count: 1200,
       sections: [
-        { id: 'overview', name: 'Overview', description: 'Product introduction', placeholder: 'Introduce the product...', required: true, order: 1 },
-        { id: 'features', name: 'Features', description: 'Key features', placeholder: 'List key features...', required: true, order: 2 },
-        { id: 'pros', name: 'Pros', description: 'Advantages', placeholder: 'List advantages...', required: true, order: 3 },
-        { id: 'cons', name: 'Cons', description: 'Disadvantages', placeholder: 'List disadvantages...', required: true, order: 4 },
-        { id: 'verdict', name: 'Verdict', description: 'Final rating', placeholder: 'Give your verdict...', required: true, order: 5 },
+        {
+          id: 'overview',
+          name: 'Overview',
+          description: 'Product introduction',
+          placeholder: 'Introduce the product...',
+          required: true,
+          order: 1,
+        },
+        {
+          id: 'features',
+          name: 'Features',
+          description: 'Key features',
+          placeholder: 'List key features...',
+          required: true,
+          order: 2,
+        },
+        {
+          id: 'pros',
+          name: 'Pros',
+          description: 'Advantages',
+          placeholder: 'List advantages...',
+          required: true,
+          order: 3,
+        },
+        {
+          id: 'cons',
+          name: 'Cons',
+          description: 'Disadvantages',
+          placeholder: 'List disadvantages...',
+          required: true,
+          order: 4,
+        },
+        {
+          id: 'verdict',
+          name: 'Verdict',
+          description: 'Final rating',
+          placeholder: 'Give your verdict...',
+          required: true,
+          order: 5,
+        },
       ],
-      metadata: { tags: ['review'], reading_time_estimate: 5, difficulty_level: 'beginner' },
+      metadata: {
+        tags: ['review'],
+        reading_time_estimate: 5,
+        difficulty_level: 'beginner',
+      },
     },
   },
   {
@@ -118,16 +193,55 @@ export const BUILTIN_TEMPLATES: Omit<ContentTemplate, 'id' | 'created_by' | 'cre
     content: {
       title_placeholder: 'How to [Action] in [Context]',
       excerpt_placeholder: 'Learn how to achieve [goal] with this step-by-step guide...',
-      body: '<h2>What You\'ll Learn</h2><p>By the end of this tutorial, you will be able to...</p><h2>Prerequisites</h2><ul><li>Requirement 1</li><li>Requirement 2</li></ul><h2>Step 1: [First Step]</h2><p>Instructions for step 1...</p><h2>Step 2: [Second Step]</h2><p>Instructions for step 2...</p><h2>Troubleshooting</h2><p>Common issues and solutions...</p><h2>Next Steps</h2><p>Where to go from here...</p>',
+      body: "<h2>What You'll Learn</h2><p>By the end of this tutorial, you will be able to...</p><h2>Prerequisites</h2><ul><li>Requirement 1</li><li>Requirement 2</li></ul><h2>Step 1: [First Step]</h2><p>Instructions for step 1...</p><h2>Step 2: [Second Step]</h2><p>Instructions for step 2...</p><h2>Troubleshooting</h2><p>Common issues and solutions...</p><h2>Next Steps</h2><p>Where to go from here...</p>",
       suggested_word_count: 2000,
       sections: [
-        { id: 'objectives', name: 'What You\'ll Learn', description: 'Learning objectives', placeholder: 'List what readers will learn...', required: true, order: 1 },
-        { id: 'prerequisites', name: 'Prerequisites', description: 'Requirements', placeholder: 'List prerequisites...', required: false, order: 2 },
-        { id: 'steps', name: 'Steps', description: 'Tutorial steps', placeholder: 'Add step-by-step instructions...', required: true, order: 3 },
-        { id: 'troubleshooting', name: 'Troubleshooting', description: 'Common issues', placeholder: 'Add troubleshooting tips...', required: false, order: 4 },
-        { id: 'next-steps', name: 'Next Steps', description: 'Further learning', placeholder: 'Suggest next steps...', required: false, order: 5 },
+        {
+          id: 'objectives',
+          name: "What You'll Learn",
+          description: 'Learning objectives',
+          placeholder: 'List what readers will learn...',
+          required: true,
+          order: 1,
+        },
+        {
+          id: 'prerequisites',
+          name: 'Prerequisites',
+          description: 'Requirements',
+          placeholder: 'List prerequisites...',
+          required: false,
+          order: 2,
+        },
+        {
+          id: 'steps',
+          name: 'Steps',
+          description: 'Tutorial steps',
+          placeholder: 'Add step-by-step instructions...',
+          required: true,
+          order: 3,
+        },
+        {
+          id: 'troubleshooting',
+          name: 'Troubleshooting',
+          description: 'Common issues',
+          placeholder: 'Add troubleshooting tips...',
+          required: false,
+          order: 4,
+        },
+        {
+          id: 'next-steps',
+          name: 'Next Steps',
+          description: 'Further learning',
+          placeholder: 'Suggest next steps...',
+          required: false,
+          order: 5,
+        },
       ],
-      metadata: { tags: ['tutorial', 'how-to'], reading_time_estimate: 10, difficulty_level: 'intermediate' },
+      metadata: {
+        tags: ['tutorial', 'how-to'],
+        reading_time_estimate: 10,
+        difficulty_level: 'intermediate',
+      },
     },
   },
   {
@@ -141,15 +255,47 @@ export const BUILTIN_TEMPLATES: Omit<ContentTemplate, 'id' | 'created_by' | 'cre
     content: {
       title_placeholder: '[Subject] [Action] [Context]',
       excerpt_placeholder: 'The most important facts in one sentence...',
-      body: '<h2>The Story</h2><p>Who, what, when, where, why, and how...</p><h2>Background</h2><p>Context and history...</p><h2>Reactions</h2><p>Quotes and responses from relevant parties...</p><h2>What\'s Next</h2><p>Future implications and developments to watch...</p>',
+      body: "<h2>The Story</h2><p>Who, what, when, where, why, and how...</p><h2>Background</h2><p>Context and history...</p><h2>Reactions</h2><p>Quotes and responses from relevant parties...</p><h2>What's Next</h2><p>Future implications and developments to watch...</p>",
       suggested_word_count: 800,
       sections: [
-        { id: 'lead', name: 'The Story', description: 'Key facts', placeholder: 'Cover the 5 Ws...', required: true, order: 1 },
-        { id: 'background', name: 'Background', description: 'Context', placeholder: 'Provide background...', required: true, order: 2 },
-        { id: 'reactions', name: 'Reactions', description: 'Quotes', placeholder: 'Include reactions...', required: false, order: 3 },
-        { id: 'next', name: 'What\'s Next', description: 'Future outlook', placeholder: 'Discuss implications...', required: false, order: 4 },
+        {
+          id: 'lead',
+          name: 'The Story',
+          description: 'Key facts',
+          placeholder: 'Cover the 5 Ws...',
+          required: true,
+          order: 1,
+        },
+        {
+          id: 'background',
+          name: 'Background',
+          description: 'Context',
+          placeholder: 'Provide background...',
+          required: true,
+          order: 2,
+        },
+        {
+          id: 'reactions',
+          name: 'Reactions',
+          description: 'Quotes',
+          placeholder: 'Include reactions...',
+          required: false,
+          order: 3,
+        },
+        {
+          id: 'next',
+          name: "What's Next",
+          description: 'Future outlook',
+          placeholder: 'Discuss implications...',
+          required: false,
+          order: 4,
+        },
       ],
-      metadata: { tags: ['news'], reading_time_estimate: 4, difficulty_level: 'beginner' },
+      metadata: {
+        tags: ['news'],
+        reading_time_estimate: 4,
+        difficulty_level: 'beginner',
+      },
     },
   },
   {
@@ -166,11 +312,36 @@ export const BUILTIN_TEMPLATES: Omit<ContentTemplate, 'id' | 'created_by' | 'cre
       body: '<h2>Introduction</h2><p>Why this list matters...</p><h2>1. [First Item]</h2><p>Description and details...</p><h2>2. [Second Item]</h2><p>Description and details...</p><h2>3. [Third Item]</h2><p>Description and details...</p><h2>Conclusion</h2><p>Wrap up and key takeaways...</p>',
       suggested_word_count: 1000,
       sections: [
-        { id: 'intro', name: 'Introduction', description: 'Set up the list', placeholder: 'Introduce your list...', required: true, order: 1 },
-        { id: 'items', name: 'List Items', description: 'The numbered items', placeholder: 'Add your list items...', required: true, order: 2 },
-        { id: 'conclusion', name: 'Conclusion', description: 'Wrap up', placeholder: 'Conclude your list...', required: false, order: 3 },
+        {
+          id: 'intro',
+          name: 'Introduction',
+          description: 'Set up the list',
+          placeholder: 'Introduce your list...',
+          required: true,
+          order: 1,
+        },
+        {
+          id: 'items',
+          name: 'List Items',
+          description: 'The numbered items',
+          placeholder: 'Add your list items...',
+          required: true,
+          order: 2,
+        },
+        {
+          id: 'conclusion',
+          name: 'Conclusion',
+          description: 'Wrap up',
+          placeholder: 'Conclude your list...',
+          required: false,
+          order: 3,
+        },
       ],
-      metadata: { tags: ['listicle', 'list'], reading_time_estimate: 5, difficulty_level: 'beginner' },
+      metadata: {
+        tags: ['listicle', 'list'],
+        reading_time_estimate: 5,
+        difficulty_level: 'beginner',
+      },
     },
   },
   {
@@ -187,11 +358,36 @@ export const BUILTIN_TEMPLATES: Omit<ContentTemplate, 'id' | 'created_by' | 'cre
       body: '<h2>About [Interviewee]</h2><p>Brief bio and context...</p><h2>The Interview</h2><p><strong>Q: First question?</strong></p><p>A: Answer...</p><p><strong>Q: Second question?</strong></p><p>A: Answer...</p><h2>Key Takeaways</h2><p>Summary of main points...</p>',
       suggested_word_count: 1500,
       sections: [
-        { id: 'bio', name: 'About the Interviewee', description: 'Introduction', placeholder: 'Introduce the interviewee...', required: true, order: 1 },
-        { id: 'qa', name: 'Q&A', description: 'Questions and answers', placeholder: 'Add Q&A pairs...', required: true, order: 2 },
-        { id: 'takeaways', name: 'Key Takeaways', description: 'Summary', placeholder: 'Summarize key points...', required: false, order: 3 },
+        {
+          id: 'bio',
+          name: 'About the Interviewee',
+          description: 'Introduction',
+          placeholder: 'Introduce the interviewee...',
+          required: true,
+          order: 1,
+        },
+        {
+          id: 'qa',
+          name: 'Q&A',
+          description: 'Questions and answers',
+          placeholder: 'Add Q&A pairs...',
+          required: true,
+          order: 2,
+        },
+        {
+          id: 'takeaways',
+          name: 'Key Takeaways',
+          description: 'Summary',
+          placeholder: 'Summarize key points...',
+          required: false,
+          order: 3,
+        },
       ],
-      metadata: { tags: ['interview'], reading_time_estimate: 7, difficulty_level: 'intermediate' },
+      metadata: {
+        tags: ['interview'],
+        reading_time_estimate: 7,
+        difficulty_level: 'intermediate',
+      },
     },
   },
 ];
@@ -278,7 +474,10 @@ export async function createTemplate(
     throw error;
   }
 
-  logger.info('[Templates] Template created', { templateId: data.id, name: template.name });
+  logger.info('[Templates] Template created', {
+    templateId: data.id,
+    name: template.name,
+  });
 
   return data as ContentTemplate;
 }
@@ -438,19 +637,23 @@ export async function seedBuiltinTemplates(systemUserId: string): Promise<void> 
   const supabase = await createServiceClient();
 
   for (const template of BUILTIN_TEMPLATES) {
-    const { error } = await supabase
-      .from('content_templates')
-      .upsert({
+    const { error } = await supabase.from('content_templates').upsert(
+      {
         ...template,
         created_by: systemUserId,
         usage_count: 0,
-      }, {
+      },
+      {
         onConflict: 'name,created_by',
         ignoreDuplicates: true,
-      });
+      }
+    );
 
     if (error) {
-      logger.warn('[Templates] Failed to seed template', { name: template.name, error });
+      logger.warn('[Templates] Failed to seed template', {
+        name: template.name,
+        error,
+      });
     }
   }
 

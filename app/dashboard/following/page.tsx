@@ -3,7 +3,7 @@
  * Phase 1.1.5: Following management page
  */
 
-import { type Metadata } from 'next';
+import type { Metadata } from 'next';
 import { FollowingPageClient } from './FollowingPageClient';
 
 export const metadata: Metadata = {

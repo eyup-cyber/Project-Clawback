@@ -3,8 +3,8 @@
  * Phase 28: Data export, account deletion, consent management
  */
 
-import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -128,10 +128,7 @@ export async function processDataExport(requestId: string): Promise<void> {
   }
 
   // Update status to processing
-  await supabase
-    .from('data_export_requests')
-    .update({ status: 'processing' })
-    .eq('id', requestId);
+  await supabase.from('data_export_requests').update({ status: 'processing' }).eq('id', requestId);
 
   try {
     // Collect user data
@@ -139,9 +136,7 @@ export async function processDataExport(requestId: string): Promise<void> {
 
     // Generate export file
     const exportData =
-      request.format === 'json'
-        ? JSON.stringify(userData, null, 2)
-        : convertToCSV(userData);
+      request.format === 'json' ? JSON.stringify(userData, null, 2) : convertToCSV(userData);
 
     // Upload to storage
     const fileName = `exports/${request.user_id}/${requestId}.${request.format}`;
@@ -170,7 +165,10 @@ export async function processDataExport(requestId: string): Promise<void> {
       })
       .eq('id', requestId);
 
-    logger.info('[GDPR] Data export completed', { requestId, userId: request.user_id });
+    logger.info('[GDPR] Data export completed', {
+      requestId,
+      userId: request.user_id,
+    });
   } catch (error) {
     // Mark as failed
     await supabase
@@ -268,12 +266,15 @@ function objectToCSV(data: Record<string, unknown>[]): string {
 
   const headers = Object.keys(data[0]);
   const rows = data.map((item) =>
-    headers.map((header) => {
-      const value = item[header];
-      if (value === null || value === undefined) return '';
-      if (typeof value === 'object') return JSON.stringify(value);
-      return String(value).replace(/"/g, '""');
-    }).map((v) => `"${v}"`).join(',')
+    headers
+      .map((header) => {
+        const value = item[header];
+        if (value === null || value === undefined) return '';
+        if (typeof value === 'object') return JSON.stringify(value);
+        return String(value).replace(/"/g, '""');
+      })
+      .map((v) => `"${v}"`)
+      .join(',')
   );
 
   return [headers.join(','), ...rows].join('\n');
@@ -382,7 +383,7 @@ export async function processAccountDeletion(requestId: string): Promise<void> {
     const userId = request.user_id;
 
     // Delete user data in order (to handle foreign key constraints)
-    
+
     // 1. Delete notifications
     await supabase.from('notifications').delete().eq('user_id', userId);
 

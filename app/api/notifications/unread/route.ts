@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { success, handleApiError, requireAuth } from '@/lib/api';
 import { getUnreadCount } from '@/lib/db/notifications';
 
@@ -15,9 +17,3 @@ export async function GET() {
     return handleApiError(err);
   }
 }
-
-
-
-
-
-

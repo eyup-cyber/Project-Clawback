@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { type NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { success, unauthorized, badRequest, handleApiError, parseBody } from '@/lib/api';

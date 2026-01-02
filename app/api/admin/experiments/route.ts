@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Experiments Admin API
  * CRUD operations for A/B experiments

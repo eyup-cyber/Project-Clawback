@@ -1,9 +1,9 @@
-import { createClient } from '@/lib/supabase/server';
-import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import Nav from '../../components/Nav';
-import Footer from '../../components/layout/Footer';
+import { notFound } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
 import { formatRelativeTime, getContentTypeIcon } from '@/lib/utils';
+import Footer from '../../components/layout/Footer';
+import Nav from '../../components/Nav';
 
 interface PostTag {
   post_id: string;
@@ -18,7 +18,11 @@ interface TagPost {
   featured_image_url: string | null;
   reading_time: number | null;
   published_at: string | null;
-  author: { display_name: string; username: string; avatar_url: string | null } | null;
+  author: {
+    display_name: string;
+    username: string;
+    avatar_url: string | null;
+  } | null;
   category: { name: string; slug: string } | null;
 }
 
@@ -71,13 +75,19 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
           <div className="text-center mb-12">
             <div
               className="inline-block px-6 py-3 rounded-full text-2xl mb-4"
-              style={{ background: 'var(--primary)', color: 'var(--background)' }}
+              style={{
+                background: 'var(--primary)',
+                color: 'var(--background)',
+              }}
             >
               #{tag.name}
             </div>
             <h1
               className="text-4xl font-bold mb-4"
-              style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--foreground)' }}
+              style={{
+                fontFamily: 'var(--font-kindergarten)',
+                color: 'var(--foreground)',
+              }}
             >
               Posts tagged with #{tag.name}
             </h1>
@@ -94,13 +104,16 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
                   key={post.id}
                   href={`/articles/${post.slug}`}
                   className="block p-6 rounded-lg border transition-all hover:border-[var(--primary)] hover:shadow-lg group"
-                  style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+                  style={{
+                    background: 'var(--surface)',
+                    borderColor: 'var(--border)',
+                  }}
                 >
                   <div className="flex gap-6">
                     {/* Featured image */}
                     {post.featured_image_url && (
                       <div className="hidden md:block w-48 h-32 rounded-lg overflow-hidden flex-shrink-0">
-                        { }
+                        {}
                         <img
                           src={post.featured_image_url}
                           alt={post.title}
@@ -114,14 +127,20 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
                       <div className="flex items-center gap-3 mb-2">
                         <span
                           className="text-sm px-2 py-1 rounded"
-                          style={{ background: 'var(--background)', color: 'var(--foreground)' }}
+                          style={{
+                            background: 'var(--background)',
+                            color: 'var(--foreground)',
+                          }}
                         >
                           {getContentTypeIcon(post.content_type)} {post.content_type}
                         </span>
                         {post.category && (
                           <span
                             className="text-sm px-2 py-1 rounded"
-                            style={{ background: 'var(--secondary)', color: 'var(--background)' }}
+                            style={{
+                              background: 'var(--secondary)',
+                              color: 'var(--background)',
+                            }}
                           >
                             {post.category.name}
                           </span>
@@ -171,12 +190,18 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
           ) : (
             <div
               className="p-12 rounded-lg border text-center"
-              style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+              style={{
+                background: 'var(--surface)',
+                borderColor: 'var(--border)',
+              }}
             >
               <span className="text-6xl block mb-4">🏷️</span>
               <h2
                 className="text-xl font-bold mb-2"
-                style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--foreground)' }}
+                style={{
+                  fontFamily: 'var(--font-kindergarten)',
+                  color: 'var(--foreground)',
+                }}
               >
                 No posts with this tag yet
               </h2>
@@ -191,7 +216,10 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
             <Link
               href="/articles"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border transition-colors hover:bg-[var(--surface)]"
-              style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
+              style={{
+                borderColor: 'var(--border)',
+                color: 'var(--foreground)',
+              }}
             >
               ← Browse All Articles
             </Link>

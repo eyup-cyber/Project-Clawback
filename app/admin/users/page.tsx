@@ -82,7 +82,11 @@ export default async function AdminUsersPage() {
           {/* Table header */}
           <div
             className="hidden md:grid md:grid-cols-5 gap-4 p-4 text-sm font-medium"
-            style={{ background: 'var(--surface-elevated)', color: 'var(--foreground)', opacity: 0.7 }}
+            style={{
+              background: 'var(--surface-elevated)',
+              color: 'var(--foreground)',
+              opacity: 0.7,
+            }}
           >
             <div>User</div>
             <div>Email</div>
@@ -105,7 +109,6 @@ export default async function AdminUsersPage() {
                     style={{ background: 'var(--primary)', color: 'var(--background)' }}
                   >
                     {user.avatar_url ? (
-                       
                       <img
                         src={user.avatar_url}
                         alt={user.display_name}
@@ -122,10 +125,7 @@ export default async function AdminUsersPage() {
                     >
                       {user.display_name || 'No name'}
                     </p>
-                    <p
-                      className="text-xs"
-                      style={{ color: 'var(--foreground)', opacity: 0.5 }}
-                    >
+                    <p className="text-xs" style={{ color: 'var(--foreground)', opacity: 0.5 }}>
                       @{user.username || 'no-username'}
                     </p>
                   </div>
@@ -142,14 +142,20 @@ export default async function AdminUsersPage() {
 
                 {/* Role */}
                 <div className="mb-2 md:mb-0">
-                  <span className="md:hidden font-medium mr-2 text-sm" style={{ color: 'var(--foreground)' }}>
+                  <span
+                    className="md:hidden font-medium mr-2 text-sm"
+                    style={{ color: 'var(--foreground)' }}
+                  >
                     Role:
                   </span>
                   <span
                     className="px-3 py-1 rounded-full text-xs font-medium capitalize"
                     style={{
-                      background: roleColors[user.role as keyof typeof roleColors]?.bg || 'var(--border)',
-                      color: roleColors[user.role as keyof typeof roleColors]?.text || 'var(--foreground)',
+                      background:
+                        roleColors[user.role as keyof typeof roleColors]?.bg || 'var(--border)',
+                      color:
+                        roleColors[user.role as keyof typeof roleColors]?.text ||
+                        'var(--foreground)',
                     }}
                   >
                     {user.role}
@@ -176,7 +182,9 @@ export default async function AdminUsersPage() {
                   {user.role !== 'admin' && (
                     <button
                       className="text-sm px-3 py-1 rounded hover:bg-[var(--background)]"
-                      style={{ color: user.role === 'contributor' ? 'var(--secondary)' : 'var(--primary)' }}
+                      style={{
+                        color: user.role === 'contributor' ? 'var(--secondary)' : 'var(--primary)',
+                      }}
                     >
                       {user.role === 'contributor' ? 'Remove Contributor' : 'Make Contributor'}
                     </button>
@@ -203,6 +211,3 @@ export default async function AdminUsersPage() {
     </div>
   );
 }
-
-
-

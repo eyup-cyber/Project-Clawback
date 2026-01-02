@@ -3,8 +3,8 @@
  * Phase 29: Database backups, point-in-time recovery, restore operations
  */
 
-import { createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -56,14 +56,7 @@ export interface BackupConfig {
 // BACKUP TABLES
 // ============================================================================
 
-const CORE_TABLES = [
-  'profiles',
-  'posts',
-  'comments',
-  'reactions',
-  'categories',
-  'tags',
-];
+const CORE_TABLES = ['profiles', 'posts', 'comments', 'reactions', 'categories', 'tags'];
 
 const EXTENDED_TABLES = [
   ...CORE_TABLES,
@@ -139,11 +132,18 @@ export async function createBackup(
     throw error;
   }
 
-  logger.info('[Backup] Backup initiated', { backupId: backup.id, type, tables });
+  logger.info('[Backup] Backup initiated', {
+    backupId: backup.id,
+    type,
+    tables,
+  });
 
   // Start backup process asynchronously
   processBackup(backup.id).catch((err) => {
-    logger.error('[Backup] Background backup failed', { backupId: backup.id, error: err });
+    logger.error('[Backup] Background backup failed', {
+      backupId: backup.id,
+      error: err,
+    });
   });
 
   return backup as BackupRecord;
@@ -156,18 +156,11 @@ async function processBackup(backupId: string): Promise<void> {
   const supabase = await createServiceClient();
 
   // Update status
-  await supabase
-    .from('backups')
-    .update({ status: 'in_progress' })
-    .eq('id', backupId);
+  await supabase.from('backups').update({ status: 'in_progress' }).eq('id', backupId);
 
   try {
     // Get backup details
-    const { data: backup } = await supabase
-      .from('backups')
-      .select('*')
-      .eq('id', backupId)
-      .single();
+    const { data: backup } = await supabase.from('backups').select('*').eq('id', backupId).single();
 
     if (!backup) throw new Error('Backup not found');
 
@@ -176,10 +169,7 @@ async function processBackup(backupId: string): Promise<void> {
 
     // Export each table
     for (const table of backup.tables_included) {
-      const { data, error } = await supabase
-        .from(table)
-        .select('*')
-        .limit(100000); // Limit for safety
+      const { data, error } = await supabase.from(table).select('*').limit(100000); // Limit for safety
 
       if (error) {
         logger.warn('[Backup] Failed to export table', { table, error });
@@ -279,11 +269,7 @@ export async function listBackups(options: {
 export async function getBackup(backupId: string): Promise<BackupRecord | null> {
   const supabase = await createServiceClient();
 
-  const { data, error } = await supabase
-    .from('backups')
-    .select('*')
-    .eq('id', backupId)
-    .single();
+  const { data, error } = await supabase.from('backups').select('*').eq('id', backupId).single();
 
   if (error) return null;
   return data as BackupRecord;
@@ -350,7 +336,10 @@ export async function restoreFromBackup(
 
   if (!dryRun) {
     processRestore(restore.id).catch((err) => {
-      logger.error('[Backup] Background restore failed', { restoreId: restore.id, error: err });
+      logger.error('[Backup] Background restore failed', {
+        restoreId: restore.id,
+        error: err,
+      });
     });
   }
 
@@ -408,7 +397,10 @@ async function processRestore(restoreId: string): Promise<void> {
         const { error: insertError } = await supabase.from(table).insert(batch);
 
         if (insertError) {
-          logger.warn('[Backup] Failed to restore batch', { table, error: insertError });
+          logger.warn('[Backup] Failed to restore batch', {
+            table,
+            error: insertError,
+          });
         } else {
           recordsRestored += batch.length;
         }
@@ -465,7 +457,10 @@ export async function cleanupExpiredBackups(): Promise<number> {
       await deleteBackup(backup.id);
       deleted++;
     } catch (error) {
-      logger.warn('[Backup] Failed to delete expired backup', { backupId: backup.id, error });
+      logger.warn('[Backup] Failed to delete expired backup', {
+        backupId: backup.id,
+        error,
+      });
     }
   }
 

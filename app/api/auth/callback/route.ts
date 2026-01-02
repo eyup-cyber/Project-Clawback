@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
@@ -9,7 +11,7 @@ export async function GET(request: Request) {
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    
+
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
     }
@@ -18,14 +20,3 @@ export async function GET(request: Request) {
   // Return the user to an error page with instructions
   return NextResponse.redirect(`${origin}/login?error=auth_callback_error`);
 }
-
-
-
-
-
-
-
-
-
-
-

@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 /**
  * Error Boundary Page - Client Component
@@ -36,13 +36,20 @@ export default function Error({
         </div>
         <h1
           className="text-3xl font-bold mb-4"
-          style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--accent)' }}
+          style={{
+            fontFamily: 'var(--font-kindergarten)',
+            color: 'var(--accent)',
+          }}
         >
           Something went wrong
         </h1>
         <p
           className="text-lg mb-8"
-          style={{ color: 'var(--foreground)', opacity: 0.7, fontFamily: 'var(--font-body)' }}
+          style={{
+            color: 'var(--foreground)',
+            opacity: 0.7,
+            fontFamily: 'var(--font-body)',
+          }}
         >
           We encountered an unexpected error. Don&apos;t worry, our team has been notified. You can
           try again or head back to the home page.

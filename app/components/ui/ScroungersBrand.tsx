@@ -1,8 +1,8 @@
 'use client';
 
-import { useRef, useCallback } from 'react';
 import gsap from 'gsap';
-import { COLORS, prefersReducedMotion, EASING } from '@/lib/animations/gsap-config';
+import { useCallback, useRef } from 'react';
+import { COLORS, EASING, prefersReducedMotion } from '@/lib/animations/gsap-config';
 
 interface ScroungersBrandProps {
   /** Size variant */
@@ -217,4 +217,3 @@ export function NavLogo({ className = '' }: { className?: string }) {
     </span>
   );
 }
-

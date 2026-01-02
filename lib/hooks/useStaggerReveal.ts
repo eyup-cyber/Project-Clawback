@@ -1,27 +1,21 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useCallback } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   ANIMATION,
-  EASING,
   DURATION,
-  STAGGER,
-  prefersReducedMotion,
+  EASING,
   getDuration,
   getStagger,
-} from "../animations/gsap-config";
+  prefersReducedMotion,
+  STAGGER,
+} from '../animations/gsap-config';
 
 gsap.registerPlugin(ScrollTrigger);
 
-type StaggerPattern =
-  | "start"
-  | "end"
-  | "center"
-  | "edges"
-  | "random"
-  | [number, number];
+type StaggerPattern = 'start' | 'end' | 'center' | 'edges' | 'random' | [number, number];
 type AnimationType = keyof typeof ANIMATION;
 
 interface StaggerRevealOptions {
@@ -45,18 +39,16 @@ interface UseStaggerRevealReturn {
   reset: () => void;
 }
 
-export function useStaggerReveal(
-  options: StaggerRevealOptions = {}
-): UseStaggerRevealReturn {
+export function useStaggerReveal(options: StaggerRevealOptions = {}): UseStaggerRevealReturn {
   const {
-    animation = "fadeInUp",
+    animation = 'fadeInUp',
     stagger = STAGGER.normal,
-    staggerFrom = "start",
-    start = "top 85%",
+    staggerFrom = 'start',
+    start = 'top 85%',
     markers = false,
     once = false,
     delay = 0,
-    childSelector = "> *",
+    childSelector = '> *',
     customFrom,
     customTo,
     onStart,
@@ -162,9 +154,7 @@ export function useStaggerReveal(
 
           timelineRef.current.to(children, {
             ...toVars,
-            duration: getDuration(
-              (toVars.duration as number) || DURATION.medium
-            ),
+            duration: getDuration((toVars.duration as number) || DURATION.medium),
             stagger: {
               each: getStagger(stagger),
               from: staggerFrom,
@@ -182,7 +172,7 @@ export function useStaggerReveal(
             duration: getDuration(DURATION.quick),
             stagger: {
               each: getStagger(stagger * 0.5),
-              from: staggerFrom === "start" ? "end" : "start",
+              from: staggerFrom === 'start' ? 'end' : 'start',
             },
           });
         },
@@ -224,7 +214,7 @@ interface CharacterRevealOptions {
   ease?: string;
   start?: string;
   once?: boolean;
-  splitBy?: "chars" | "words" | "lines";
+  splitBy?: 'chars' | 'words' | 'lines';
 }
 
 export function useCharacterReveal(options: CharacterRevealOptions = {}) {
@@ -232,18 +222,18 @@ export function useCharacterReveal(options: CharacterRevealOptions = {}) {
     stagger = 0.02,
     duration = DURATION.normal,
     ease = EASING.snappy,
-    start = "top 85%",
+    start = 'top 85%',
     once = true,
-    splitBy = "chars",
+    splitBy = 'chars',
   } = options;
 
   const ref = useRef<HTMLElement>(null);
-  const originalText = useRef<string>("");
+  const originalText = useRef<string>('');
 
   useEffect(() => {
     if (!ref.current) return;
 
-    originalText.current = ref.current.textContent || "";
+    originalText.current = ref.current.textContent || '';
 
     if (prefersReducedMotion()) return;
 
@@ -251,27 +241,26 @@ export function useCharacterReveal(options: CharacterRevealOptions = {}) {
     let elements: string[] = [];
 
     switch (splitBy) {
-      case "chars":
-        elements = text.split("");
+      case 'chars':
+        elements = text.split('');
         break;
-      case "words":
-        elements = text.split(" ");
+      case 'words':
+        elements = text.split(' ');
         break;
-      case "lines":
-        elements = text.split("\n");
+      case 'lines':
+        elements = text.split('\n');
         break;
     }
 
     // Wrap each element in a span
     ref.current.innerHTML = elements
       .map((el, i) => {
-        const content =
-          splitBy === "words" && i < elements.length - 1 ? `${el}&nbsp;` : el;
+        const content = splitBy === 'words' && i < elements.length - 1 ? `${el}&nbsp;` : el;
         return `<span class="reveal-char" style="display: inline-block; opacity: 0;">${content}</span>`;
       })
-      .join("");
+      .join('');
 
-    const chars = ref.current.querySelectorAll(".reveal-char");
+    const chars = ref.current.querySelectorAll('.reveal-char');
 
     const ctx = gsap.context(() => {
       gsap.set(chars, { opacity: 0, y: 20 });
@@ -297,7 +286,7 @@ export function useCharacterReveal(options: CharacterRevealOptions = {}) {
             duration: getDuration(duration * 0.5),
             stagger: {
               each: getStagger(stagger * 0.5),
-              from: "end",
+              from: 'end',
             },
           });
         },
@@ -330,9 +319,9 @@ export function useGridReveal(options: GridRevealOptions = {}) {
   const {
     columns = 3,
     stagger = 0.05,
-    start = "top 85%",
+    start = 'top 85%',
     once = false,
-    animation = "fadeInUp",
+    animation = 'fadeInUp',
   } = options;
 
   const ref = useRef<HTMLElement>(null);
@@ -368,9 +357,7 @@ export function useGridReveal(options: GridRevealOptions = {}) {
           children.forEach((child, index) => {
             gsap.to(child, {
               ...preset.to,
-              duration: getDuration(
-                (preset.to.duration as number) || DURATION.medium
-              ),
+              duration: getDuration((preset.to.duration as number) || DURATION.medium),
               delay: getDelay(index),
             });
           });

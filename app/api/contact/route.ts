@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { createClient } from '@/lib/supabase/server';
 import { type NextRequest } from 'next/server';
 import { success, handleApiError, parseBody } from '@/lib/api';
@@ -53,7 +55,12 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      logger.error('Failed to save contact submission', error, { email: sanitizedData.email }, requestId);
+      logger.error(
+        'Failed to save contact submission',
+        error,
+        { email: sanitizedData.email },
+        requestId
+      );
       throw error;
     }
 
@@ -96,4 +103,3 @@ export async function POST(request: NextRequest) {
     clearContext(requestId);
   }
 }
-

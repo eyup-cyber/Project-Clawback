@@ -3,7 +3,12 @@
 import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from './primitives';
 
-type Option = { label: string; value: string; description?: string; disabled?: boolean };
+type Option = {
+  label: string;
+  value: string;
+  description?: string;
+  disabled?: boolean;
+};
 
 interface RadioGroupFieldProps {
   label?: string;
@@ -27,12 +32,10 @@ export function RadioGroupField({
   className,
 }: Readonly<RadioGroupFieldProps>) {
   return (
-    <div className={cn('space-y-2 rounded-xl border border-(--border) bg-(--surface) p-3', className)}>
-      {label && (
-        <div className="text-sm font-semibold text-(--foreground)">
-          {label}
-        </div>
-      )}
+    <div
+      className={cn('space-y-2 rounded-xl border border-(--border) bg-(--surface) p-3', className)}
+    >
+      {label && <div className="text-sm font-semibold text-(--foreground)">{label}</div>}
 
       <RadioGroup
         value={value}
@@ -52,7 +55,9 @@ export function RadioGroupField({
             <RadioGroupItem value={opt.value} disabled={opt.disabled || disabled} />
             <div className="space-y-0.5">
               <div className="text-sm text-(--foreground)">{opt.label}</div>
-              {opt.description && <p className="text-sm text-(--foreground)/70">{opt.description}</p>}
+              {opt.description && (
+                <p className="text-sm text-(--foreground)/70">{opt.description}</p>
+              )}
             </div>
           </label>
         ))}
@@ -63,12 +68,7 @@ export function RadioGroupField({
           {error}
         </p>
       )}
-      {!error && hint && (
-        <p className="text-sm text-(--foreground)/70">
-          {hint}
-        </p>
-      )}
+      {!error && hint && <p className="text-sm text-(--foreground)/70">{hint}</p>}
     </div>
   );
 }
-

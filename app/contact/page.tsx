@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import Nav from '../components/Nav';
 import Footer from '../components/layout/Footer';
+import Nav from '../components/Nav';
 
 export default function ContactPage() {
   const [loading, setLoading] = useState(false);
@@ -22,7 +22,7 @@ export default function ContactPage() {
     // Simulate form submission
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    toast.success('Message sent! We\'ll get back to you soon.');
+    toast.success("Message sent! We'll get back to you soon.");
     setSubmitted(true);
     setLoading(false);
   };
@@ -35,13 +35,20 @@ export default function ContactPage() {
         <div className="max-w-4xl mx-auto">
           <h1
             className="text-5xl font-bold mb-4 text-center"
-            style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--primary)' }}
+            style={{
+              fontFamily: 'var(--font-kindergarten)',
+              color: 'var(--primary)',
+            }}
           >
             get in touch
           </h1>
           <p
             className="text-center mb-12 text-lg"
-            style={{ color: 'var(--foreground)', opacity: 0.7, fontFamily: 'var(--font-body)' }}
+            style={{
+              color: 'var(--foreground)',
+              opacity: 0.7,
+              fontFamily: 'var(--font-body)',
+            }}
           >
             Questions, feedback, or just want to say hello? We&apos;d love to hear from you.
           </p>
@@ -52,14 +59,26 @@ export default function ContactPage() {
               <div>
                 <h2
                   className="text-2xl font-bold mb-4"
-                  style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--secondary)' }}
+                  style={{
+                    fontFamily: 'var(--font-kindergarten)',
+                    color: 'var(--secondary)',
+                  }}
                 >
                   Contact Information
                 </h2>
-                <div className="space-y-4" style={{ color: 'var(--foreground)', fontFamily: 'var(--font-body)' }}>
+                <div
+                  className="space-y-4"
+                  style={{
+                    color: 'var(--foreground)',
+                    fontFamily: 'var(--font-body)',
+                  }}
+                >
                   <p className="flex items-center gap-3">
                     <span className="text-2xl">📧</span>
-                    <a href="mailto:contact@scroungers.media" className="hover:text-[var(--primary)]">
+                    <a
+                      href="mailto:contact@scroungers.media"
+                      className="hover:text-[var(--primary)]"
+                    >
                       contact@scroungers.media
                     </a>
                   </p>
@@ -80,11 +99,20 @@ export default function ContactPage() {
               <div>
                 <h2
                   className="text-2xl font-bold mb-4"
-                  style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--secondary)' }}
+                  style={{
+                    fontFamily: 'var(--font-kindergarten)',
+                    color: 'var(--secondary)',
+                  }}
                 >
                   Quick Links
                 </h2>
-                <ul className="space-y-2" style={{ color: 'var(--foreground)', fontFamily: 'var(--font-body)' }}>
+                <ul
+                  className="space-y-2"
+                  style={{
+                    color: 'var(--foreground)',
+                    fontFamily: 'var(--font-body)',
+                  }}
+                >
                   <li>
                     <a href="/apply" className="hover:text-[var(--primary)]">
                       → Become a Contributor
@@ -105,17 +133,29 @@ export default function ContactPage() {
 
               <div
                 className="p-6 rounded-lg"
-                style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+                style={{
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                }}
               >
                 <h3
                   className="text-xl font-bold mb-2"
-                  style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--primary)' }}
+                  style={{
+                    fontFamily: 'var(--font-kindergarten)',
+                    color: 'var(--primary)',
+                  }}
                 >
                   Response Time
                 </h3>
-                <p style={{ color: 'var(--foreground)', opacity: 0.8, fontFamily: 'var(--font-body)' }}>
-                  We aim to respond to all inquiries within 48 hours. For urgent matters,
-                  please reach out on Twitter.
+                <p
+                  style={{
+                    color: 'var(--foreground)',
+                    opacity: 0.8,
+                    fontFamily: 'var(--font-body)',
+                  }}
+                >
+                  We aim to respond to all inquiries within 48 hours. For urgent matters, please
+                  reach out on Twitter.
                 </p>
               </div>
             </div>
@@ -125,12 +165,18 @@ export default function ContactPage() {
               {submitted ? (
                 <div
                   className="p-8 rounded-lg border text-center"
-                  style={{ background: 'var(--surface)', borderColor: 'var(--primary)' }}
+                  style={{
+                    background: 'var(--surface)',
+                    borderColor: 'var(--primary)',
+                  }}
                 >
                   <span className="text-6xl block mb-4">✉️</span>
                   <h2
                     className="text-2xl font-bold mb-4"
-                    style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--primary)' }}
+                    style={{
+                      fontFamily: 'var(--font-kindergarten)',
+                      color: 'var(--primary)',
+                    }}
                   >
                     Message Sent!
                   </h2>
@@ -235,7 +281,10 @@ export default function ContactPage() {
                     type="submit"
                     disabled={loading}
                     className="w-full py-3 rounded-lg font-medium disabled:opacity-50"
-                    style={{ background: 'var(--primary)', color: 'var(--background)' }}
+                    style={{
+                      background: 'var(--primary)',
+                      color: 'var(--background)',
+                    }}
                   >
                     {loading ? 'Sending...' : 'Send Message'}
                   </button>
@@ -250,6 +299,3 @@ export default function ContactPage() {
     </>
   );
 }
-
-
-

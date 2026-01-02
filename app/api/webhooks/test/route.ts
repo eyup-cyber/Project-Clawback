@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Webhook Test API
  * Send a test webhook to verify endpoint
@@ -28,7 +30,7 @@ export async function POST(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED', 401));
+      return applySecurityHeaders(apiError('Authentication required', 'UNAUTHORIZED'));
     }
 
     // Parse body
@@ -37,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     if (!parseResult.success) {
       return applySecurityHeaders(
-        apiError('Invalid request', 'VALIDATION_ERROR', 400, {
+        apiError('Invalid request', 'VALIDATION_ERROR', {
           errors: parseResult.error.flatten().fieldErrors,
         })
       );
@@ -54,7 +56,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (fetchError || !webhook) {
-      return applySecurityHeaders(apiError('Webhook not found', 'NOT_FOUND', 404));
+      return applySecurityHeaders(apiError('Webhook not found', 'NOT_FOUND'));
     }
 
     // Send test webhook
@@ -96,6 +98,6 @@ export async function POST(request: NextRequest) {
     );
   } catch (err) {
     logger.error('Webhook test error', err instanceof Error ? err : new Error(String(err)));
-    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR', 500));
+    return applySecurityHeaders(apiError('Internal error', 'INTERNAL_ERROR'));
   }
 }

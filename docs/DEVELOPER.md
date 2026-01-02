@@ -42,8 +42,8 @@ git --version
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/scroungers-multimedia/scroungers-multimedia.git
-cd scroungers-multimedia
+git clone https://github.com/eyup-cyber/Project-Clawback.git
+cd Project-Clawback
 ```
 
 ### 2. Install Dependencies
@@ -65,8 +65,10 @@ Edit `.env.local` with your configuration (see [Environment Variables](#environm
 **Option A: Use Supabase Cloud (Recommended for beginners)**
 
 1. Create a project at [supabase.com](https://supabase.com)
-2. Copy your project URL and anon key to `.env.local`
-3. Run migrations via Supabase Dashboard or CLI
+2. Copy your project URL and anon key from your [Supabase Dashboard](https://app.supabase.com) → Project Settings → API
+3. Copy your service role key from Project Settings → API (keep this secret - never commit it!)
+4. Add these values to your `.env.local` file
+5. Run migrations via Supabase Dashboard SQL Editor or CLI (see [Database Setup](#database-setup))
 
 **Option B: Local Supabase with Docker**
 
@@ -95,6 +97,8 @@ The app will be available at [http://localhost:3000](http://localhost:3000).
 
 Create a `.env.local` file with the following variables:
 
+> **⚠️ Important:** Never commit `.env.local` or any file containing secrets. The service role key must never be exposed to the client.
+
 ```bash
 # ============================================================================
 # REQUIRED
@@ -103,38 +107,49 @@ Create a `.env.local` file with the following variables:
 # Site URL
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+# Supabase Configuration
+# Find these in your Supabase Dashboard: https://app.supabase.com → Your Project → Settings → API
+# - Project URL: NEXT_PUBLIC_SUPABASE_URL
+# - anon/public key: NEXT_PUBLIC_SUPABASE_ANON_KEY (safe for client-side use)
+# - service_role key: SUPABASE_SERVICE_ROLE_KEY (SERVER-SIDE ONLY - never expose to browser!)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
-# Admin
+# Admin Email
+# Email address for admin notifications and alerts
 ADMIN_EMAIL=admin@example.com
 
 # ============================================================================
 # OPTIONAL (Features may be limited without these)
 # ============================================================================
 
-# Email (Resend)
+# Email Service (Resend)
+# Required for email notifications. Get your API key from: https://resend.com/api-keys
 RESEND_API_KEY=re_xxxxx
 FROM_EMAIL=noreply@yourdomain.com
 
-# Storage (Cloudflare R2)
+# Cloudflare R2 Storage
+# Required for media uploads. Configure in Cloudflare Dashboard → R2 → Create Bucket
+# Then create API tokens in Cloudflare Dashboard → My Profile → API Tokens
 R2_ACCESS_KEY_ID=your_r2_access_key
 R2_SECRET_ACCESS_KEY=your_r2_secret_key
 R2_BUCKET_NAME=your_bucket_name
 R2_ACCOUNT_ID=your_account_id
 R2_PUBLIC_URL=https://your-bucket.r2.dev
 
-# YouTube API
+# YouTube API (Optional)
+# Required if using YouTube integration. Get API key from: https://console.cloud.google.com/apis/credentials
 YOUTUBE_API_KEY=your_youtube_api_key
 YOUTUBE_CHANNEL_ID=your_channel_id
 YOUTUBE_PLAYLIST_ID=your_playlist_id
 
-# Caching (Redis)
+# Redis Cache (Optional)
+# Used for caching and rate limiting. Format: redis://localhost:6379 or redis://user:password@host:port
 REDIS_URL=redis://localhost:6379
 
 # Logging
+# Set log level: debug (verbose), info (default), warn, error (production)
 LOG_LEVEL=debug  # debug, info, warn, error
 ```
 
@@ -155,13 +170,13 @@ supabase db push
 
 ### Migration Files
 
-| File | Description |
-|------|-------------|
-| `001_initial_schema.sql` | Core tables, RLS, functions |
-| `002_notifications.sql` | Notification system |
-| `003_user_preferences.sql` | User settings |
-| `004_content_reports.sql` | Moderation and reports |
-| `005_audit_logs.sql` | Security audit trail |
+| File                       | Description                 |
+| -------------------------- | --------------------------- |
+| `001_initial_schema.sql`   | Core tables, RLS, functions |
+| `002_notifications.sql`    | Notification system         |
+| `003_user_preferences.sql` | User settings               |
+| `004_content_reports.sql`  | Moderation and reports      |
+| `005_audit_logs.sql`       | Security audit trail        |
 
 ### Generating Types
 
@@ -231,14 +246,14 @@ scroungers-multimedia/
 
 ### Key Files
 
-| File | Purpose |
-|------|---------|
-| `middleware.ts` | Auth middleware, security headers |
-| `lib/api/response.ts` | Standardized API responses |
-| `lib/api/middleware.ts` | Auth and role middleware |
-| `lib/api/validation.ts` | Zod validation schemas |
-| `lib/api/error-handler.ts` | Centralized error handling |
-| `lib/logger/index.ts` | Structured JSON logging |
+| File                       | Purpose                           |
+| -------------------------- | --------------------------------- |
+| `middleware.ts`            | Auth middleware, security headers |
+| `lib/api/response.ts`      | Standardized API responses        |
+| `lib/api/middleware.ts`    | Auth and role middleware          |
+| `lib/api/validation.ts`    | Zod validation schemas            |
+| `lib/api/error-handler.ts` | Centralized error handling        |
+| `lib/logger/index.ts`      | Structured JSON logging           |
 
 ---
 
@@ -400,6 +415,7 @@ type(scope): description
 Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
 Examples:
+
 ```
 feat(api): add comment reactions endpoint
 fix(auth): resolve session refresh issue
@@ -454,35 +470,43 @@ Set these in your deployment platform:
 ### Common Issues
 
 **1. Supabase connection errors**
+
 ```
 Error: Invalid API key
 ```
+
 - Check `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - Ensure Supabase project is running
 
 **2. Migration errors**
+
 ```
 Error: relation "table_name" already exists
 ```
+
 - Run migrations in order
 - Check if table already exists in Supabase
 
 **3. Type errors after schema change**
+
 ```
 Property 'x' does not exist on type...
 ```
+
 - Regenerate types: `pnpm supabase gen types typescript`
 
 **4. Email not sending**
+
 ```
 Error: API key invalid
 ```
+
 - Check `RESEND_API_KEY`
 - Verify domain in Resend dashboard
 
 ### Getting Help
 
-- Check existing issues on GitHub
+- Check existing issues on [GitHub](https://github.com/eyup-cyber/Project-Clawback/issues)
 - Create a new issue with reproduction steps
 - Join our Discord community
 
@@ -496,4 +520,3 @@ Error: API key invalid
 - [Cloudflare R2 Documentation](https://developers.cloudflare.com/r2/)
 - [OpenAPI Specification](/docs/openapi.yaml)
 - [Backend Architecture](/docs/BACKEND.md)
-

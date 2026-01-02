@@ -1,6 +1,6 @@
-import { createClient } from '@/lib/supabase/server';
 import { ApiError } from '@/lib/api/response';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -90,7 +90,8 @@ export async function createComment(input: CreateCommentInput): Promise<CommentW
       content: input.content,
       parent_id: input.parent_id || null,
     })
-    .select(`
+    .select(
+      `
       *,
       author:profiles!comments_author_id_fkey (
         id,
@@ -98,11 +99,15 @@ export async function createComment(input: CreateCommentInput): Promise<CommentW
         display_name,
         avatar_url
       )
-    `)
+    `
+    )
     .single();
 
   if (error) {
-    logger.error('[createComment] Error', error, { postId: input.post_id, authorId: input.author_id });
+    logger.error('[createComment] Error', error, {
+      postId: input.post_id,
+      authorId: input.author_id,
+    });
     throw ApiError.badRequest('Failed to create comment');
   }
 
@@ -117,7 +122,8 @@ export async function getCommentById(id: string): Promise<CommentWithAuthor> {
 
   const { data, error } = await supabase
     .from('comments')
-    .select(`
+    .select(
+      `
       *,
       author:profiles!comments_author_id_fkey (
         id,
@@ -125,7 +131,8 @@ export async function getCommentById(id: string): Promise<CommentWithAuthor> {
         display_name,
         avatar_url
       )
-    `)
+    `
+    )
     .eq('id', id)
     .single();
 
@@ -148,7 +155,14 @@ export async function listComments(options: {
   order?: 'asc' | 'desc';
 }): Promise<{ comments: CommentWithAuthor[]; total: number }> {
   const supabase = await createClient();
-  const { post_id, parent_id = null, page = 1, limit = 20, sort = 'created_at', order = 'desc' } = options;
+  const {
+    post_id,
+    parent_id = null,
+    page = 1,
+    limit = 20,
+    sort = 'created_at',
+    order = 'desc',
+  } = options;
 
   let query = supabase
     .from('comments')
@@ -186,7 +200,12 @@ export async function listComments(options: {
   const { data, error, count } = await query;
 
   if (error) {
-    logger.error('[listComments] Error', error, { post_id, parent_id, page, limit });
+    logger.error('[listComments] Error', error, {
+      post_id,
+      parent_id,
+      page,
+      limit,
+    });
     throw ApiError.badRequest('Failed to fetch comments');
   }
 
@@ -240,10 +259,7 @@ export async function getCommentsWithReplies(options: {
 /**
  * Update a comment
  */
-export async function updateComment(
-  id: string,
-  content: string
-): Promise<CommentWithAuthor> {
+export async function updateComment(id: string, content: string): Promise<CommentWithAuthor> {
   const supabase = await createClient();
 
   const { error } = await supabase
@@ -313,7 +329,11 @@ export async function flagComment(
     .eq('id', commentId);
 
   if (updateError) {
-    logger.error('[flagComment] Update error', updateError, { commentId, reporterId, reason });
+    logger.error('[flagComment] Update error', updateError, {
+      commentId,
+      reporterId,
+      reason,
+    });
     throw ApiError.badRequest('Failed to flag comment');
   }
 
@@ -406,4 +426,3 @@ export async function getCommentCount(postId: string): Promise<number> {
 
   return count || 0;
 }
-

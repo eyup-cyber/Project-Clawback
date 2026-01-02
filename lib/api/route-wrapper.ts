@@ -3,12 +3,12 @@
  * Provides logging, error handling, security headers, and request context
  */
 
-import { type NextRequest, type NextResponse } from 'next/server';
-import { generateRequestId, createContext, clearContext } from '@/lib/logger/context';
+import type { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
-import { handleApiError } from './error-handler';
+import { clearContext, createContext, generateRequestId } from '@/lib/logger/context';
+import { assertCsrfOrThrow, requiresCsrfProtection } from '@/lib/security/csrf';
 import { applySecurityHeaders } from '@/lib/security/headers';
-import { requiresCsrfProtection, assertCsrfOrThrow } from '@/lib/security/csrf';
+import { handleApiError } from './error-handler';
 import type { UserRole } from './middleware';
 
 interface RouteOptions {

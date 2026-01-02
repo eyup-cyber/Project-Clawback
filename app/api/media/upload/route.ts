@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { type NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { r2Client } from '@/lib/r2/client';
@@ -34,7 +36,11 @@ export async function POST(request: NextRequest) {
       userId: user.id,
     });
 
-    logger.info('Media upload request', { method: 'POST', path: '/api/media/upload', userId: user.id }, requestId);
+    logger.info(
+      'Media upload request',
+      { method: 'POST', path: '/api/media/upload', userId: user.id },
+      requestId
+    );
 
     // Rate limit: 20 uploads per hour
     await rateLimitByUser(user.id, { maxRequests: 20, windowMs: 3600000 });
@@ -95,7 +101,12 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (dbError) {
-      logger.error('Failed to create media record', dbError, { userId: user.id, fileName }, requestId);
+      logger.error(
+        'Failed to create media record',
+        dbError,
+        { userId: user.id, fileName },
+        requestId
+      );
       throw dbError;
     }
 
@@ -103,12 +114,15 @@ export async function POST(request: NextRequest) {
     logger.performance('mediaUpload', duration, { mediaId: media.id, fileSize }, requestId);
     logger.info('Media upload initiated', { mediaId: media.id }, requestId);
 
-    const response = success({
-      uploadUrl,
-      mediaId: media.id,
-      publicUrl,
-      key,
-    }, 201);
+    const response = success(
+      {
+        uploadUrl,
+        mediaId: media.id,
+        publicUrl,
+        key,
+      },
+      201
+    );
 
     return applySecurityHeaders(response);
   } catch (err) {
@@ -133,7 +147,11 @@ export async function PUT(request: NextRequest) {
       userId: user.id,
     });
 
-    logger.info('Media upload confirmation', { method: 'PUT', path: '/api/media/upload', userId: user.id }, requestId);
+    logger.info(
+      'Media upload confirmation',
+      { method: 'PUT', path: '/api/media/upload', userId: user.id },
+      requestId
+    );
 
     const body = await request.json();
     const { mediaId } = body;
@@ -170,9 +188,3 @@ export async function PUT(request: NextRequest) {
     clearContext(requestId);
   }
 }
-
-
-
-
-
-

@@ -1,10 +1,10 @@
 'use client';
 
-/* eslint-disable react-hooks/refs, react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/refs */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
 import gsap from 'gsap';
-import { EASING, DURATION, prefersReducedMotion, getDuration } from '../animations/gsap-config';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { DURATION, EASING, getDuration, prefersReducedMotion } from '../animations/gsap-config';
 
 interface SmoothCounterOptions {
   from?: number;
@@ -46,8 +46,10 @@ export function useSmoothCounter(options: SmoothCounterOptions): UseSmoothCounte
   const tweenRef = useRef<gsap.core.Tween | null>(null);
   const counterRef = useRef({ value: from });
   const hasStarted = useRef(false);
-  
-  const [displayValue, setDisplayValue] = useState(() => formatNumber(from, decimals, separator, prefix, suffix));
+
+  const [displayValue, setDisplayValue] = useState(() =>
+    formatNumber(from, decimals, separator, prefix, suffix)
+  );
 
   const start = useCallback(() => {
     if (prefersReducedMotion()) {
@@ -65,7 +67,9 @@ export function useSmoothCounter(options: SmoothCounterOptions): UseSmoothCounte
       delay,
       ease,
       onUpdate: () => {
-        setDisplayValue(formatNumber(counterRef.current.value, decimals, separator, prefix, suffix));
+        setDisplayValue(
+          formatNumber(counterRef.current.value, decimals, separator, prefix, suffix)
+        );
       },
       onComplete,
     });
@@ -115,23 +119,25 @@ export function useSmoothCounter(options: SmoothCounterOptions): UseSmoothCounte
       if (tweenRef.current) {
         tweenRef.current.kill();
       }
-      
+
       tweenRef.current = gsap.to(counterRef.current, {
         value: to,
         duration: getDuration(duration * 0.5),
         ease,
         onUpdate: () => {
-          setDisplayValue(formatNumber(counterRef.current.value, decimals, separator, prefix, suffix));
+          setDisplayValue(
+            formatNumber(counterRef.current.value, decimals, separator, prefix, suffix)
+          );
         },
       });
     }
   }, [to, duration, ease, decimals, separator, prefix, suffix]);
 
-  return { 
-    value: displayValue, 
-    ref: ref as React.RefObject<HTMLElement | null>, 
-    start, 
-    reset 
+  return {
+    value: displayValue,
+    ref: ref as React.RefObject<HTMLElement | null>,
+    start,
+    reset,
   };
 }
 
@@ -145,10 +151,10 @@ function formatNumber(
 ): string {
   const fixed = value.toFixed(decimals);
   const [whole, decimal] = fixed.split('.');
-  
+
   // Add thousand separators
   const withSeparators = whole.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
-  
+
   const formatted = decimal ? `${withSeparators}.${decimal}` : withSeparators;
   return `${prefix}${formatted}${suffix}`;
 }
@@ -171,7 +177,7 @@ export function useMultipleCounters(
   const countersRef = useRef<Record<string, { value: number }>>({});
   const tweensRef = useRef<gsap.core.Tween[]>([]);
   const hasStarted = useRef(false);
-  
+
   const [values, setValues] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
     configs.forEach((config) => {
@@ -204,7 +210,7 @@ export function useMultipleCounters(
     }
 
     hasStarted.current = true;
-    
+
     configs.forEach((config, index) => {
       const counter = countersRef.current[config.id];
       counter.value = config.from || 0;
@@ -212,7 +218,7 @@ export function useMultipleCounters(
       const tween = gsap.to(counter, {
         value: config.to,
         duration: getDuration(config.duration || DURATION.slow),
-        delay: (config.delay || 0) + (index * staggerDelay),
+        delay: (config.delay || 0) + index * staggerDelay,
         ease: config.ease || EASING.snappy,
         onUpdate: () => {
           setValues((prev) => ({
@@ -274,18 +280,12 @@ export function useMultipleCounters(
     };
   }, [startAll]);
 
-  return { 
-    values, 
-    ref: ref as React.RefObject<HTMLElement | null>, 
-    startAll, 
-    resetAll 
+  return {
+    values,
+    ref: ref as React.RefObject<HTMLElement | null>,
+    startAll,
+    resetAll,
   };
 }
 
 export default useSmoothCounter;
-
-
-
-
-
-

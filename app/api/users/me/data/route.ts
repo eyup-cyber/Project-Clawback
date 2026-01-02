@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * GDPR Data Export API
  * Export all user data in JSON format

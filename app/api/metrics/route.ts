@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Metrics endpoint - Prometheus-compatible format
  * GET /api/metrics
@@ -22,21 +24,25 @@ function formatPrometheusMetrics(metrics: ReturnType<typeof getMetricsSummary>):
   // Request count
   lines.push('# HELP scroungers_requests_total Total number of requests');
   lines.push('# TYPE scroungers_requests_total counter');
-  lines.push(`scroungers_requests_total ${metrics.counters.find(c => c.name === 'requests')?.value ?? 0}`);
+  lines.push(
+    `scroungers_requests_total ${metrics.counters.find((c) => c.name === 'requests')?.value ?? 0}`
+  );
 
   // Error count
   lines.push('# HELP scroungers_errors_total Total number of errors');
   lines.push('# TYPE scroungers_errors_total counter');
-  lines.push(`scroungers_errors_total ${metrics.counters.find(c => c.name === 'errors')?.value ?? 0}`);
+  lines.push(
+    `scroungers_errors_total ${metrics.counters.find((c) => c.name === 'errors')?.value ?? 0}`
+  );
 
   // Response time metrics
-  const responseTimes = metrics.timings.find(t => t.name.includes('response'));
+  const responseTimes = metrics.timings.find((t) => t.name.includes('response'));
   if (responseTimes) {
     lines.push('# HELP scroungers_response_time_seconds Response time histogram');
     lines.push('# TYPE scroungers_response_time_seconds histogram');
     lines.push(`scroungers_response_time_seconds_sum ${(responseTimes.sum ?? 0) / 1000}`);
     lines.push(`scroungers_response_time_seconds_count ${responseTimes.count ?? 0}`);
-    
+
     // Add percentile buckets
     const buckets = [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10];
     for (const bucket of buckets) {
@@ -50,7 +56,7 @@ function formatPrometheusMetrics(metrics: ReturnType<typeof getMetricsSummary>):
   }
 
   // Database query metrics
-  const dbTimes = metrics.timings.find(t => t.name.includes('db') || t.name.includes('database'));
+  const dbTimes = metrics.timings.find((t) => t.name.includes('db') || t.name.includes('database'));
   if (dbTimes) {
     lines.push('# HELP scroungers_db_query_seconds Database query time');
     lines.push('# TYPE scroungers_db_query_seconds summary');
@@ -114,4 +120,3 @@ export async function GET(request: Request) {
 export async function HEAD() {
   return new NextResponse(null, { status: 200 });
 }
-

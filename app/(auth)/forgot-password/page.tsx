@@ -54,15 +54,12 @@ export default function ForgotPasswordPage() {
         >
           <span className="text-3xl">✉️</span>
         </div>
-        <h1
-          className="text-2xl font-display mb-4"
-          style={{ color: 'var(--foreground)' }}
-        >
+        <h1 className="text-2xl font-display mb-4" style={{ color: 'var(--foreground)' }}>
           Check Your Email
         </h1>
         <p className="mb-6" style={{ color: 'var(--foreground)', opacity: 0.7 }}>
-          We&apos;ve sent a password reset link to <strong>{email}</strong>. 
-          Click the link in the email to reset your password.
+          We&apos;ve sent a password reset link to <strong>{email}</strong>. Click the link in the
+          email to reset your password.
         </p>
         <p className="text-sm mb-6" style={{ color: 'var(--foreground)', opacity: 0.5 }}>
           Don&apos;t see the email? Check your spam folder.
@@ -89,16 +86,10 @@ export default function ForgotPasswordPage() {
         borderColor: 'var(--border)',
       }}
     >
-      <h1
-        className="text-2xl font-display text-center mb-2"
-        style={{ color: 'var(--foreground)' }}
-      >
+      <h1 className="text-2xl font-display text-center mb-2" style={{ color: 'var(--foreground)' }}>
         Forgot Password?
       </h1>
-      <p
-        className="text-center mb-6"
-        style={{ color: 'var(--foreground)', opacity: 0.7 }}
-      >
+      <p className="text-center mb-6" style={{ color: 'var(--foreground)', opacity: 0.7 }}>
         Enter your email and we&apos;ll send you a reset link.
       </p>
 
@@ -129,9 +120,7 @@ export default function ForgotPasswordPage() {
             }}
             placeholder="you@example.com"
           />
-          {error && (
-            <p className="mt-1 text-sm text-red-500">{error}</p>
-          )}
+          {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
         </div>
 
         {/* Submit */}
@@ -162,6 +151,3 @@ export default function ForgotPasswordPage() {
     </div>
   );
 }
-
-
-

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Simple environment validation script.
  * Fails on missing critical variables, warns on recommended ones.

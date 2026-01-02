@@ -1,5 +1,6 @@
 /**
  * Tests for useDebounce hook
+ * @jest-environment jsdom
  */
 
 import { renderHook, act } from '@testing-library/react';

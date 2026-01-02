@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { type NextRequest } from 'next/server';
 import { success, handleApiError, requireAuth } from '@/lib/api';
 import {

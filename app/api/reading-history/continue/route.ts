@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Continue Reading API
  */

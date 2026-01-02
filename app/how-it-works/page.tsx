@@ -1,68 +1,52 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import Link from "next/link";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const steps = [
   {
-    number: "01",
-    title: "Apply",
+    number: '01',
+    title: 'Apply',
     description:
-      "Fill out a simple application telling us who you are and what you want to create. No credentials needed — just passion and a story to tell.",
-    icon: "📝",
-    details: [
-      "5-minute application",
-      "No CV or portfolio required",
-      "Tell us your perspective",
-    ],
+      'Fill out a simple application telling us who you are and what you want to create. No credentials needed — just passion and a story to tell.',
+    icon: '📝',
+    details: ['5-minute application', 'No CV or portfolio required', 'Tell us your perspective'],
   },
   {
-    number: "02",
-    title: "Create",
+    number: '02',
+    title: 'Create',
     description:
-      "Use our word processor to write articles, embed videos, add images, and craft your content exactly how you want it.",
-    icon: "✨",
-    details: [
-      "Rich text editor",
-      "Video & image embedding",
-      "Draft auto-saving",
-    ],
+      'Use our word processor to write articles, embed videos, add images, and craft your content exactly how you want it.',
+    icon: '✨',
+    details: ['Rich text editor', 'Video & image embedding', 'Draft auto-saving'],
   },
   {
-    number: "03",
-    title: "Publish",
+    number: '03',
+    title: 'Publish',
     description:
-      "Submit your work for a quick review. We check for basic guidelines only — your voice stays yours. Published within 48 hours.",
-    icon: "🚀",
-    details: [
-      "48-hour review time",
-      "No editorial interference",
-      "Your voice, unfiltered",
-    ],
+      'Submit your work for a quick review. We check for basic guidelines only — your voice stays yours. Published within 48 hours.',
+    icon: '🚀',
+    details: ['48-hour review time', 'No editorial interference', 'Your voice, unfiltered'],
   },
   {
-    number: "04",
-    title: "Earn",
+    number: '04',
+    title: 'Earn',
     description:
-      "Add your Ko-fi link to every post. Readers support you directly. We take 0% — every penny goes to you.",
-    icon: "💰",
-    details: [
-      "100% of earnings are yours",
-      "Direct Ko-fi integration",
-      "Build your audience",
-    ],
+      'Add your Ko-fi link to every post. Readers support you directly. We take 0% — every penny goes to you.',
+    icon: '💰',
+    details: ['100% of earnings are yours', 'Direct Ko-fi integration', 'Build your audience'],
   },
 ];
 
 const stats = [
-  { value: "1,722+", label: "Community Members" },
-  { value: "£2,180", label: "Monthly Creator Earnings" },
-  { value: "0%", label: "Platform Cut" },
-  { value: "48hrs", label: "Review Time" },
+  { value: '1,722+', label: 'Community Members' },
+  { value: '£2,180', label: 'Monthly Creator Earnings' },
+  { value: '0%', label: 'Platform Cut' },
+  { value: '48hrs', label: 'Review Time' },
 ];
 
 export default function HowItWorksPage() {
@@ -74,18 +58,18 @@ export default function HowItWorksPage() {
     const ctx = gsap.context(() => {
       // Hero animation
       gsap.fromTo(
-        ".hero-title",
+        '.hero-title',
         { y: 60, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1, ease: "power3.out", delay: 0.2 }
+        { y: 0, opacity: 1, duration: 1, ease: 'power3.out', delay: 0.2 }
       );
       gsap.fromTo(
-        ".hero-subtitle",
+        '.hero-subtitle',
         { y: 40, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", delay: 0.4 }
+        { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.4 }
       );
 
       // Stats animation
-      const statItems = statsRef.current?.querySelectorAll(".stat-item");
+      const statItems = statsRef.current?.querySelectorAll('.stat-item');
       if (statItems && statItems.length > 0) {
         gsap.fromTo(
           statItems,
@@ -95,17 +79,17 @@ export default function HowItWorksPage() {
             opacity: 1,
             duration: 0.6,
             stagger: 0.1,
-            ease: "power2.out",
+            ease: 'power2.out',
             scrollTrigger: {
               trigger: statsRef.current,
-              start: "top 80%",
+              start: 'top 80%',
             },
           }
         );
       }
 
       // Steps animation
-      const stepCards = stepsRef.current?.querySelectorAll(".step-card");
+      const stepCards = stepsRef.current?.querySelectorAll('.step-card');
       if (stepCards && stepCards.length > 0) {
         stepCards.forEach((card, index) => {
           gsap.fromTo(
@@ -115,10 +99,10 @@ export default function HowItWorksPage() {
               x: 0,
               opacity: 1,
               duration: 0.8,
-              ease: "power3.out",
+              ease: 'power3.out',
               scrollTrigger: {
                 trigger: card,
-                start: "top 85%",
+                start: 'top 85%',
               },
             }
           );
@@ -130,7 +114,7 @@ export default function HowItWorksPage() {
   }, []);
 
   return (
-    <main className="min-h-screen" style={{ background: "var(--background)" }}>
+    <main className="min-h-screen" style={{ background: 'var(--background)' }}>
       {/* Hero Section */}
       <section
         ref={heroRef}
@@ -138,16 +122,16 @@ export default function HowItWorksPage() {
       >
         <p
           className="hero-subtitle text-xs sm:text-sm uppercase tracking-[0.3em] mb-4 italic"
-          style={{ color: "var(--accent)", fontFamily: "var(--font-body)" }}
+          style={{ color: 'var(--accent)', fontFamily: 'var(--font-body)' }}
         >
           A View From The Sewer
         </p>
         <h1
           className="hero-title text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6"
           style={{
-            fontFamily: "var(--font-kindergarten)",
-            color: "var(--primary)",
-            textShadow: "0 0 40px var(--glow-primary)",
+            fontFamily: 'var(--font-kindergarten)',
+            color: 'var(--primary)',
+            textShadow: '0 0 40px var(--glow-primary)',
           }}
         >
           How It Works
@@ -155,14 +139,14 @@ export default function HowItWorksPage() {
         <p
           className="hero-subtitle text-base sm:text-lg md:text-xl max-w-2xl mx-auto"
           style={{
-            color: "var(--foreground)",
-            fontFamily: "var(--font-body)",
+            color: 'var(--foreground)',
+            fontFamily: 'var(--font-body)',
             opacity: 0.8,
-            letterSpacing: "-0.02em",
+            letterSpacing: '-0.02em',
           }}
         >
-          From application to publication in four simple steps. No gatekeepers,
-          no middlemen, no bullshit.
+          From application to publication in four simple steps. No gatekeepers, no middlemen, no
+          bullshit.
         </p>
       </section>
 
@@ -170,7 +154,7 @@ export default function HowItWorksPage() {
       <section
         ref={statsRef}
         className="py-12 sm:py-16 px-4 sm:px-8"
-        style={{ borderTop: "1px solid var(--border)" }}
+        style={{ borderTop: '1px solid var(--border)' }}
       >
         <div className="max-w-6xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
           {stats.map((stat) => (
@@ -178,15 +162,15 @@ export default function HowItWorksPage() {
               key={stat.label}
               className="stat-item text-center p-4 sm:p-6 rounded-xl"
               style={{
-                background: "var(--surface)",
-                border: "1px solid var(--border)",
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
               }}
             >
               <p
                 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2"
                 style={{
-                  fontFamily: "var(--font-kindergarten)",
-                  color: "var(--secondary)",
+                  fontFamily: 'var(--font-kindergarten)',
+                  color: 'var(--secondary)',
                 }}
               >
                 {stat.value}
@@ -194,9 +178,9 @@ export default function HowItWorksPage() {
               <p
                 className="text-xs sm:text-sm"
                 style={{
-                  color: "var(--foreground)",
+                  color: 'var(--foreground)',
                   opacity: 0.7,
-                  fontFamily: "var(--font-body)",
+                  fontFamily: 'var(--font-body)',
                 }}
               >
                 {stat.label}
@@ -213,7 +197,7 @@ export default function HowItWorksPage() {
             <div
               key={step.number}
               className={`step-card flex flex-col ${
-                index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
+                index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
               } gap-6 sm:gap-8 items-center`}
             >
               {/* Number & Icon */}
@@ -221,20 +205,18 @@ export default function HowItWorksPage() {
                 <div
                   className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full flex items-center justify-center mb-2"
                   style={{
-                    background: "var(--surface)",
-                    border: "2px solid var(--primary)",
-                    boxShadow: "0 0 30px var(--glow-primary)",
+                    background: 'var(--surface)',
+                    border: '2px solid var(--primary)',
+                    boxShadow: '0 0 30px var(--glow-primary)',
                   }}
                 >
-                  <span className="text-3xl sm:text-4xl md:text-5xl">
-                    {step.icon}
-                  </span>
+                  <span className="text-3xl sm:text-4xl md:text-5xl">{step.icon}</span>
                 </div>
                 <p
                   className="text-4xl sm:text-5xl md:text-6xl font-bold"
                   style={{
-                    fontFamily: "var(--font-kindergarten)",
-                    color: "var(--primary)",
+                    fontFamily: 'var(--font-kindergarten)',
+                    color: 'var(--primary)',
                     opacity: 0.3,
                   }}
                 >
@@ -247,8 +229,8 @@ export default function HowItWorksPage() {
                 <h2
                   className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4"
                   style={{
-                    fontFamily: "var(--font-kindergarten)",
-                    color: "var(--secondary)",
+                    fontFamily: 'var(--font-kindergarten)',
+                    color: 'var(--secondary)',
                   }}
                 >
                   {step.title}
@@ -256,10 +238,10 @@ export default function HowItWorksPage() {
                 <p
                   className="text-sm sm:text-base md:text-lg mb-4 sm:mb-6"
                   style={{
-                    color: "var(--foreground)",
-                    fontFamily: "var(--font-body)",
+                    color: 'var(--foreground)',
+                    fontFamily: 'var(--font-body)',
                     lineHeight: 1.7,
-                    letterSpacing: "-0.02em",
+                    letterSpacing: '-0.02em',
                   }}
                 >
                   {step.description}
@@ -270,12 +252,12 @@ export default function HowItWorksPage() {
                       key={detail}
                       className="flex items-center justify-center md:justify-start gap-2 text-sm"
                       style={{
-                        color: "var(--foreground)",
-                        fontFamily: "var(--font-body)",
+                        color: 'var(--foreground)',
+                        fontFamily: 'var(--font-body)',
                         opacity: 0.8,
                       }}
                     >
-                      <span style={{ color: "var(--accent)" }}>✓</span>
+                      <span style={{ color: 'var(--accent)' }}>✓</span>
                       {detail}
                     </li>
                   ))}
@@ -290,15 +272,14 @@ export default function HowItWorksPage() {
       <section
         className="py-16 sm:py-24 px-4 sm:px-8 text-center"
         style={{
-          background:
-            "linear-gradient(to bottom, var(--background), var(--surface))",
+          background: 'linear-gradient(to bottom, var(--background), var(--surface))',
         }}
       >
         <h2
           className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6"
           style={{
-            fontFamily: "var(--font-kindergarten)",
-            color: "var(--primary)",
+            fontFamily: 'var(--font-kindergarten)',
+            color: 'var(--primary)',
           }}
         >
           Ready to Start?
@@ -306,24 +287,24 @@ export default function HowItWorksPage() {
         <p
           className="text-base sm:text-lg max-w-xl mx-auto mb-6 sm:mb-8"
           style={{
-            color: "var(--foreground)",
-            fontFamily: "var(--font-body)",
+            color: 'var(--foreground)',
+            fontFamily: 'var(--font-body)',
             opacity: 0.8,
-            letterSpacing: "-0.02em",
+            letterSpacing: '-0.02em',
           }}
         >
-          Join 1,722+ community members already sharing their stories. Your
-          voice matters — let&apos;s hear it.
+          Join 1,722+ community members already sharing their stories. Your voice matters —
+          let&apos;s hear it.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/apply"
             className="px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-medium transition-all duration-300 hover:scale-105"
             style={{
-              background: "var(--primary)",
-              color: "var(--background)",
-              fontFamily: "var(--font-body)",
-              boxShadow: "0 0 20px var(--glow-primary)",
+              background: 'var(--primary)',
+              color: 'var(--background)',
+              fontFamily: 'var(--font-body)',
+              boxShadow: '0 0 20px var(--glow-primary)',
             }}
           >
             Apply Now
@@ -332,10 +313,10 @@ export default function HowItWorksPage() {
             href="/articles"
             className="px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-medium transition-all duration-300 hover:scale-105"
             style={{
-              background: "transparent",
-              color: "var(--foreground)",
-              fontFamily: "var(--font-body)",
-              border: "1px solid var(--border)",
+              background: 'transparent',
+              color: 'var(--foreground)',
+              fontFamily: 'var(--font-body)',
+              border: '1px solid var(--border)',
             }}
           >
             Explore Content
@@ -349,9 +330,9 @@ export default function HowItWorksPage() {
           href="/"
           className="text-sm hover:underline"
           style={{
-            color: "var(--foreground)",
+            color: 'var(--foreground)',
             opacity: 0.6,
-            fontFamily: "var(--font-body)",
+            fontFamily: 'var(--font-body)',
           }}
         >
           ← Back to Home
@@ -360,9 +341,3 @@ export default function HowItWorksPage() {
     </main>
   );
 }
-
-
-
-
-
-

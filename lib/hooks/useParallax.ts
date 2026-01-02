@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useCallback, useState, type RefObject } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { EASING, prefersReducedMotion } from "../animations/gsap-config";
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { type RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { EASING, prefersReducedMotion } from '../animations/gsap-config';
 
 gsap.registerPlugin(ScrollTrigger);
 
 interface ParallaxOptions {
   speed?: number;
-  direction?: "vertical" | "horizontal";
+  direction?: 'vertical' | 'horizontal';
   reverse?: boolean;
   start?: string;
   end?: string;
@@ -23,10 +23,10 @@ interface UseParallaxReturn {
 export function useParallax(options: ParallaxOptions = {}): UseParallaxReturn {
   const {
     speed = 0.3,
-    direction = "vertical",
+    direction = 'vertical',
     reverse = false,
-    start = "top bottom",
-    end = "bottom top",
+    start = 'top bottom',
+    end = 'bottom top',
     scrub = true,
   } = options;
 
@@ -36,7 +36,7 @@ export function useParallax(options: ParallaxOptions = {}): UseParallaxReturn {
     if (!ref.current || prefersReducedMotion()) return;
 
     const movement = speed * 100;
-    const axis = direction === "vertical" ? "yPercent" : "xPercent";
+    const axis = direction === 'vertical' ? 'yPercent' : 'xPercent';
     const value = reverse ? movement : -movement;
 
     const ctx = gsap.context(() => {
@@ -62,7 +62,7 @@ export function useParallax(options: ParallaxOptions = {}): UseParallaxReturn {
 interface ParallaxLayer {
   selector: string;
   speed: number;
-  direction?: "vertical" | "horizontal";
+  direction?: 'vertical' | 'horizontal';
 }
 
 interface MultiLayerParallaxOptions {
@@ -73,12 +73,7 @@ interface MultiLayerParallaxOptions {
 }
 
 export function useMultiLayerParallax(options: MultiLayerParallaxOptions) {
-  const {
-    layers,
-    start = "top bottom",
-    end = "bottom top",
-    scrub = true,
-  } = options;
+  const { layers, start = 'top bottom', end = 'bottom top', scrub = true } = options;
 
   const ref = useRef<HTMLElement>(null);
 
@@ -86,12 +81,12 @@ export function useMultiLayerParallax(options: MultiLayerParallaxOptions) {
     if (!ref.current || prefersReducedMotion()) return;
 
     const ctx = gsap.context(() => {
-      layers.forEach(({ selector, speed, direction = "vertical" }) => {
+      layers.forEach(({ selector, speed, direction = 'vertical' }) => {
         const elements = ref.current?.querySelectorAll(selector);
         if (!elements?.length) return;
 
         const movement = speed * 100;
-        const axis = direction === "vertical" ? "yPercent" : "xPercent";
+        const axis = direction === 'vertical' ? 'yPercent' : 'xPercent';
 
         gsap.to(elements, {
           [axis]: -movement,
@@ -161,11 +156,11 @@ export function useMouseParallax(options: MouseParallaxOptions = {}): {
       frameRef.current = requestAnimationFrame(animate);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove);
     frameRef.current = requestAnimationFrame(animate);
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener('mousemove', handleMouseMove);
       if (frameRef.current) {
         cancelAnimationFrame(frameRef.current);
       }
@@ -182,18 +177,13 @@ export function useMouseParallax(options: MouseParallaxOptions = {}): {
 // Hook for scroll-based rotation
 interface RotationParallaxOptions {
   maxRotation?: number;
-  axis?: "x" | "y" | "z";
+  axis?: 'x' | 'y' | 'z';
   start?: string;
   end?: string;
 }
 
 export function useRotationParallax(options: RotationParallaxOptions = {}) {
-  const {
-    maxRotation = 360,
-    axis = "z",
-    start = "top bottom",
-    end = "bottom top",
-  } = options;
+  const { maxRotation = 360, axis = 'z', start = 'top bottom', end = 'bottom top' } = options;
 
   const ref = useRef<HTMLElement>(null);
 
@@ -230,12 +220,7 @@ interface ScaleParallaxOptions {
 }
 
 export function useScaleParallax(options: ScaleParallaxOptions = {}) {
-  const {
-    startScale = 1,
-    endScale = 1.2,
-    start = "top bottom",
-    end = "bottom top",
-  } = options;
+  const { startScale = 1, endScale = 1.2, start = 'top bottom', end = 'bottom top' } = options;
 
   const ref = useRef<HTMLElement>(null);
 
@@ -272,12 +257,7 @@ interface OpacityParallaxOptions {
 }
 
 export function useOpacityParallax(options: OpacityParallaxOptions = {}) {
-  const {
-    startOpacity = 1,
-    endOpacity = 0,
-    start = "top center",
-    end = "bottom top",
-  } = options;
+  const { startOpacity = 1, endOpacity = 0, start = 'top center', end = 'bottom top' } = options;
 
   const ref = useRef<HTMLElement>(null);
 

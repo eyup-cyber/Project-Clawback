@@ -3,7 +3,7 @@
  * Phase 3.4: Reading history and stats
  */
 
-import { type Metadata } from 'next';
+import type { Metadata } from 'next';
 import { ReadingHistoryPageClient } from './ReadingHistoryPageClient';
 
 export const metadata: Metadata = {

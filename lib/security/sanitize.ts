@@ -15,15 +15,52 @@ export function sanitizeHtml(html: string): string {
 
   return DOMPurify.sanitize(html, {
     ALLOWED_TAGS: [
-      'p', 'br', 'strong', 'em', 'u', 's', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'a', 'img', 'iframe',
-      'div', 'span', 'table', 'thead', 'tbody', 'tr', 'td', 'th',
+      'p',
+      'br',
+      'strong',
+      'em',
+      'u',
+      's',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'ul',
+      'ol',
+      'li',
+      'blockquote',
+      'code',
+      'pre',
+      'a',
+      'img',
+      'iframe',
+      'div',
+      'span',
+      'table',
+      'thead',
+      'tbody',
+      'tr',
+      'td',
+      'th',
     ],
     ALLOWED_ATTR: [
-      'href', 'target', 'rel', 'src', 'alt', 'title', 'width', 'height',
-      'class', 'id', 'style', 'data-*',
+      'href',
+      'target',
+      'rel',
+      'src',
+      'alt',
+      'title',
+      'width',
+      'height',
+      'class',
+      'id',
+      'style',
+      'data-*',
     ],
-    ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+    ALLOWED_URI_REGEXP:
+      /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|data):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i,
     KEEP_CONTENT: true,
   });
 }
@@ -52,7 +89,7 @@ export function sanitizeUrl(url: string): string | null {
 
   try {
     const parsed = new URL(url);
-    
+
     // Only allow http, https, and mailto protocols
     const allowedProtocols = ['http:', 'https:', 'mailto:'];
     if (!allowedProtocols.includes(parsed.protocol)) {
@@ -75,7 +112,7 @@ export function sanitizeFilename(filename: string): string {
 
   // Remove path components
   const basename = filename.split('/').pop() || filename.split('\\').pop() || filename;
-  
+
   // Remove dangerous characters
   return basename.replace(/[^a-zA-Z0-9._-]/g, '_').substring(0, 255);
 }
@@ -116,7 +153,3 @@ export function escapeSqlString(str: string): string {
 
   return str.replace(/'/g, "''");
 }
-
-
-
-

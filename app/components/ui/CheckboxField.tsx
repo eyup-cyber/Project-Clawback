@@ -54,4 +54,3 @@ export function CheckboxField({
     </label>
   );
 }
-

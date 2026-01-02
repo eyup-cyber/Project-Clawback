@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { type NextRequest } from 'next/server';
 import {
   success,
@@ -38,9 +40,3 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return handleApiError(err);
   }
 }
-
-
-
-
-
-

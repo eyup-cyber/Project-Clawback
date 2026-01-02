@@ -3,9 +3,9 @@
  * Phase 33: Import from Medium, WordPress, Substack; Export to various formats
  */
 
-import { createClient, createServiceClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/logger';
 import TurndownService from 'turndown';
+import { logger } from '@/lib/logger';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -96,10 +96,10 @@ const turndownService = new TurndownService({
 // Add rules for common elements
 turndownService.addRule('figure', {
   filter: 'figure',
-  replacement: function (content, node) {
+  replacement: (content, node) => {
     const img = (node as Element).querySelector('img');
     const figcaption = (node as Element).querySelector('figcaption');
-    
+
     if (img) {
       const src = img.getAttribute('src') || '';
       const alt = img.getAttribute('alt') || '';
@@ -111,10 +111,8 @@ turndownService.addRule('figure', {
 });
 
 turndownService.addRule('codeBlock', {
-  filter: function (node) {
-    return node.nodeName === 'PRE' && node.firstChild?.nodeName === 'CODE';
-  },
-  replacement: function (_content, node) {
+  filter: (node) => node.nodeName === 'PRE' && node.firstChild?.nodeName === 'CODE',
+  replacement: (_content, node) => {
     const code = (node as Element).querySelector('code');
     const className = code?.getAttribute('class') || '';
     const language = className.match(/language-(\w+)/)?.[1] || '';
@@ -130,10 +128,7 @@ turndownService.addRule('codeBlock', {
 /**
  * Start an import job
  */
-export async function startImport(
-  userId: string,
-  source: ImportSource
-): Promise<ImportResult> {
+export async function startImport(userId: string, source: ImportSource): Promise<ImportResult> {
   const supabase = await createClient();
 
   // Create import record
@@ -158,11 +153,17 @@ export async function startImport(
     throw error;
   }
 
-  logger.info('[Import] Import job created', { importId: importRecord.id, type: source.type });
+  logger.info('[Import] Import job created', {
+    importId: importRecord.id,
+    type: source.type,
+  });
 
   // Process import asynchronously
   processImport(importRecord.id, userId, source).catch((err) => {
-    logger.error('[Import] Background import failed', { importId: importRecord.id, error: err });
+    logger.error('[Import] Background import failed', {
+      importId: importRecord.id,
+      error: err,
+    });
   });
 
   return importRecord as ImportResult;
@@ -179,24 +180,18 @@ async function processImport(
   const supabase = await createServiceClient();
 
   // Update status
-  await supabase
-    .from('import_jobs')
-    .update({ status: 'processing' })
-    .eq('id', importId);
+  await supabase.from('import_jobs').update({ status: 'processing' }).eq('id', importId);
 
   const errors: ImportError[] = [];
   let imported = 0;
   let failed = 0;
-  let skipped = 0;
+  const skipped = 0;
 
   try {
     // Parse content based on source type
     const posts = await parseImportSource(source);
 
-    await supabase
-      .from('import_jobs')
-      .update({ total_items: posts.length })
-      .eq('id', importId);
+    await supabase.from('import_jobs').update({ total_items: posts.length }).eq('id', importId);
 
     // Import each post
     for (const post of posts) {
@@ -232,13 +227,23 @@ async function processImport(
       })
       .eq('id', importId);
 
-    logger.info('[Import] Import completed', { importId, imported, failed, skipped });
+    logger.info('[Import] Import completed', {
+      importId,
+      imported,
+      failed,
+      skipped,
+    });
   } catch (error) {
     await supabase
       .from('import_jobs')
       .update({
         status: 'failed',
-        errors: [{ item: 'General', error: error instanceof Error ? error.message : 'Unknown error' }],
+        errors: [
+          {
+            item: 'General',
+            error: error instanceof Error ? error.message : 'Unknown error',
+          },
+        ],
         completed_at: new Date().toISOString(),
       })
       .eq('id', importId);
@@ -276,18 +281,18 @@ async function parseImportSource(source: ImportSource): Promise<ParsedPost[]> {
  */
 function parseMediumExport(html: string): ParsedPost[] {
   const posts: ParsedPost[] = [];
-  
+
   // Parse Medium's HTML format
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
-  
+
   const articles = doc.querySelectorAll('article');
-  
+
   articles.forEach((article) => {
     const title = article.querySelector('h1')?.textContent || 'Untitled';
     const content = article.innerHTML;
     const publishedTime = article.querySelector('time')?.getAttribute('datetime');
-    
+
     posts.push({
       title,
       content: turndownService.turndown(content),
@@ -303,22 +308,22 @@ function parseMediumExport(html: string): ParsedPost[] {
  */
 function parseWordPressExport(xml: string): ParsedPost[] {
   const posts: ParsedPost[] = [];
-  
+
   const parser = new DOMParser();
   const doc = parser.parseFromString(xml, 'text/xml');
-  
+
   const items = doc.querySelectorAll('item');
-  
+
   items.forEach((item) => {
     const postType = item.querySelector('wp\\:post_type')?.textContent;
     if (postType !== 'post') return;
-    
+
     const title = item.querySelector('title')?.textContent || 'Untitled';
     const content = item.querySelector('content\\:encoded')?.textContent || '';
     const excerpt = item.querySelector('excerpt\\:encoded')?.textContent || '';
     const slug = item.querySelector('wp\\:post_name')?.textContent;
     const pubDate = item.querySelector('pubDate')?.textContent;
-    
+
     const tags: string[] = [];
     item.querySelectorAll('category[domain="post_tag"]').forEach((tag) => {
       tags.push(tag.textContent || '');
@@ -391,28 +396,33 @@ function parseGhostExport(json: string): ParsedPost[] {
 function parseMarkdownFiles(markdown: string): ParsedPost[] {
   // Extract front matter if present
   const frontMatterMatch = markdown.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-  
+
   if (frontMatterMatch) {
     const frontMatter = frontMatterMatch[1];
     const content = frontMatterMatch[2];
-    
+
     // Parse YAML front matter
     const metadata: Record<string, string> = {};
     frontMatter.split('\n').forEach((line) => {
       const [key, ...valueParts] = line.split(':');
       if (key && valueParts.length) {
-        metadata[key.trim()] = valueParts.join(':').trim().replace(/^["']|["']$/g, '');
+        metadata[key.trim()] = valueParts
+          .join(':')
+          .trim()
+          .replace(/^["']|["']$/g, '');
       }
     });
 
-    return [{
-      title: metadata.title || 'Untitled',
-      content,
-      excerpt: metadata.description || metadata.excerpt,
-      slug: metadata.slug,
-      published_at: metadata.date || metadata.published,
-      tags: metadata.tags?.split(',').map((t) => t.trim()),
-    }];
+    return [
+      {
+        title: metadata.title || 'Untitled',
+        content,
+        excerpt: metadata.description || metadata.excerpt,
+        slug: metadata.slug,
+        published_at: metadata.date || metadata.published,
+        tags: metadata.tags?.split(',').map((t) => t.trim()),
+      },
+    ];
   }
 
   // No front matter - try to extract title from first heading
@@ -429,11 +439,10 @@ function parseMarkdownFiles(markdown: string): ParsedPost[] {
 function parseHTMLContent(html: string): ParsedPost {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
-  
-  const title = doc.querySelector('h1')?.textContent || 
-                doc.querySelector('title')?.textContent || 
-                'Untitled';
-  
+
+  const title =
+    doc.querySelector('h1')?.textContent || doc.querySelector('title')?.textContent || 'Untitled';
+
   const content = doc.body?.innerHTML || html;
 
   return {
@@ -454,20 +463,18 @@ async function importPost(
 
   const slug = post.slug || generateSlug(post.title);
 
-  const { error } = await supabase
-    .from('posts')
-    .insert({
-      title: post.title,
-      slug,
-      content: post.content,
-      excerpt: post.excerpt || post.content.substring(0, 200),
-      author_id: userId,
-      status: options?.defaultStatus || 'draft',
-      published_at: options?.preserveDates && post.published_at ? post.published_at : null,
-      canonical_url: post.canonical_url || null,
-      featured_image_url: options?.preserveImages ? post.featured_image_url : null,
-      category_id: options?.defaultCategory || null,
-    });
+  const { error } = await supabase.from('posts').insert({
+    title: post.title,
+    slug,
+    content: post.content,
+    excerpt: post.excerpt || post.content.substring(0, 200),
+    author_id: userId,
+    status: options?.defaultStatus || 'draft',
+    published_at: options?.preserveDates && post.published_at ? post.published_at : null,
+    canonical_url: post.canonical_url || null,
+    featured_image_url: options?.preserveImages ? post.featured_image_url : null,
+    category_id: options?.defaultCategory || null,
+  });
 
   if (error) throw error;
 }
@@ -487,10 +494,7 @@ function generateSlug(title: string): string {
 /**
  * Start an export job
  */
-export async function startExport(
-  userId: string,
-  options: ExportOptions
-): Promise<ExportResult> {
+export async function startExport(userId: string, options: ExportOptions): Promise<ExportResult> {
   const supabase = await createClient();
 
   const { data: exportRecord, error } = await supabase
@@ -510,11 +514,17 @@ export async function startExport(
     throw error;
   }
 
-  logger.info('[Export] Export job created', { exportId: exportRecord.id, format: options.format });
+  logger.info('[Export] Export job created', {
+    exportId: exportRecord.id,
+    format: options.format,
+  });
 
   // Process export asynchronously
   processExport(exportRecord.id, userId, options).catch((err) => {
-    logger.error('[Export] Background export failed', { exportId: exportRecord.id, error: err });
+    logger.error('[Export] Background export failed', {
+      exportId: exportRecord.id,
+      error: err,
+    });
   });
 
   return exportRecord as ExportResult;
@@ -530,10 +540,7 @@ async function processExport(
 ): Promise<void> {
   const supabase = await createServiceClient();
 
-  await supabase
-    .from('export_jobs')
-    .update({ status: 'processing' })
-    .eq('id', exportId);
+  await supabase.from('export_jobs').update({ status: 'processing' }).eq('id', exportId);
 
   try {
     // Fetch posts
@@ -597,7 +604,10 @@ async function processExport(
       })
       .eq('id', exportId);
 
-    logger.info('[Export] Export completed', { exportId, postsExported: posts?.length });
+    logger.info('[Export] Export completed', {
+      exportId,
+      postsExported: posts?.length,
+    });
   } catch (error) {
     await supabase
       .from('export_jobs')
@@ -621,20 +631,26 @@ function generateExport(posts: Record<string, unknown>[], options: ExportOptions
       return JSON.stringify(posts, null, 2);
 
     case 'markdown':
-      return posts.map((post) => {
-        const frontMatter = options.includeMetadata ? `---
+      return posts
+        .map((post) => {
+          const frontMatter = options.includeMetadata
+            ? `---
 title: "${post.title}"
 slug: "${post.slug}"
 date: "${post.published_at || post.created_at}"
 excerpt: "${post.excerpt || ''}"
 ---
 
-` : '';
-        return `${frontMatter}# ${post.title}\n\n${post.content}`;
-      }).join('\n\n---\n\n');
+`
+            : '';
+          return `${frontMatter}# ${post.title}\n\n${post.content}`;
+        })
+        .join('\n\n---\n\n');
 
     case 'html':
-      return posts.map((post) => `
+      return posts
+        .map(
+          (post) => `
 <!DOCTYPE html>
 <html>
 <head>
@@ -649,30 +665,40 @@ excerpt: "${post.excerpt || ''}"
   </article>
 </body>
 </html>
-      `).join('\n');
+      `
+        )
+        .join('\n');
 
     case 'wordpress':
       return generateWordPressXML(posts);
 
     case 'jekyll':
-      return posts.map((post) => `---
+      return posts
+        .map(
+          (post) => `---
 layout: post
 title: "${post.title}"
 date: ${post.published_at || post.created_at}
 ---
 
 ${post.content}
-      `).join('\n');
+      `
+        )
+        .join('\n');
 
     case 'hugo':
-      return posts.map((post) => `+++
+      return posts
+        .map(
+          (post) => `+++
 title = "${post.title}"
 date = "${post.published_at || post.created_at}"
 draft = ${post.status !== 'published'}
 +++
 
 ${post.content}
-      `).join('\n');
+      `
+        )
+        .join('\n');
 
     default:
       return JSON.stringify(posts, null, 2);
@@ -680,7 +706,9 @@ ${post.content}
 }
 
 function generateWordPressXML(posts: Record<string, unknown>[]): string {
-  const items = posts.map((post) => `
+  const items = posts
+    .map(
+      (post) => `
     <item>
       <title>${escapeXML(post.title as string)}</title>
       <link>${post.canonical_url || ''}</link>
@@ -691,7 +719,9 @@ function generateWordPressXML(posts: Record<string, unknown>[]): string {
       <wp:post_type>post</wp:post_type>
       <wp:status>${post.status === 'published' ? 'publish' : 'draft'}</wp:status>
     </item>
-  `).join('\n');
+  `
+    )
+    .join('\n');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"
@@ -717,25 +747,39 @@ function escapeXML(str: string): string {
 
 function getExportExtension(format: ExportFormat): string {
   switch (format) {
-    case 'json': return 'json';
-    case 'markdown': return 'md';
-    case 'html': return 'html';
-    case 'wordpress': return 'xml';
-    case 'jekyll': return 'md';
-    case 'hugo': return 'md';
-    default: return 'txt';
+    case 'json':
+      return 'json';
+    case 'markdown':
+      return 'md';
+    case 'html':
+      return 'html';
+    case 'wordpress':
+      return 'xml';
+    case 'jekyll':
+      return 'md';
+    case 'hugo':
+      return 'md';
+    default:
+      return 'txt';
   }
 }
 
 function getExportMimeType(format: ExportFormat): string {
   switch (format) {
-    case 'json': return 'application/json';
-    case 'markdown': return 'text/markdown';
-    case 'html': return 'text/html';
-    case 'wordpress': return 'application/xml';
-    case 'jekyll': return 'text/markdown';
-    case 'hugo': return 'text/markdown';
-    default: return 'text/plain';
+    case 'json':
+      return 'application/json';
+    case 'markdown':
+      return 'text/markdown';
+    case 'html':
+      return 'text/html';
+    case 'wordpress':
+      return 'application/xml';
+    case 'jekyll':
+      return 'text/markdown';
+    case 'hugo':
+      return 'text/markdown';
+    default:
+      return 'text/plain';
   }
 }
 
@@ -745,11 +789,7 @@ function getExportMimeType(format: ExportFormat): string {
 export async function getImportStatus(importId: string): Promise<ImportResult | null> {
   const supabase = await createClient();
 
-  const { data } = await supabase
-    .from('import_jobs')
-    .select('*')
-    .eq('id', importId)
-    .single();
+  const { data } = await supabase.from('import_jobs').select('*').eq('id', importId).single();
 
   return data as ImportResult | null;
 }
@@ -760,11 +800,7 @@ export async function getImportStatus(importId: string): Promise<ImportResult | 
 export async function getExportStatus(exportId: string): Promise<ExportResult | null> {
   const supabase = await createClient();
 
-  const { data } = await supabase
-    .from('export_jobs')
-    .select('*')
-    .eq('id', exportId)
-    .single();
+  const { data } = await supabase.from('export_jobs').select('*').eq('id', exportId).single();
 
   return data as ExportResult | null;
 }

@@ -4,8 +4,8 @@
 
 'use client';
 
-import Link from 'next/link';
 import Image from 'next/image';
+import Link from 'next/link';
 import { FollowButton } from '@/app/components/dashboard/FollowButton';
 import EmptyState from '@/app/components/dashboard/shared/EmptyState';
 

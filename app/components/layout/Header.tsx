@@ -1,12 +1,12 @@
-"use client";
-import Link from "next/link";
-import { useState } from "react";
+'use client';
+import Link from 'next/link';
+import { useState } from 'react';
 
 const navLinks = [
-  { href: "/about", label: "ABOUT" },
-  { href: "/articles", label: "NEWSROOM" },
-  { href: "/articles?type=audio", label: "AUDIO" },
-  { href: "/articles?type=video", label: "VIDEO" },
+  { href: '/about', label: 'ABOUT' },
+  { href: '/articles', label: 'NEWSROOM' },
+  { href: '/articles?type=audio', label: 'AUDIO' },
+  { href: '/articles?type=video', label: 'VIDEO' },
 ];
 
 export default function Header() {
@@ -17,19 +17,14 @@ export default function Header() {
       <div className="container">
         <nav className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link 
-            href="/" 
-            className="flex flex-col leading-none"
-          >
-            <span 
+          <Link href="/" className="flex flex-col leading-none">
+            <span
               className="text-xl tracking-wider text-[var(--primary)]"
-              style={{ fontFamily: "var(--font-kindergarten)" }}
+              style={{ fontFamily: 'var(--font-kindergarten)' }}
             >
               SCROUNGERS
             </span>
-            <span className="text-[10px] tracking-[0.3em] text-[var(--accent)]">
-              MULTIMEDIA
-            </span>
+            <span className="text-[10px] tracking-[0.3em] text-[var(--accent)]">MULTIMEDIA</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -46,7 +41,7 @@ export default function Header() {
             <Link
               href="/articles?breaking=true"
               className="text-sm font-medium tracking-wide text-[var(--accent)] hover:text-[var(--primary-light)] transition-colors"
-              style={{ fontFamily: "var(--font-body)" }}
+              style={{ fontFamily: 'var(--font-body)' }}
             >
               BREAKING
             </Link>
@@ -57,14 +52,14 @@ export default function Header() {
             <Link
               href="/login"
               className="text-sm text-[var(--foreground)] hover:text-[var(--primary)] transition-colors"
-              style={{ fontFamily: "var(--font-body)" }}
+              style={{ fontFamily: 'var(--font-body)' }}
             >
               SIGN IN
             </Link>
             <Link
               href="/apply"
               className="text-sm bg-[var(--primary)] text-[var(--background)] px-5 py-2 rounded hover:bg-[var(--primary-light)] transition-colors font-medium"
-              style={{ fontFamily: "var(--font-body)" }}
+              style={{ fontFamily: 'var(--font-body)' }}
             >
               APPLY NOW
             </Link>
@@ -76,12 +71,7 @@ export default function Header() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {mobileMenuOpen ? (
                 <path
                   strokeLinecap="round"

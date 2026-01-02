@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * RSS Feed API
  * Generates RSS and Atom feeds for content

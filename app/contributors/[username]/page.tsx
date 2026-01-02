@@ -1,9 +1,9 @@
-import { createClient } from '@/lib/supabase/server';
-import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import Nav from '../../components/Nav';
+import { notFound } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import { formatRelativeTime, getContentTypeIcon, getInitials } from '@/lib/utils';
 import Footer from '../../components/layout/Footer';
-import { getInitials, formatRelativeTime, getContentTypeIcon } from '@/lib/utils';
+import Nav from '../../components/Nav';
 
 interface ContributorPost {
   id: string;
@@ -77,7 +77,6 @@ export default async function ContributorProfilePage({
               }}
             >
               {contributor.avatar_url ? (
-                 
                 <img
                   src={contributor.avatar_url}
                   alt={contributor.display_name}
@@ -91,7 +90,10 @@ export default async function ContributorProfilePage({
             {/* Name and username */}
             <h1
               className="text-4xl font-bold mb-2"
-              style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--primary)' }}
+              style={{
+                fontFamily: 'var(--font-kindergarten)',
+                color: 'var(--primary)',
+              }}
             >
               {contributor.display_name}
             </h1>
@@ -103,7 +105,10 @@ export default async function ContributorProfilePage({
             {contributor.bio && (
               <p
                 className="text-lg max-w-2xl mx-auto mb-6"
-                style={{ color: 'var(--foreground)', fontFamily: 'var(--font-body)' }}
+                style={{
+                  color: 'var(--foreground)',
+                  fontFamily: 'var(--font-body)',
+                }}
               >
                 {contributor.bio}
               </p>
@@ -145,7 +150,10 @@ export default async function ContributorProfilePage({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium"
-                  style={{ background: 'var(--secondary)', color: 'var(--background)' }}
+                  style={{
+                    background: 'var(--secondary)',
+                    color: 'var(--background)',
+                  }}
                 >
                   ☕ Support on Ko-fi
                 </a>
@@ -156,7 +164,10 @@ export default async function ContributorProfilePage({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border"
-                  style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                  style={{
+                    borderColor: 'var(--border)',
+                    color: 'var(--foreground)',
+                  }}
                 >
                   🐦 @{contributor.twitter_handle}
                 </a>
@@ -167,7 +178,10 @@ export default async function ContributorProfilePage({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border"
-                  style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                  style={{
+                    borderColor: 'var(--border)',
+                    color: 'var(--foreground)',
+                  }}
                 >
                   🌐 Website
                 </a>
@@ -179,7 +193,10 @@ export default async function ContributorProfilePage({
           <div>
             <h2
               className="text-2xl font-bold mb-6"
-              style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--secondary)' }}
+              style={{
+                fontFamily: 'var(--font-kindergarten)',
+                color: 'var(--secondary)',
+              }}
             >
               Posts by {contributor.display_name}
             </h2>
@@ -191,7 +208,10 @@ export default async function ContributorProfilePage({
                     key={post.id}
                     href={`/articles/${post.slug}`}
                     className="block p-6 rounded-lg border transition-all hover:border-[var(--primary)] hover:shadow-lg group"
-                    style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+                    style={{
+                      background: 'var(--surface)',
+                      borderColor: 'var(--border)',
+                    }}
                   >
                     <div className="flex gap-4">
                       {/* Type icon */}
@@ -242,7 +262,7 @@ export default async function ContributorProfilePage({
                       {/* Featured image */}
                       {post.featured_image_url && (
                         <div className="hidden md:block w-32 h-24 rounded-lg overflow-hidden flex-shrink-0">
-                          { }
+                          {}
                           <img
                             src={post.featured_image_url}
                             alt={post.title}
@@ -257,7 +277,10 @@ export default async function ContributorProfilePage({
             ) : (
               <div
                 className="p-12 rounded-lg border text-center"
-                style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+                style={{
+                  background: 'var(--surface)',
+                  borderColor: 'var(--border)',
+                }}
               >
                 <p style={{ color: 'var(--foreground)', opacity: 0.6 }}>
                   No published posts yet. Check back soon!

@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { newsletterSchema } from "@/lib/validations";
-import toast from "react-hot-toast";
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
+import { newsletterSchema } from '@/lib/validations';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -16,7 +16,7 @@ function Confetti({ active }: { active: boolean }) {
     if (!active || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     canvas.width = canvas.offsetWidth;
@@ -33,7 +33,7 @@ function Confetti({ active }: { active: boolean }) {
       rotationSpeed: number;
     }> = [];
 
-    const colors = ["#32CD32", "#FFD700", "#FF00FF", "#E0E0E0"];
+    const colors = ['#32CD32', '#FFD700', '#FF00FF', '#E0E0E0'];
 
     // Create particles
     for (let i = 0; i < 50; i++) {
@@ -100,14 +100,7 @@ function Confetti({ active }: { active: boolean }) {
 function Spinner() {
   return (
     <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path
         className="opacity-75"
         fill="currentColor"
@@ -118,7 +111,7 @@ function Spinner() {
 }
 
 export default function Newsletter() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -136,11 +129,11 @@ export default function Newsletter() {
         y: 50,
         opacity: 0,
         duration: 0.9,
-        ease: "power3.out",
+        ease: 'power3.out',
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "top 85%",
-          toggleActions: "play none none reverse",
+          start: 'top 85%',
+          toggleActions: 'play none none reverse',
         },
       });
     }, sectionRef);
@@ -162,7 +155,7 @@ export default function Newsletter() {
         { x: 5, duration: 0.06 },
         { x: 0, duration: 0.06 },
       ],
-      ease: "power2.out",
+      ease: 'power2.out',
     });
 
     setError(true);
@@ -174,7 +167,7 @@ export default function Newsletter() {
 
     const result = newsletterSchema.safeParse({ email });
     if (!result.success) {
-      toast.error("Please enter a valid email address");
+      toast.error('Please enter a valid email address');
       shakeInput();
       return;
     }
@@ -187,7 +180,7 @@ export default function Newsletter() {
     setSubscribed(true);
     setLoading(false);
     setShowConfetti(true);
-    toast.success("Welcome to the margins!");
+    toast.success('Welcome to the margins!');
 
     // Clear confetti after animation
     setTimeout(() => setShowConfetti(false), 3000);
@@ -198,7 +191,7 @@ export default function Newsletter() {
       <section
         ref={sectionRef}
         className="py-20 px-4 md:px-8 relative overflow-hidden"
-        style={{ background: "var(--surface)" }}
+        style={{ background: 'var(--surface)' }}
       >
         <Confetti active={showConfetti} />
 
@@ -206,9 +199,8 @@ export default function Newsletter() {
           <div
             className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center animate-bounce"
             style={{
-              background:
-                "linear-gradient(135deg, var(--primary), var(--secondary))",
-              boxShadow: "0 0 40px var(--glow-primary)",
+              background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+              boxShadow: '0 0 40px var(--glow-primary)',
             }}
           >
             <span className="text-4xl">🎉</span>
@@ -216,8 +208,8 @@ export default function Newsletter() {
           <h3
             className="text-3xl md:text-4xl mb-4"
             style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--primary)",
+              fontFamily: 'var(--font-display)',
+              color: 'var(--primary)',
             }}
           >
             You&apos;re In!
@@ -225,16 +217,14 @@ export default function Newsletter() {
           <p
             className="text-lg"
             style={{
-              fontFamily: "var(--font-body)",
-              color: "var(--foreground)",
+              fontFamily: 'var(--font-body)',
+              color: 'var(--foreground)',
               opacity: 0.8,
             }}
           >
             We&apos;ll keep you updated with the latest from the margins.
             <br />
-            <span style={{ opacity: 0.6 }}>
-              Check your inbox for a welcome message.
-            </span>
+            <span style={{ opacity: 0.6 }}>Check your inbox for a welcome message.</span>
           </p>
         </div>
       </section>
@@ -247,21 +237,21 @@ export default function Newsletter() {
       className="py-20 px-4 md:px-8"
       style={{
         background:
-          "linear-gradient(180deg, var(--background) 0%, var(--surface) 50%, var(--background) 100%)",
+          'linear-gradient(180deg, var(--background) 0%, var(--surface) 50%, var(--background) 100%)',
       }}
     >
       <div ref={contentRef} className="max-w-2xl mx-auto text-center">
         <p
           className="text-sm uppercase tracking-[0.3em] mb-3"
-          style={{ color: "var(--accent)", fontFamily: "var(--font-body)" }}
+          style={{ color: 'var(--accent)', fontFamily: 'var(--font-body)' }}
         >
           Newsletter
         </p>
         <h3
           className="text-3xl md:text-4xl mb-4"
           style={{
-            fontFamily: "var(--font-display)",
-            color: "var(--secondary)",
+            fontFamily: 'var(--font-display)',
+            color: 'var(--secondary)',
           }}
         >
           Stay Informed
@@ -269,13 +259,13 @@ export default function Newsletter() {
         <p
           className="mb-10 max-w-md mx-auto"
           style={{
-            fontFamily: "var(--font-body)",
-            color: "var(--foreground)",
+            fontFamily: 'var(--font-body)',
+            color: 'var(--foreground)',
             opacity: 0.7,
           }}
         >
-          Get the latest from Scroungers Multimedia straight to your inbox. No
-          spam, just the good stuff.
+          Get the latest from Scroungers Multimedia straight to your inbox. No spam, just the good
+          stuff.
         </p>
 
         <form
@@ -295,31 +285,26 @@ export default function Newsletter() {
               placeholder="your@email.com"
               className="w-full px-5 py-4 rounded-xl outline-none transition-all duration-300"
               style={{
-                background: "var(--background)",
+                background: 'var(--background)',
                 border: `2px solid ${
-                  error
-                    ? "var(--accent)"
-                    : isFocused
-                    ? "var(--primary)"
-                    : "var(--border)"
+                  error ? 'var(--accent)' : isFocused ? 'var(--primary)' : 'var(--border)'
                 }`,
-                color: "var(--foreground)",
-                fontFamily: "var(--font-body)",
+                color: 'var(--foreground)',
+                fontFamily: 'var(--font-body)',
                 boxShadow: isFocused
-                  ? "0 0 20px var(--glow-primary), 0 0 40px rgba(50, 205, 50, 0.1)"
+                  ? '0 0 20px var(--glow-primary), 0 0 40px rgba(50, 205, 50, 0.1)'
                   : error
-                  ? "0 0 20px var(--glow-accent)"
-                  : "none",
+                    ? '0 0 20px var(--glow-accent)'
+                    : 'none',
               }}
             />
             {/* Focus glow effect */}
             <div
               className="absolute inset-0 rounded-xl pointer-events-none transition-opacity duration-300"
               style={{
-                background:
-                  "linear-gradient(135deg, var(--primary), var(--secondary))",
+                background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
                 opacity: isFocused ? 0.1 : 0,
-                filter: "blur(20px)",
+                filter: 'blur(20px)',
               }}
             />
           </div>
@@ -331,12 +316,12 @@ export default function Newsletter() {
             className="px-8 py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 active:scale-100 disabled:hover:scale-100"
             style={{
               background: loading
-                ? "var(--surface-elevated)"
-                : "linear-gradient(135deg, var(--primary), #28a428)",
-              color: loading ? "var(--foreground)" : "#000",
-              fontFamily: "var(--font-body)",
-              boxShadow: loading ? "none" : "0 4px 20px var(--glow-primary)",
-              cursor: loading ? "not-allowed" : "pointer",
+                ? 'var(--surface-elevated)'
+                : 'linear-gradient(135deg, var(--primary), #28a428)',
+              color: loading ? 'var(--foreground)' : '#000',
+              fontFamily: 'var(--font-body)',
+              boxShadow: loading ? 'none' : '0 4px 20px var(--glow-primary)',
+              cursor: loading ? 'not-allowed' : 'pointer',
             }}
           >
             {loading ? (
@@ -365,8 +350,8 @@ export default function Newsletter() {
         <p
           className="mt-6 text-xs"
           style={{
-            fontFamily: "var(--font-body)",
-            color: "var(--foreground)",
+            fontFamily: 'var(--font-body)',
+            color: 'var(--foreground)',
             opacity: 0.4,
           }}
         >

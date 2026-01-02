@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { type NextRequest } from 'next/server';
 import { success } from '@/lib/api';
 import { getHealthStatus } from '@/lib/monitoring/health';

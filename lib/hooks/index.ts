@@ -1,40 +1,22 @@
 // Authentication
 export { useAuth } from './useAuth';
+export { useMagneticButton, useMagneticEffect } from './useMagneticEffect';
 
-// Animation Hooks
-export { 
-  useScrollAnimation, 
-  useStaggeredScrollAnimation, 
-  useParallaxScroll, 
-  useScrollProgress 
-} from './useScrollAnimation';
-
-export { 
-  useMousePosition, 
-  useTilt3D 
-} from './useMousePosition';
-
-export { 
-  useMagneticEffect, 
-  useMagneticButton 
-} from './useMagneticEffect';
-
-export { 
-  useSmoothCounter, 
-  useMultipleCounters 
-} from './useSmoothCounter';
-
-export { 
-  useStaggerReveal, 
-  useCharacterReveal, 
-  useGridReveal 
-} from './useStaggerReveal';
-
-export { 
-  useParallax, 
-  useMultiLayerParallax, 
-  useMouseParallax, 
-  useRotationParallax, 
-  useScaleParallax, 
-  useOpacityParallax 
+export { useMousePosition, useTilt3D } from './useMousePosition';
+export {
+  useMouseParallax,
+  useMultiLayerParallax,
+  useOpacityParallax,
+  useParallax,
+  useRotationParallax,
+  useScaleParallax,
 } from './useParallax';
+// Animation Hooks
+export {
+  useParallaxScroll,
+  useScrollAnimation,
+  useScrollProgress,
+  useStaggeredScrollAnimation,
+} from './useScrollAnimation';
+export { useMultipleCounters, useSmoothCounter } from './useSmoothCounter';
+export { useCharacterReveal, useGridReveal, useStaggerReveal } from './useStaggerReveal';

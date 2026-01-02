@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { type NextRequest } from 'next/server';
 import { success, handleApiError, requireEditor } from '@/lib/api';
 import { getApplicationById } from '@/lib/db';
@@ -21,9 +23,3 @@ export async function GET(request: NextRequest, context: RouteContext) {
     return handleApiError(err);
   }
 }
-
-
-
-
-
-

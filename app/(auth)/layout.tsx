@@ -42,21 +42,26 @@ function FloatingParticles() {
       ))}
       <style jsx>{`
         @keyframes float {
-          0%, 100% { transform: translate(0, 0); }
-          25% { transform: translate(20px, -30px); }
-          50% { transform: translate(-10px, 20px); }
-          75% { transform: translate(15px, 10px); }
+          0%,
+          100% {
+            transform: translate(0, 0);
+          }
+          25% {
+            transform: translate(20px, -30px);
+          }
+          50% {
+            transform: translate(-10px, 20px);
+          }
+          75% {
+            transform: translate(15px, 10px);
+          }
         }
       `}</style>
     </div>
   );
 }
 
-export default function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLAnchorElement>(null);
 
@@ -98,8 +103,9 @@ export default function AuthLayout({
     <div
       ref={containerRef}
       className="min-h-screen flex flex-col items-center justify-center px-4 py-12"
-      style={{ 
-        background: 'radial-gradient(ellipse at center top, rgba(1, 60, 35, 1) 0%, var(--background) 60%)' 
+      style={{
+        background:
+          'radial-gradient(ellipse at center top, rgba(1, 60, 35, 1) 0%, var(--background) 60%)',
       }}
     >
       {/* Floating particles */}
@@ -109,13 +115,15 @@ export default function AuthLayout({
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at 20% 80%, rgba(255, 0, 255, 0.05) 0%, transparent 50%)',
+          background:
+            'radial-gradient(ellipse at 20% 80%, rgba(255, 0, 255, 0.05) 0%, transparent 50%)',
         }}
       />
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at 80% 20%, rgba(255, 215, 0, 0.05) 0%, transparent 50%)',
+          background:
+            'radial-gradient(ellipse at 80% 20%, rgba(255, 215, 0, 0.05) 0%, transparent 50%)',
         }}
       />
 
@@ -132,14 +140,10 @@ export default function AuthLayout({
       />
 
       {/* Logo */}
-      <Link
-        ref={logoRef}
-        href="/"
-        className="mb-10 text-center relative z-10 group"
-      >
+      <Link ref={logoRef} href="/" className="mb-10 text-center relative z-10 group">
         <span
           className="text-4xl md:text-5xl block transition-all duration-300 group-hover:scale-105"
-          style={{ 
+          style={{
             fontFamily: 'var(--font-display)',
             color: 'var(--primary)',
             textShadow: '0 0 30px var(--glow-primary)',
@@ -149,7 +153,7 @@ export default function AuthLayout({
         </span>
         <span
           className="text-xs tracking-[0.3em] uppercase block mt-1"
-          style={{ 
+          style={{
             fontFamily: 'var(--font-body)',
             color: 'var(--accent)',
             fontWeight: 500,
@@ -160,20 +164,24 @@ export default function AuthLayout({
       </Link>
 
       {/* Content */}
-      <div className="auth-content w-full max-w-md relative z-10">
-        {children}
-      </div>
+      <div className="auth-content w-full max-w-md relative z-10">{children}</div>
 
       {/* Footer links */}
-      <div 
-        className="auth-footer mt-10 text-center text-sm relative z-10" 
+      <div
+        className="auth-footer mt-10 text-center text-sm relative z-10"
         style={{ fontFamily: 'var(--font-body)', color: 'var(--foreground)', opacity: 0.5 }}
       >
-        <Link href="/terms" className="hover:text-[var(--primary)] transition-colors">Terms</Link>
+        <Link href="/terms" className="hover:text-[var(--primary)] transition-colors">
+          Terms
+        </Link>
         <span className="mx-3">·</span>
-        <Link href="/privacy" className="hover:text-[var(--primary)] transition-colors">Privacy</Link>
+        <Link href="/privacy" className="hover:text-[var(--primary)] transition-colors">
+          Privacy
+        </Link>
         <span className="mx-3">·</span>
-        <Link href="/contact" className="hover:text-[var(--primary)] transition-colors">Contact</Link>
+        <Link href="/contact" className="hover:text-[var(--primary)] transition-colors">
+          Contact
+        </Link>
       </div>
     </div>
   );

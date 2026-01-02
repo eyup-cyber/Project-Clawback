@@ -1,12 +1,8 @@
+export const runtime = 'edge';
+
 import { type NextRequest } from 'next/server';
 import { z } from 'zod';
-import {
-  success,
-  handleApiError,
-  parseBody,
-  getAuthUser,
-  rateLimitByIp,
-} from '@/lib/api';
+import { success, handleApiError, parseBody, getAuthUser, rateLimitByIp } from '@/lib/api';
 import { incrementViewCount } from '@/lib/db';
 
 const trackViewSchema = z.object({
@@ -37,9 +33,3 @@ export async function POST(request: NextRequest) {
     return handleApiError(err);
   }
 }
-
-
-
-
-
-

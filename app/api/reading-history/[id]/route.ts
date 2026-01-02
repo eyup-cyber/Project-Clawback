@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Single Reading History Item API Routes
  */

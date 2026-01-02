@@ -3,7 +3,7 @@
  * Phase 3.1: Reader dashboard overview
  */
 
-import { type Metadata } from 'next';
+import type { Metadata } from 'next';
 import { DashboardHomeClient } from './DashboardHomeClient';
 
 export const metadata: Metadata = {

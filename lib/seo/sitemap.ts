@@ -3,8 +3,8 @@
  * Phase 40: Generate XML sitemaps for posts, categories, authors, and pages
  */
 
-import { createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -21,7 +21,14 @@ export interface SitemapUrl {
   alternates?: SitemapAlternate[];
 }
 
-export type ChangeFrequency = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
+export type ChangeFrequency =
+  | 'always'
+  | 'hourly'
+  | 'daily'
+  | 'weekly'
+  | 'monthly'
+  | 'yearly'
+  | 'never';
 
 export interface SitemapImage {
   loc: string;
@@ -244,7 +251,9 @@ export async function generatePostsSitemap(
 
   const { data: posts, error } = await supabase
     .from('posts')
-    .select('slug, updated_at, published_at, title, featured_image_url, featured_image_alt, category:categories(name)')
+    .select(
+      'slug, updated_at, published_at, title, featured_image_url, featured_image_alt, category:categories(name)'
+    )
     .eq('status', 'published')
     .order('published_at', { ascending: false })
     .range(offset, offset + config.maxUrlsPerSitemap - 1);
@@ -264,18 +273,20 @@ export async function generatePostsSitemap(
 
     // Add featured image
     if (config.includeImages && post.featured_image_url) {
-      url.images = [{
-        loc: post.featured_image_url,
-        caption: post.featured_image_alt || post.title,
-        title: post.title,
-      }];
+      url.images = [
+        {
+          loc: post.featured_image_url,
+          caption: post.featured_image_alt || post.title,
+          title: post.title,
+        },
+      ];
     }
 
     // Add news metadata for recent posts (last 2 days)
     if (config.includeNews) {
       const publishedAt = new Date(post.published_at);
       const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
-      
+
       if (publishedAt > twoDaysAgo) {
         url.news = {
           publication: {
@@ -330,10 +341,14 @@ export async function generateCategoriesSitemap(
     lastmod: category.updated_at,
     changefreq: 'weekly' as ChangeFrequency,
     priority: 0.7,
-    images: category.image_url ? [{
-      loc: category.image_url,
-      title: category.name,
-    }] : undefined,
+    images: category.image_url
+      ? [
+          {
+            loc: category.image_url,
+            title: category.name,
+          },
+        ]
+      : undefined,
   }));
 
   return generateSitemapXml(urls, config);
@@ -363,10 +378,14 @@ export async function generateAuthorsSitemap(
     lastmod: author.updated_at,
     changefreq: 'weekly' as ChangeFrequency,
     priority: 0.6,
-    images: author.avatar_url ? [{
-      loc: author.avatar_url,
-      title: author.display_name || author.username,
-    }] : undefined,
+    images: author.avatar_url
+      ? [
+          {
+            loc: author.avatar_url,
+            title: author.display_name || author.username,
+          },
+        ]
+      : undefined,
   }));
 
   return generateSitemapXml(urls, config);
@@ -375,9 +394,7 @@ export async function generateAuthorsSitemap(
 /**
  * Generate tags sitemap
  */
-export async function generateTagsSitemap(
-  config: SitemapConfig = DEFAULT_CONFIG
-): Promise<string> {
+export async function generateTagsSitemap(config: SitemapConfig = DEFAULT_CONFIG): Promise<string> {
   const supabase = await createServiceClient();
 
   const { data: tags, error } = await supabase
@@ -414,7 +431,11 @@ export async function generatePagesSitemap(
     { loc: `${config.baseUrl}/contact`, changefreq: 'monthly', priority: 0.6 },
     { loc: `${config.baseUrl}/privacy`, changefreq: 'yearly', priority: 0.3 },
     { loc: `${config.baseUrl}/terms`, changefreq: 'yearly', priority: 0.3 },
-    { loc: `${config.baseUrl}/categories`, changefreq: 'weekly', priority: 0.8 },
+    {
+      loc: `${config.baseUrl}/categories`,
+      changefreq: 'weekly',
+      priority: 0.8,
+    },
     { loc: `${config.baseUrl}/tags`, changefreq: 'weekly', priority: 0.6 },
     { loc: `${config.baseUrl}/authors`, changefreq: 'weekly', priority: 0.6 },
     { loc: `${config.baseUrl}/search`, changefreq: 'monthly', priority: 0.5 },

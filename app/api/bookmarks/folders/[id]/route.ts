@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Single Bookmark Folder API Routes
  */

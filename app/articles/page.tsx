@@ -18,83 +18,125 @@ const mockPosts = [
     id: '1',
     title: 'The Queue That Never Moves',
     slug: 'housing-crisis-view-from-queue',
-    excerpt: 'After three years on the housing waiting list, I have some thoughts on what\'s really happening to social housing in this country.',
+    excerpt:
+      "After three years on the housing waiting list, I have some thoughts on what's really happening to social housing in this country.",
     content_type: 'written' as const,
-    featured_image_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&h=630&fit=crop&q=80', // Abstract architectural drawing
+    featured_image_url:
+      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&h=630&fit=crop&q=80', // Abstract architectural drawing
     published_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     reading_time: 8,
     reaction_count: 234,
     comment_count: 45,
-    author: { display_name: 'Eyup Lovely', username: 'eyup_lovely', avatar_url: null, kofi_username: 'eyuplovely' },
+    author: {
+      display_name: 'Eyup Lovely',
+      username: 'eyup_lovely',
+      avatar_url: null,
+      kofi_username: 'eyuplovely',
+    },
     category: { name: 'Housing', slug: 'housing', color: '#32CD32' },
   },
   {
     id: '2',
     title: 'The System and Its Shadows',
     slug: 'universal-credit-documentary',
-    excerpt: 'A 20-minute deep dive into the system that\'s failing millions. Featuring interviews with claimants, advisors, and critics.',
+    excerpt:
+      "A 20-minute deep dive into the system that's failing millions. Featuring interviews with claimants, advisors, and critics.",
     content_type: 'video' as const,
-    featured_image_url: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200&h=630&fit=crop&q=80', // Abstract geometric pattern
+    featured_image_url:
+      'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200&h=630&fit=crop&q=80', // Abstract geometric pattern
     published_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
     media_duration: 1200,
     reaction_count: 567,
     comment_count: 89,
-    author: { display_name: 'Dave Number 7', username: 'davenumber7', avatar_url: null, kofi_username: 'davenumber7' },
+    author: {
+      display_name: 'Dave Number 7',
+      username: 'davenumber7',
+      avatar_url: null,
+      kofi_username: 'davenumber7',
+    },
     category: { name: 'Benefits', slug: 'benefits', color: '#32CD32' },
   },
   {
     id: '3',
     title: 'SCROUNGERS EPISODE 12',
     slug: 'voices-margins-ep-12',
-    excerpt: 'This week we talk to three disability activists about the latest PIP reforms and what they mean for claimants.',
+    excerpt:
+      'This week we talk to three disability activists about the latest PIP reforms and what they mean for claimants.',
     content_type: 'audio' as const,
-    featured_image_url: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=1200&h=630&fit=crop&q=80', // Abstract sound wave illustration
+    featured_image_url:
+      'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=1200&h=630&fit=crop&q=80', // Abstract sound wave illustration
     published_at: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
     media_duration: 3600,
     reaction_count: 123,
     comment_count: 34,
-    author: { display_name: 'Michael J. S. Walker', username: 'mjswalker', avatar_url: null, kofi_username: 'mjswalker' },
+    author: {
+      display_name: 'Michael J. S. Walker',
+      username: 'mjswalker',
+      avatar_url: null,
+      kofi_username: 'mjswalker',
+    },
     category: { name: 'Health', slug: 'health', color: '#FF00FF' },
   },
   {
     id: '4',
     title: 'The Cost of Living in 40 Drawings',
     slug: 'cost-living-40-drawings',
-    excerpt: 'A visual journey through a year of austerity Britain, told through the eyes of those at the sharp end.',
+    excerpt:
+      'A visual journey through a year of austerity Britain, told through the eyes of those at the sharp end.',
     content_type: 'visual' as const,
-    featured_image_url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&h=600&fit=crop&q=80', // Abstract sketch/drawing
+    featured_image_url:
+      'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&h=600&fit=crop&q=80', // Abstract sketch/drawing
     published_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
     reaction_count: 892,
     comment_count: 156,
-    author: { display_name: 'Sewer Correspondent', username: 'sewer_correspondent', avatar_url: null, kofi_username: 'sewercorrespondent' },
+    author: {
+      display_name: 'Sewer Correspondent',
+      username: 'sewer_correspondent',
+      avatar_url: null,
+      kofi_username: 'sewercorrespondent',
+    },
     category: { name: 'Culture', slug: 'culture', color: '#FFD700' },
   },
   {
     id: '5',
     title: 'Platforms and Precarity',
     slug: 'gig-economy-no-rights',
-    excerpt: 'From Deliveroo to Uber to Amazon Flex, how platform capitalism is redefining what it means to work.',
+    excerpt:
+      'From Deliveroo to Uber to Amazon Flex, how platform capitalism is redefining what it means to work.',
     content_type: 'written' as const,
-    featured_image_url: 'https://images.unsplash.com/photo-1557682250-33bd709cbe85?w=1200&h=630&fit=crop&q=80', // Abstract line drawing
+    featured_image_url:
+      'https://images.unsplash.com/photo-1557682250-33bd709cbe85?w=1200&h=630&fit=crop&q=80', // Abstract line drawing
     published_at: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
     reading_time: 12,
     reaction_count: 345,
     comment_count: 67,
-    author: { display_name: 'Eyup Lovely', username: 'eyup_lovely', avatar_url: null, kofi_username: 'eyuplovely' },
+    author: {
+      display_name: 'Eyup Lovely',
+      username: 'eyup_lovely',
+      avatar_url: null,
+      kofi_username: 'eyuplovely',
+    },
     category: { name: 'Work', slug: 'work', color: '#32CD32' },
   },
   {
     id: '6',
     title: 'A Haiku for Every Tory MP',
     slug: 'haiku-every-tory-mp',
-    excerpt: 'Exactly what it sounds like. 350 haikus of righteous fury, despair, and occasional dark humour.',
+    excerpt:
+      'Exactly what it sounds like. 350 haikus of righteous fury, despair, and occasional dark humour.',
     content_type: 'written' as const,
-    featured_image_url: 'https://images.unsplash.com/photo-1557682250-33bd709cbe85?w=1200&h=630&fit=crop&q=80', // Abstract illustration
+    featured_image_url:
+      'https://images.unsplash.com/photo-1557682250-33bd709cbe85?w=1200&h=630&fit=crop&q=80', // Abstract illustration
     published_at: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(),
     reading_time: 25,
     reaction_count: 1234,
     comment_count: 234,
-    author: { display_name: 'Dave Number 7', username: 'davenumber7', avatar_url: null, kofi_username: 'davenumber7' },
+    author: {
+      display_name: 'Dave Number 7',
+      username: 'davenumber7',
+      avatar_url: null,
+      kofi_username: 'davenumber7',
+    },
     category: { name: 'Culture', slug: 'culture', color: '#FFD700' },
   },
 ];
@@ -103,14 +145,14 @@ type ContentType = 'all' | 'written' | 'video' | 'audio' | 'visual';
 type SortOption = 'latest' | 'trending' | 'discussed';
 
 // Tab button component with animated underline
-function FilterTab({ 
-  active, 
-  onClick, 
+function FilterTab({
+  active,
+  onClick,
   children,
   icon,
-}: { 
-  active: boolean; 
-  onClick: () => void; 
+}: {
+  active: boolean;
+  onClick: () => void;
   children: React.ReactNode;
   icon?: string;
 }) {
@@ -141,26 +183,40 @@ function FilterTab({
 }
 
 // Article card component with 3D hover
-function ArticleCard({ post, viewMode }: { post: typeof mockPosts[0]; viewMode: 'grid' | 'list' }) {
+function ArticleCard({
+  post,
+  viewMode,
+}: {
+  post: (typeof mockPosts)[0];
+  viewMode: 'grid' | 'list';
+}) {
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLAnchorElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!cardRef.current || viewMode === 'list') return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setTilt({ x: y * 8, y: -x * 8 });
-  }, [viewMode]);
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!cardRef.current || viewMode === 'list') return;
+      const rect = cardRef.current.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      setTilt({ x: y * 8, y: -x * 8 });
+    },
+    [viewMode]
+  );
 
   const handleMouseLeave = useCallback(() => {
     setTilt({ x: 0, y: 0 });
     setIsHovered(false);
   }, []);
 
-  const getInitials = (name: string) => 
-    name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+  const getInitials = (name: string) =>
+    name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase();
 
   return (
     <Link
@@ -172,10 +228,11 @@ function ArticleCard({ post, viewMode }: { post: typeof mockPosts[0]; viewMode: 
       style={{
         background: 'var(--surface)',
         border: `1px solid ${isHovered ? 'var(--primary)' : 'var(--border)'}`,
-        transform: viewMode === 'grid' 
-          ? `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${isHovered ? 1.02 : 1})`
-          : undefined,
-        boxShadow: isHovered 
+        transform:
+          viewMode === 'grid'
+            ? `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${isHovered ? 1.02 : 1})`
+            : undefined,
+        boxShadow: isHovered
           ? '0 20px 40px rgba(0,0,0,0.2), 0 0 30px var(--glow-primary)'
           : '0 4px 20px rgba(0,0,0,0.1)',
       }}
@@ -192,7 +249,6 @@ function ArticleCard({ post, viewMode }: { post: typeof mockPosts[0]; viewMode: 
       >
         {/* Featured Image */}
         {post.featured_image_url && (
-           
           <img
             src={post.featured_image_url}
             alt={post.title}
@@ -200,14 +256,14 @@ function ArticleCard({ post, viewMode }: { post: typeof mockPosts[0]; viewMode: 
             style={{ zIndex: 1 }}
           />
         )}
-        
+
         {/* Placeholder for image (fallback) */}
         {!post.featured_image_url && (
           <div className="absolute inset-0 flex items-center justify-center">
             <span className="text-5xl opacity-20">{getContentTypeIcon(post.content_type)}</span>
           </div>
         )}
-        
+
         {/* Category badge */}
         <span
           className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide"
@@ -215,13 +271,13 @@ function ArticleCard({ post, viewMode }: { post: typeof mockPosts[0]; viewMode: 
         >
           {post.category.name}
         </span>
-        
+
         {/* Content type badge */}
         <span
           className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${
             isHovered ? 'animate-pulse' : ''
           }`}
-          style={{ 
+          style={{
             background: 'rgba(0,0,0,0.7)',
             backdropFilter: 'blur(4px)',
             color: '#fff',
@@ -254,20 +310,20 @@ function ArticleCard({ post, viewMode }: { post: typeof mockPosts[0]; viewMode: 
       <div className="p-5 flex-1">
         <h3
           className="text-lg font-bold line-clamp-2 transition-colors duration-200 mb-2"
-          style={{ 
+          style={{
             fontFamily: 'var(--font-body)',
             color: isHovered ? 'var(--primary)' : 'var(--foreground)',
           }}
         >
           {post.title}
         </h3>
-        
-        <p 
-          className="text-sm line-clamp-2 mb-4" 
-          style={{ 
+
+        <p
+          className="text-sm line-clamp-2 mb-4"
+          style={{
             fontFamily: 'var(--font-body)',
-            color: 'var(--foreground)', 
-            opacity: 0.7 
+            color: 'var(--foreground)',
+            opacity: 0.7,
           }}
         >
           {post.excerpt}
@@ -275,7 +331,7 @@ function ArticleCard({ post, viewMode }: { post: typeof mockPosts[0]; viewMode: 
 
         {/* Author */}
         <div className="flex items-center gap-3 mb-3">
-          <div 
+          <div
             className="relative"
             style={{
               background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
@@ -283,7 +339,7 @@ function ArticleCard({ post, viewMode }: { post: typeof mockPosts[0]; viewMode: 
               borderRadius: '50%',
             }}
           >
-            <div 
+            <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
               style={{ background: 'var(--surface)', color: 'var(--primary)' }}
             >
@@ -291,13 +347,13 @@ function ArticleCard({ post, viewMode }: { post: typeof mockPosts[0]; viewMode: 
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <p 
+            <p
               className="text-sm font-medium truncate"
               style={{ fontFamily: 'var(--font-body)', color: 'var(--foreground)' }}
             >
               {post.author.display_name}
             </p>
-            <p 
+            <p
               className="text-xs"
               style={{ fontFamily: 'var(--font-body)', color: 'var(--foreground)', opacity: 0.5 }}
             >
@@ -307,28 +363,28 @@ function ArticleCard({ post, viewMode }: { post: typeof mockPosts[0]; viewMode: 
         </div>
 
         {/* Stats */}
-        <div 
+        <div
           className="flex items-center gap-4 pt-3 text-sm"
-          style={{ 
+          style={{
             borderTop: '1px solid var(--border)',
-            color: 'var(--foreground)', 
+            color: 'var(--foreground)',
             opacity: 0.6,
             fontFamily: 'var(--font-body)',
           }}
         >
           <span className="flex items-center gap-1">
-            <span className={isHovered ? 'animate-bounce' : ''}>⭐</span> 
+            <span className={isHovered ? 'animate-bounce' : ''}>⭐</span>
             {post.reaction_count}
           </span>
           <span className="flex items-center gap-1">
-            <span>💬</span> 
+            <span>💬</span>
             {post.comment_count}
           </span>
           {post.author.kofi_username && (
             <span
               className="ml-auto text-xs px-2.5 py-1 rounded-full font-medium transition-all"
-              style={{ 
-                background: isHovered ? 'var(--secondary)' : 'rgba(255, 215, 0, 0.15)', 
+              style={{
+                background: isHovered ? 'var(--secondary)' : 'rgba(255, 215, 0, 0.15)',
                 color: isHovered ? '#000' : 'var(--secondary)',
               }}
             >
@@ -342,19 +398,19 @@ function ArticleCard({ post, viewMode }: { post: typeof mockPosts[0]; viewMode: 
 }
 
 // Pagination component
-function Pagination({ 
-  currentPage, 
-  totalPages, 
-  onPageChange 
-}: { 
-  currentPage: number; 
-  totalPages: number; 
+function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
   onPageChange: (page: number) => void;
 }) {
   if (totalPages <= 1) return null;
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-  
+
   // Show max 5 page numbers
   let visiblePages = pages;
   if (totalPages > 5) {
@@ -368,22 +424,29 @@ function Pagination({
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         className="p-2 rounded-lg transition-all disabled:opacity-30"
-        style={{ 
+        style={{
           border: '1px solid var(--border)',
           color: 'var(--foreground)',
         }}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <path d="M15 18l-6-6 6-6" />
         </svg>
       </button>
-      
+
       {visiblePages[0] > 1 && (
         <>
           <button
             onClick={() => onPageChange(1)}
             className="w-10 h-10 rounded-lg transition-all"
-            style={{ 
+            style={{
               border: '1px solid var(--border)',
               color: 'var(--foreground)',
               fontFamily: 'var(--font-body)',
@@ -391,16 +454,18 @@ function Pagination({
           >
             1
           </button>
-          {visiblePages[0] > 2 && <span style={{ color: 'var(--foreground)', opacity: 0.5 }}>...</span>}
+          {visiblePages[0] > 2 && (
+            <span style={{ color: 'var(--foreground)', opacity: 0.5 }}>...</span>
+          )}
         </>
       )}
-      
+
       {visiblePages.map((page) => (
         <button
           key={page}
           onClick={() => onPageChange(page)}
           className="w-10 h-10 rounded-lg font-medium transition-all"
-          style={{ 
+          style={{
             background: currentPage === page ? 'var(--primary)' : 'transparent',
             border: currentPage === page ? 'none' : '1px solid var(--border)',
             color: currentPage === page ? 'var(--background)' : 'var(--foreground)',
@@ -410,7 +475,7 @@ function Pagination({
           {page}
         </button>
       ))}
-      
+
       {visiblePages[visiblePages.length - 1] < totalPages && (
         <>
           {visiblePages[visiblePages.length - 1] < totalPages - 1 && (
@@ -419,7 +484,7 @@ function Pagination({
           <button
             onClick={() => onPageChange(totalPages)}
             className="w-10 h-10 rounded-lg transition-all"
-            style={{ 
+            style={{
               border: '1px solid var(--border)',
               color: 'var(--foreground)',
               fontFamily: 'var(--font-body)',
@@ -429,17 +494,24 @@ function Pagination({
           </button>
         </>
       )}
-      
+
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         className="p-2 rounded-lg transition-all disabled:opacity-30"
-        style={{ 
+        style={{
           border: '1px solid var(--border)',
           color: 'var(--foreground)',
         }}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <path d="M9 18l6-6-6-6" />
         </svg>
       </button>
@@ -467,7 +539,7 @@ export default function ArticlesPage() {
     setSortByRaw(value);
     setCurrentPage(1);
   };
-  
+
   const headerRef = useRef<HTMLDivElement>(null);
   const filtersRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -510,7 +582,7 @@ export default function ArticlesPage() {
   }, []);
 
   // Filter posts
-  const filteredPosts = mockPosts.filter(post => {
+  const filteredPosts = mockPosts.filter((post) => {
     if (contentType !== 'all' && post.content_type !== contentType) return false;
     if (category !== 'all' && post.category.slug !== category) return false;
     return true;
@@ -538,11 +610,14 @@ export default function ArticlesPage() {
   return (
     <>
       <Nav />
-      <main className="min-h-screen pt-28 pb-20 px-4 md:px-8" style={{ background: 'var(--background)' }}>
+      <main
+        className="min-h-screen pt-28 pb-20 px-4 md:px-8"
+        style={{ background: 'var(--background)' }}
+      >
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div ref={headerRef} className="mb-12">
-            <p 
+            <p
               className="text-sm uppercase tracking-[0.3em] mb-3"
               style={{ color: 'var(--accent)', fontFamily: 'var(--font-body)' }}
             >
@@ -550,19 +625,19 @@ export default function ArticlesPage() {
             </p>
             <h1
               className="text-4xl md:text-6xl mb-4"
-              style={{ 
+              style={{
                 fontFamily: 'var(--font-display)',
                 color: 'var(--secondary)',
               }}
             >
               The Newsroom
             </h1>
-            <p 
-              className="text-lg max-w-xl" 
-              style={{ 
+            <p
+              className="text-lg max-w-xl"
+              style={{
                 fontFamily: 'var(--font-body)',
-                color: 'var(--foreground)', 
-                opacity: 0.7 
+                color: 'var(--foreground)',
+                opacity: 0.7,
               }}
             >
               Political journalism from the people who live it. No credentials required.
@@ -573,17 +648,20 @@ export default function ArticlesPage() {
           <div
             ref={filtersRef}
             className="rounded-2xl p-4 md:p-6 mb-10"
-            style={{ 
-              background: 'var(--surface)', 
+            style={{
+              background: 'var(--surface)',
               border: '1px solid var(--border)',
             }}
           >
             {/* Content type tabs */}
-            <div className="flex flex-wrap items-center gap-1 mb-4 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
+            <div
+              className="flex flex-wrap items-center gap-1 mb-4 pb-4"
+              style={{ borderBottom: '1px solid var(--border)' }}
+            >
               <FilterTab active={contentType === 'all'} onClick={() => setContentType('all')}>
                 All
               </FilterTab>
-              {CONTENT_TYPES.map(type => (
+              {CONTENT_TYPES.map((type) => (
                 <FilterTab
                   key={type.id}
                   active={contentType === type.id}
@@ -611,17 +689,19 @@ export default function ArticlesPage() {
                   }}
                 >
                   <option value="all">All Categories</option>
-                  {DEFAULT_CATEGORIES.map(cat => (
-                    <option key={cat.slug} value={cat.slug}>{cat.icon} {cat.name}</option>
+                  {DEFAULT_CATEGORIES.map((cat) => (
+                    <option key={cat.slug} value={cat.slug}>
+                      {cat.icon} {cat.name}
+                    </option>
                   ))}
                 </select>
-                <svg 
+                <svg
                   className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                  width="16" 
-                  height="16" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="var(--foreground)" 
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="var(--foreground)"
                   strokeWidth="2"
                 >
                   <path d="M6 9l6 6 6-6" />
@@ -645,13 +725,13 @@ export default function ArticlesPage() {
                   <option value="trending">🔥 Trending</option>
                   <option value="discussed">💬 Most Discussed</option>
                 </select>
-                <svg 
+                <svg
                   className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                  width="16" 
-                  height="16" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="var(--foreground)" 
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="var(--foreground)"
                   strokeWidth="2"
                 >
                   <path d="M6 9l6 6 6-6" />
@@ -659,7 +739,7 @@ export default function ArticlesPage() {
               </div>
 
               {/* Results count */}
-              <span 
+              <span
                 className="text-sm hidden md:block"
                 style={{ color: 'var(--foreground)', opacity: 0.5, fontFamily: 'var(--font-body)' }}
               >
@@ -667,7 +747,10 @@ export default function ArticlesPage() {
               </span>
 
               {/* View toggle */}
-              <div className="ml-auto flex gap-2 p-1 rounded-xl" style={{ background: 'var(--background)' }}>
+              <div
+                className="ml-auto flex gap-2 p-1 rounded-xl"
+                style={{ background: 'var(--background)' }}
+              >
                 <button
                   onClick={() => setViewMode('grid')}
                   className="p-2 rounded-lg transition-all"
@@ -677,7 +760,14 @@ export default function ArticlesPage() {
                   }}
                   aria-label="Grid view"
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
                     <rect x="3" y="3" width="7" height="7" rx="1" />
                     <rect x="14" y="3" width="7" height="7" rx="1" />
                     <rect x="3" y="14" width="7" height="7" rx="1" />
@@ -693,7 +783,14 @@ export default function ArticlesPage() {
                   }}
                   aria-label="List view"
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
                     <line x1="8" y1="6" x2="21" y2="6" />
                     <line x1="8" y1="12" x2="21" y2="12" />
                     <line x1="8" y1="18" x2="21" y2="18" />
@@ -722,35 +819,35 @@ export default function ArticlesPage() {
           </div>
 
           {/* Pagination */}
-          <Pagination 
-            currentPage={currentPage} 
-            totalPages={totalPages} 
-            onPageChange={setCurrentPage} 
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
           />
 
           {/* No results */}
           {sortedPosts.length === 0 && (
             <div className="text-center py-20">
-              <div 
+              <div
                 className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"
                 style={{ background: 'var(--surface)' }}
               >
                 <span className="text-4xl">🔍</span>
               </div>
-              <p 
-                className="text-xl mb-2" 
-                style={{ 
+              <p
+                className="text-xl mb-2"
+                style={{
                   fontFamily: 'var(--font-body)',
-                  color: 'var(--foreground)', 
+                  color: 'var(--foreground)',
                 }}
               >
                 No articles found
               </p>
-              <p 
-                className="text-sm mb-6" 
-                style={{ 
+              <p
+                className="text-sm mb-6"
+                style={{
                   fontFamily: 'var(--font-body)',
-                  color: 'var(--foreground)', 
+                  color: 'var(--foreground)',
                   opacity: 0.5,
                 }}
               >
@@ -762,8 +859,8 @@ export default function ArticlesPage() {
                   setCategory('all');
                 }}
                 className="px-6 py-3 rounded-xl font-medium transition-all hover:scale-105"
-                style={{ 
-                  background: 'var(--primary)', 
+                style={{
+                  background: 'var(--primary)',
                   color: 'var(--background)',
                   fontFamily: 'var(--font-body)',
                 }}

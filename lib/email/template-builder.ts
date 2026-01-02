@@ -3,8 +3,8 @@
  * Phase 39: MJML-based email templates with variable substitution
  */
 
-import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -70,7 +70,10 @@ export interface EmailPreviewData {
 // DEFAULT TEMPLATES
 // ============================================================================
 
-export const DEFAULT_TEMPLATES: Omit<EmailTemplate, 'id' | 'html_content' | 'created_by' | 'created_at' | 'updated_at'>[] = [
+export const DEFAULT_TEMPLATES: Omit<
+  EmailTemplate,
+  'id' | 'html_content' | 'created_by' | 'created_at' | 'updated_at'
+>[] = [
   {
     name: 'Welcome Email',
     slug: 'welcome',
@@ -123,11 +126,39 @@ Get started: {{dashboard_url}}
 
 © {{current_year}} {{site_name}}. All rights reserved.`,
     variables: [
-      { name: 'site_name', description: 'Name of the site', type: 'string', required: true, example: 'Scroungers Multimedia' },
-      { name: 'user_name', description: 'User display name', type: 'string', required: true, example: 'John' },
-      { name: 'logo_url', description: 'Logo image URL', type: 'url', required: false },
-      { name: 'dashboard_url', description: 'Link to dashboard', type: 'url', required: true },
-      { name: 'current_year', description: 'Current year', type: 'number', required: false, default_value: new Date().getFullYear().toString() },
+      {
+        name: 'site_name',
+        description: 'Name of the site',
+        type: 'string',
+        required: true,
+        example: 'Scroungers Multimedia',
+      },
+      {
+        name: 'user_name',
+        description: 'User display name',
+        type: 'string',
+        required: true,
+        example: 'John',
+      },
+      {
+        name: 'logo_url',
+        description: 'Logo image URL',
+        type: 'url',
+        required: false,
+      },
+      {
+        name: 'dashboard_url',
+        description: 'Link to dashboard',
+        type: 'url',
+        required: true,
+      },
+      {
+        name: 'current_year',
+        description: 'Current year',
+        type: 'number',
+        required: false,
+        default_value: new Date().getFullYear().toString(),
+      },
     ],
     is_active: true,
     is_default: true,
@@ -181,11 +212,37 @@ We received a request to reset your password. Click the link below to create a n
 
 This link will expire in {{expiry_hours}} hours. If you didn't request this, please ignore this email.`,
     variables: [
-      { name: 'site_name', description: 'Name of the site', type: 'string', required: true },
-      { name: 'user_name', description: 'User display name', type: 'string', required: true },
-      { name: 'logo_url', description: 'Logo image URL', type: 'url', required: false },
-      { name: 'reset_url', description: 'Password reset link', type: 'url', required: true },
-      { name: 'expiry_hours', description: 'Hours until expiry', type: 'number', required: false, default_value: '24' },
+      {
+        name: 'site_name',
+        description: 'Name of the site',
+        type: 'string',
+        required: true,
+      },
+      {
+        name: 'user_name',
+        description: 'User display name',
+        type: 'string',
+        required: true,
+      },
+      {
+        name: 'logo_url',
+        description: 'Logo image URL',
+        type: 'url',
+        required: false,
+      },
+      {
+        name: 'reset_url',
+        description: 'Password reset link',
+        type: 'url',
+        required: true,
+      },
+      {
+        name: 'expiry_hours',
+        description: 'Hours until expiry',
+        type: 'number',
+        required: false,
+        default_value: '24',
+      },
     ],
     is_active: true,
     is_default: true,
@@ -195,7 +252,7 @@ This link will expire in {{expiry_hours}} hours. If you didn't request this, ple
     name: 'New Comment Notification',
     slug: 'new-comment',
     subject: 'New comment on "{{post_title}}"',
-    description: 'Sent when someone comments on user\'s post',
+    description: "Sent when someone comments on user's post",
     category: 'notification',
     mjml_content: `
 <mjml>
@@ -248,13 +305,48 @@ View comment: {{comment_url}}
 ---
 Unsubscribe: {{unsubscribe_url}}`,
     variables: [
-      { name: 'author_name', description: 'Post author name', type: 'string', required: true },
-      { name: 'commenter_name', description: 'Commenter name', type: 'string', required: true },
-      { name: 'post_title', description: 'Title of the post', type: 'string', required: true },
-      { name: 'post_url', description: 'Link to post', type: 'url', required: true },
-      { name: 'comment_excerpt', description: 'Comment preview', type: 'string', required: true },
-      { name: 'comment_url', description: 'Direct link to comment', type: 'url', required: true },
-      { name: 'unsubscribe_url', description: 'Unsubscribe link', type: 'url', required: true },
+      {
+        name: 'author_name',
+        description: 'Post author name',
+        type: 'string',
+        required: true,
+      },
+      {
+        name: 'commenter_name',
+        description: 'Commenter name',
+        type: 'string',
+        required: true,
+      },
+      {
+        name: 'post_title',
+        description: 'Title of the post',
+        type: 'string',
+        required: true,
+      },
+      {
+        name: 'post_url',
+        description: 'Link to post',
+        type: 'url',
+        required: true,
+      },
+      {
+        name: 'comment_excerpt',
+        description: 'Comment preview',
+        type: 'string',
+        required: true,
+      },
+      {
+        name: 'comment_url',
+        description: 'Direct link to comment',
+        type: 'url',
+        required: true,
+      },
+      {
+        name: 'unsubscribe_url',
+        description: 'Unsubscribe link',
+        type: 'url',
+        required: true,
+      },
     ],
     is_active: true,
     is_default: true,
@@ -337,15 +429,60 @@ View Dashboard: {{dashboard_url}}
 ---
 Unsubscribe: {{unsubscribe_url}}`,
     variables: [
-      { name: 'site_name', description: 'Name of the site', type: 'string', required: true },
-      { name: 'user_name', description: 'User display name', type: 'string', required: true },
-      { name: 'logo_url', description: 'Logo image URL', type: 'url', required: false },
-      { name: 'top_posts', description: 'Array of top posts', type: 'html', required: true },
-      { name: 'view_count', description: 'Total views', type: 'number', required: true },
-      { name: 'new_followers', description: 'New follower count', type: 'number', required: true },
-      { name: 'comment_count', description: 'New comment count', type: 'number', required: true },
-      { name: 'dashboard_url', description: 'Link to dashboard', type: 'url', required: true },
-      { name: 'unsubscribe_url', description: 'Unsubscribe link', type: 'url', required: true },
+      {
+        name: 'site_name',
+        description: 'Name of the site',
+        type: 'string',
+        required: true,
+      },
+      {
+        name: 'user_name',
+        description: 'User display name',
+        type: 'string',
+        required: true,
+      },
+      {
+        name: 'logo_url',
+        description: 'Logo image URL',
+        type: 'url',
+        required: false,
+      },
+      {
+        name: 'top_posts',
+        description: 'Array of top posts',
+        type: 'html',
+        required: true,
+      },
+      {
+        name: 'view_count',
+        description: 'Total views',
+        type: 'number',
+        required: true,
+      },
+      {
+        name: 'new_followers',
+        description: 'New follower count',
+        type: 'number',
+        required: true,
+      },
+      {
+        name: 'comment_count',
+        description: 'New comment count',
+        type: 'number',
+        required: true,
+      },
+      {
+        name: 'dashboard_url',
+        description: 'Link to dashboard',
+        type: 'url',
+        required: true,
+      },
+      {
+        name: 'unsubscribe_url',
+        description: 'Unsubscribe link',
+        type: 'url',
+        required: true,
+      },
     ],
     is_active: true,
     is_default: true,
@@ -364,7 +501,7 @@ Unsubscribe: {{unsubscribe_url}}`,
 export function compileMjmlToHtml(mjml: string): string {
   // This is a simplified version - in production, use mjml package
   // For now, return a basic HTML structure
-  
+
   // Extract body content and convert to basic HTML
   const bodyMatch = mjml.match(/<mj-body[^>]*>([\s\S]*?)<\/mj-body>/);
   if (!bodyMatch) {
@@ -375,17 +512,25 @@ export function compileMjmlToHtml(mjml: string): string {
 
   // Convert MJML tags to HTML (simplified)
   html = html
-    .replace(/<mj-section[^>]*>/g, '<table width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding: 20px;">')
+    .replace(
+      /<mj-section[^>]*>/g,
+      '<table width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding: 20px;">'
+    )
     .replace(/<\/mj-section>/g, '</td></tr></table>')
     .replace(/<mj-column[^>]*>/g, '')
     .replace(/<\/mj-column>/g, '')
     .replace(/<mj-text([^>]*)>/g, '<p$1>')
     .replace(/<\/mj-text>/g, '</p>')
-    .replace(/<mj-button[^>]*background-color="([^"]*)"[^>]*href="([^"]*)"[^>]*>/g, 
-      '<a href="$2" style="background-color: $1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">')
+    .replace(
+      /<mj-button[^>]*background-color="([^"]*)"[^>]*href="([^"]*)"[^>]*>/g,
+      '<a href="$2" style="background-color: $1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">'
+    )
     .replace(/<\/mj-button>/g, '</a>')
     .replace(/<mj-image[^>]*src="([^"]*)"[^>]*\/>/g, '<img src="$1" style="max-width: 100%;" />')
-    .replace(/<mj-divider[^>]*\/>/g, '<hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;" />');
+    .replace(
+      /<mj-divider[^>]*\/>/g,
+      '<hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;" />'
+    );
 
   return `
 <!DOCTYPE html>
@@ -432,18 +577,23 @@ export function substituteVariables(
   });
 
   // Handle {{#each}} loops (simplified)
-  result = result.replace(/\{\{#each (\w+)\}\}([\s\S]*?)\{\{\/each\}\}/g, (match, arrayName, template) => {
-    const items = context[arrayName];
-    if (!Array.isArray(items)) return '';
-    
-    return items.map((item) => {
-      let itemContent = template;
-      Object.entries(item).forEach(([key, value]) => {
-        itemContent = itemContent.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), String(value));
-      });
-      return itemContent;
-    }).join('');
-  });
+  result = result.replace(
+    /\{\{#each (\w+)\}\}([\s\S]*?)\{\{\/each\}\}/g,
+    (match, arrayName, template) => {
+      const items = context[arrayName];
+      if (!Array.isArray(items)) return '';
+
+      return items
+        .map((item) => {
+          let itemContent = template;
+          Object.entries(item).forEach(([key, value]) => {
+            itemContent = itemContent.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), String(value));
+          });
+          return itemContent;
+        })
+        .join('');
+    }
+  );
 
   return result;
 }
@@ -463,10 +613,7 @@ export async function getTemplates(options: {
   const { category, isActive, search } = options;
   const supabase = await createClient();
 
-  let query = supabase
-    .from('email_templates')
-    .select('*')
-    .order('name', { ascending: true });
+  let query = supabase.from('email_templates').select('*').order('name', { ascending: true });
 
   if (category) query = query.eq('category', category);
   if (isActive !== undefined) query = query.eq('is_active', isActive);
@@ -526,7 +673,10 @@ export async function createTemplate(
     throw error;
   }
 
-  logger.info('[Email] Template created', { templateId: data.id, slug: template.slug });
+  logger.info('[Email] Template created', {
+    templateId: data.id,
+    slug: template.slug,
+  });
 
   return data as EmailTemplate;
 }
@@ -572,11 +722,7 @@ export async function updateTemplate(
 export async function getTemplate(templateId: string): Promise<EmailTemplate | null> {
   const supabase = await createClient();
 
-  const { data } = await supabase
-    .from('email_templates')
-    .select('*')
-    .eq('id', templateId)
-    .single();
+  const { data } = await supabase.from('email_templates').select('*').eq('id', templateId).single();
 
   return data as EmailTemplate | null;
 }
@@ -670,7 +816,7 @@ export async function previewTemplate(
 
   // Use example values if no context provided
   const previewContext: EmailRenderContext = context || {};
-  
+
   template.variables.forEach((v) => {
     if (previewContext[v.name] === undefined) {
       previewContext[v.name] = v.example || v.default_value || `{{${v.name}}}`;
@@ -733,7 +879,10 @@ export async function seedDefaultTemplates(systemUserId: string): Promise<void> 
     } catch (error) {
       // Ignore duplicate key errors
       if ((error as { code?: string })?.code !== '23505') {
-        logger.warn('[Email] Failed to seed template', { slug: template.slug, error });
+        logger.warn('[Email] Failed to seed template', {
+          slug: template.slug,
+          error,
+        });
       }
     }
   }

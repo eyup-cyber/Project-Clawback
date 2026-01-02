@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Search Suggestions API
  * Provides autocomplete suggestions for search queries

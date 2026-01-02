@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Reading History API Routes
  * Phase 3.3: Reading progress and history
@@ -25,7 +27,7 @@ const getHistorySchema = z.object({
   completed_only: z.coerce.boolean().optional(),
 });
 
-export const POST = withRouteHandler(async (_req: NextRequest) => {
+export const POST = withRouteHandler(async (req: NextRequest) => {
   const { user } = await requireAuth();
 
   const body = await req.json();
@@ -40,7 +42,7 @@ export const POST = withRouteHandler(async (_req: NextRequest) => {
   return success(history);
 });
 
-export const GET = withRouteHandler(async (_req: NextRequest) => {
+export const GET = withRouteHandler(async (req: NextRequest) => {
   const { user } = await requireAuth();
 
   const searchParams = req.nextUrl.searchParams;
@@ -57,7 +59,7 @@ export const GET = withRouteHandler(async (_req: NextRequest) => {
   return success(result);
 });
 
-export const DELETE = withRouteHandler(async (_req: NextRequest) => {
+export const DELETE = withRouteHandler(async () => {
   const { user } = await requireAuth();
 
   await readingHistoryDb.clearReadingHistory(user.id);

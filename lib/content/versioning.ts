@@ -3,8 +3,8 @@
  * Phase 54: Version history, comparison, and restoration
  */
 
-import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES
@@ -199,13 +199,7 @@ export async function getVersions(
 ): Promise<{ versions: VersionWithAuthor[]; total: number }> {
   const supabase = await createClient();
 
-  const {
-    content_type,
-    content_id,
-    include_auto_saves = false,
-    limit = 50,
-    offset = 0,
-  } = query;
+  const { content_type, content_id, include_auto_saves = false, limit = 50, offset = 0 } = query;
 
   let queryBuilder = supabase
     .from('content_versions')
@@ -387,10 +381,7 @@ export async function cleanupAutoSaves(
 
   const idsToDelete = autoSaves.map((v) => v.id);
 
-  const { error } = await supabase
-    .from('content_versions')
-    .delete()
-    .in('id', idsToDelete);
+  const { error } = await supabase.from('content_versions').delete().in('id', idsToDelete);
 
   if (error) {
     logger.error('[Versioning] Failed to cleanup auto-saves', error);
@@ -411,10 +402,7 @@ export async function compareVersions(
   versionId1: string,
   versionId2: string
 ): Promise<ContentDiff> {
-  const [version1, version2] = await Promise.all([
-    getVersion(versionId1),
-    getVersion(versionId2),
-  ]);
+  const [version1, version2] = await Promise.all([getVersion(versionId1), getVersion(versionId2)]);
 
   if (!version1 || !version2) {
     throw new Error('One or both versions not found');
@@ -422,9 +410,7 @@ export async function compareVersions(
 
   // Ensure version1 is older
   const [older, newer] =
-    version1.version_number < version2.version_number
-      ? [version1, version2]
-      : [version2, version1];
+    version1.version_number < version2.version_number ? [version1, version2] : [version2, version1];
 
   return generateDiff(older, newer);
 }
@@ -574,10 +560,7 @@ function computeLCS(arr1: string[], arr2: string[]): string[] {
 /**
  * Generate metadata diff
  */
-function generateMetadataDiff(
-  oldMeta: VersionMetadata,
-  newMeta: VersionMetadata
-): MetadataDiff {
+function generateMetadataDiff(oldMeta: VersionMetadata, newMeta: VersionMetadata): MetadataDiff {
   const changes: MetadataDiff['changes'] = [];
 
   // Compare all keys
@@ -723,8 +706,7 @@ export function formatDiffForHTML(diff: LineDiff[]): string {
   return diff
     .map((line) => {
       const lineNum = line.oldLineNumber || line.newLineNumber || '';
-      const prefix =
-        line.type === 'added' ? '+' : line.type === 'removed' ? '-' : ' ';
+      const prefix = line.type === 'added' ? '+' : line.type === 'removed' ? '-' : ' ';
       const className =
         line.type === 'added'
           ? 'diff-added'

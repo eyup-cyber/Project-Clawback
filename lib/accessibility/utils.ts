@@ -91,7 +91,10 @@ export const saveFocus = (): HTMLElement | null => {
 /**
  * Announce to screen readers
  */
-export const announceToScreenReader = (message: string, priority: 'polite' | 'assertive' = 'polite') => {
+export const announceToScreenReader = (
+  message: string,
+  priority: 'polite' | 'assertive' = 'polite'
+) => {
   const announcement = document.createElement('div');
   announcement.setAttribute('role', 'status');
   announcement.setAttribute('aria-live', priority);
@@ -152,7 +155,3 @@ export const ensureAccessibleName = (element: HTMLElement, fallbackName: string)
     element.setAttribute('aria-label', fallbackName);
   }
 };
-
-
-
-

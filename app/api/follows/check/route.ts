@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Check Follow Status API
  */

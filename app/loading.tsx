@@ -10,12 +10,19 @@ export default function Loading() {
           {/* Outer ring */}
           <div
             className="absolute inset-0 rounded-full border-4 border-transparent animate-spin"
-            style={{ borderTopColor: 'var(--primary)', animationDuration: '1s' }}
+            style={{
+              borderTopColor: 'var(--primary)',
+              animationDuration: '1s',
+            }}
           />
           {/* Inner ring */}
           <div
             className="absolute inset-2 rounded-full border-4 border-transparent animate-spin"
-            style={{ borderBottomColor: 'var(--secondary)', animationDuration: '0.75s', animationDirection: 'reverse' }}
+            style={{
+              borderBottomColor: 'var(--secondary)',
+              animationDuration: '0.75s',
+              animationDirection: 'reverse',
+            }}
           />
           {/* Center dot */}
           <div
@@ -23,11 +30,14 @@ export default function Loading() {
             style={{ background: 'var(--primary)' }}
           />
         </div>
-        
+
         {/* Loading text */}
         <p
           className="text-lg font-bold animate-pulse"
-          style={{ fontFamily: 'var(--font-kindergarten)', color: 'var(--primary)' }}
+          style={{
+            fontFamily: 'var(--font-kindergarten)',
+            color: 'var(--primary)',
+          }}
         >
           Loading...
         </p>
@@ -35,12 +45,3 @@ export default function Loading() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-

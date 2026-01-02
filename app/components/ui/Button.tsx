@@ -1,6 +1,13 @@
 'use client';
 
-import { forwardRef, type ButtonHTMLAttributes, type ReactNode, useState, useRef, useCallback } from 'react';
+import {
+  type ButtonHTMLAttributes,
+  forwardRef,
+  type ReactNode,
+  useCallback,
+  useRef,
+  useState,
+} from 'react';
 import { cn } from '@/lib/utils';
 
 interface RippleType {
@@ -28,21 +35,14 @@ function Spinner({ size = 'md' }: { size?: string }) {
     lg: 'w-5 h-5',
     icon: 'w-4 h-4',
   };
-  
+
   return (
     <svg
       className={`animate-spin ${sizes[size as keyof typeof sizes] || sizes.md}`}
       fill="none"
       viewBox="0 0 24 24"
     >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path
         className="opacity-75"
         fill="currentColor"
@@ -76,23 +76,26 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const rippleIdRef = useRef(0);
 
     // Handle ripple effect
-    const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-      if (ripple && buttonRef.current && !disabled && !loading) {
-        const rect = buttonRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        const id = rippleIdRef.current++;
-        setRipples((prev) => [...prev, { x, y, id }]);
-        
-        // Remove ripple after animation
-        setTimeout(() => {
-          setRipples((prev) => prev.filter((r) => r.id !== id));
-        }, 600);
-      }
-      
-      onClick?.(e);
-    }, [ripple, disabled, loading, onClick]);
+    const handleClick = useCallback(
+      (e: React.MouseEvent<HTMLButtonElement>) => {
+        if (ripple && buttonRef.current && !disabled && !loading) {
+          const rect = buttonRef.current.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+
+          const id = rippleIdRef.current++;
+          setRipples((prev) => [...prev, { x, y, id }]);
+
+          // Remove ripple after animation
+          setTimeout(() => {
+            setRipples((prev) => prev.filter((r) => r.id !== id));
+          }, 600);
+        }
+
+        onClick?.(e);
+      },
+      [ripple, disabled, loading, onClick]
+    );
 
     const baseStyles = `
       relative overflow-hidden
@@ -143,14 +146,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       icon: 'p-2.5',
     };
 
-    const glowStyles = glow ? {
-      primary: 'shadow-[0_0_20px_var(--glow-primary)]',
-      secondary: 'shadow-[0_0_20px_var(--glow-secondary)]',
-      accent: 'shadow-[0_0_20px_var(--glow-accent)]',
-      outline: '',
-      ghost: '',
-      danger: 'shadow-[0_0_20px_rgba(220,38,38,0.4)]',
-    } : {};
+    const glowStyles = glow
+      ? {
+          primary: 'shadow-[0_0_20px_var(--glow-primary)]',
+          secondary: 'shadow-[0_0_20px_var(--glow-secondary)]',
+          accent: 'shadow-[0_0_20px_var(--glow-accent)]',
+          outline: '',
+          ghost: '',
+          danger: 'shadow-[0_0_20px_rgba(220,38,38,0.4)]',
+        }
+      : {};
 
     return (
       <button
@@ -161,9 +166,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           else if (ref) ref.current = node;
         }}
         className={cn(
-          baseStyles, 
-          variants[variant], 
-          sizes[size], 
+          baseStyles,
+          variants[variant],
+          sizes[size],
           glow && glowStyles[variant],
           fullWidth && 'w-full',
           className
@@ -185,22 +190,23 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               height: '10px',
               marginLeft: '-5px',
               marginTop: '-5px',
-              background: variant === 'outline' || variant === 'ghost' 
-                ? 'rgba(50, 205, 50, 0.3)' 
-                : 'rgba(255, 255, 255, 0.3)',
+              background:
+                variant === 'outline' || variant === 'ghost'
+                  ? 'rgba(50, 205, 50, 0.3)'
+                  : 'rgba(255, 255, 255, 0.3)',
             }}
           />
         ))}
 
         {/* Loading spinner */}
         {loading && <Spinner size={size} />}
-        
+
         {/* Left icon */}
         {!loading && leftIcon && <span className="flex-shrink-0">{leftIcon}</span>}
-        
+
         {/* Children with loading text fade */}
         <span className={cn(loading && 'opacity-70')}>{children}</span>
-        
+
         {/* Right icon */}
         {!loading && rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
 
@@ -245,18 +251,18 @@ export function IconButton({
 }
 
 // Button with arrow
-export function ArrowButton({ 
-  children, 
+export function ArrowButton({
+  children,
   direction = 'right',
-  ...props 
+  ...props
 }: ButtonProps & { direction?: 'left' | 'right' }) {
   const arrow = (
-    <svg 
-      width="16" 
-      height="16" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
       strokeWidth="2"
       className={cn(
         'transition-transform group-hover:translate-x-1',
@@ -268,8 +274,8 @@ export function ArrowButton({
   );
 
   return (
-    <Button 
-      className="group" 
+    <Button
+      className="group"
       rightIcon={direction === 'right' ? arrow : undefined}
       leftIcon={direction === 'left' ? arrow : undefined}
       {...props}

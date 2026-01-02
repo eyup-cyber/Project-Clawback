@@ -1,9 +1,15 @@
 'use client';
 
-import { useEffect, useRef, type ReactNode } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { EASING, DURATION, prefersReducedMotion, getDuration, getStagger } from '@/lib/animations/gsap-config';
+import { type ReactNode, useEffect, useRef } from 'react';
+import {
+  DURATION,
+  EASING,
+  getDuration,
+  getStagger,
+  prefersReducedMotion,
+} from '@/lib/animations/gsap-config';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -94,11 +100,24 @@ export default function TextReveal({
         onEnter: () => {
           if (once && hasAnimated.current) return;
           hasAnimated.current = true;
-          animateReveal(type, container, elements, getDuration(duration), getStagger(stagger), delay);
+          animateReveal(
+            type,
+            container,
+            elements,
+            getDuration(duration),
+            getStagger(stagger),
+            delay
+          );
         },
         onLeaveBack: () => {
           if (once) return;
-          reverseReveal(type, container, elements, getDuration(duration * 0.5), getStagger(stagger * 0.5));
+          reverseReveal(
+            type,
+            container,
+            elements,
+            getDuration(duration * 0.5),
+            getStagger(stagger * 0.5)
+          );
         },
       });
     }, container);
@@ -108,7 +127,11 @@ export default function TextReveal({
 
   return (
     <Component
-      ref={containerRef as React.RefObject<HTMLHeadingElement & HTMLParagraphElement & HTMLDivElement & HTMLSpanElement>}
+      ref={
+        containerRef as React.RefObject<
+          HTMLHeadingElement & HTMLParagraphElement & HTMLDivElement & HTMLSpanElement
+        >
+      }
       className={className}
       style={{ overflow: type === 'clip' ? 'hidden' : undefined }}
     >
@@ -248,10 +271,10 @@ function animateReveal(
       });
       break;
 
-    case 'glitch':
+    case 'glitch': {
       // Glitch effect with random transforms
       const tl = gsap.timeline({ delay });
-      
+
       tl.set(container, { opacity: 1 })
         .to(container, {
           skewX: 10,
@@ -273,6 +296,7 @@ function animateReveal(
           ease: EASING.snappy,
         });
       break;
+    }
   }
 }
 
@@ -358,7 +382,11 @@ export function GradientText({
 
   return (
     <Component
-      ref={ref as React.RefObject<HTMLHeadingElement & HTMLParagraphElement & HTMLDivElement & HTMLSpanElement>}
+      ref={
+        ref as React.RefObject<
+          HTMLHeadingElement & HTMLParagraphElement & HTMLDivElement & HTMLSpanElement
+        >
+      }
       className={className}
       style={{
         background: `linear-gradient(90deg, ${gradientStops}, ${from})`,
@@ -441,9 +469,3 @@ export function HighlightText({
     </span>
   );
 }
-
-
-
-
-
-

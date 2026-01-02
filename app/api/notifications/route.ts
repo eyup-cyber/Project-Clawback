@@ -1,12 +1,8 @@
+export const runtime = 'edge';
+
 import { type NextRequest } from 'next/server';
 import { z } from 'zod';
-import {
-  success,
-  handleApiError,
-  parseParams,
-  parseBody,
-  requireAuth,
-} from '@/lib/api';
+import { success, handleApiError, parseParams, parseBody, requireAuth } from '@/lib/api';
 import {
   getNotifications,
   markNotificationsRead,
@@ -99,9 +95,3 @@ export async function DELETE() {
     return handleApiError(err);
   }
 }
-
-
-
-
-
-

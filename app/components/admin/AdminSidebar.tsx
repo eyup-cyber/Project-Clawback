@@ -42,11 +42,11 @@ const sidebarSections: SidebarSection[] = [
   },
 ];
 
-function SidebarContent({ 
+function SidebarContent({
   sections,
-  pathname, 
-  onItemClick 
-}: { 
+  pathname,
+  onItemClick,
+}: {
   sections: SidebarSection[];
   pathname: string;
   onItemClick?: () => void;
@@ -55,10 +55,10 @@ function SidebarContent({
     <nav className="p-3 sm:p-4 space-y-6">
       {sections.map((section) => (
         <div key={section.title}>
-          <p 
+          <p
             className="text-[10px] sm:text-xs uppercase tracking-wider mb-2 px-3"
-            style={{ 
-              color: 'var(--foreground)', 
+            style={{
+              color: 'var(--foreground)',
               opacity: 0.5,
               fontFamily: 'var(--font-body)',
               fontWeight: 500,
@@ -68,7 +68,8 @@ function SidebarContent({
           </p>
           <div className="space-y-1">
             {section.items.map((item) => {
-              const isActive = pathname === item.href ||
+              const isActive =
+                pathname === item.href ||
                 (item.href !== '/admin' && pathname.startsWith(item.href));
 
               return (
@@ -79,27 +80,28 @@ function SidebarContent({
                   className={`
                     flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg transition-all duration-200
                     min-h-[44px] relative overflow-hidden
-                    ${isActive
-                      ? 'text-[var(--background)] font-medium'
-                      : 'text-[var(--foreground)] hover:bg-[var(--surface-elevated)]'
+                    ${
+                      isActive
+                        ? 'text-[var(--background)] font-medium'
+                        : 'text-[var(--foreground)] hover:bg-[var(--surface-elevated)]'
                     }
                   `}
                   style={{
-                    background: isActive 
-                      ? 'linear-gradient(90deg, var(--accent), var(--accent))' 
+                    background: isActive
+                      ? 'linear-gradient(90deg, var(--accent), var(--accent))'
                       : undefined,
                     boxShadow: isActive ? '0 0 20px var(--glow-accent)' : undefined,
                   }}
                 >
                   {/* Active indicator bar */}
                   {isActive && (
-                    <span 
+                    <span
                       className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full"
                       style={{ background: 'var(--secondary)' }}
                     />
                   )}
                   <span className="text-lg sm:text-xl">{item.icon}</span>
-                  <span 
+                  <span
                     className="text-sm"
                     style={{ fontFamily: 'var(--font-body)', letterSpacing: '-0.02em' }}
                   >
@@ -119,7 +121,7 @@ function SidebarContent({
           className="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-[var(--foreground)] hover:bg-[var(--surface-elevated)] transition-all duration-200 min-h-[44px]"
         >
           <span className="text-lg sm:text-xl">🎨</span>
-          <span 
+          <span
             className="text-sm"
             style={{ fontFamily: 'var(--font-body)', letterSpacing: '-0.02em' }}
           >
@@ -131,7 +133,7 @@ function SidebarContent({
           className="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-[var(--foreground)] hover:bg-[var(--surface-elevated)] transition-all duration-200 min-h-[44px]"
         >
           <span className="text-lg sm:text-xl">🏠</span>
-          <span 
+          <span
             className="text-sm"
             style={{ fontFamily: 'var(--font-body)', letterSpacing: '-0.02em' }}
           >
@@ -153,16 +155,14 @@ export default function AdminSidebar() {
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
         className="lg:hidden fixed bottom-4 right-4 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-transform duration-200 active:scale-95"
-        style={{ 
+        style={{
           background: 'var(--accent)',
           boxShadow: '0 0 20px var(--glow-accent)',
         }}
         aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={mobileOpen}
       >
-        <span className="text-2xl text-[var(--background)]">
-          {mobileOpen ? '✕' : '☰'}
-        </span>
+        <span className="text-2xl text-[var(--background)]">{mobileOpen ? '✕' : '☰'}</span>
       </button>
 
       {/* Mobile overlay */}
@@ -188,10 +188,10 @@ export default function AdminSidebar() {
         }}
       >
         <div className="h-full overflow-y-auto">
-          <SidebarContent 
+          <SidebarContent
             sections={sidebarSections}
-            pathname={pathname} 
-            onItemClick={() => setMobileOpen(false)} 
+            pathname={pathname}
+            onItemClick={() => setMobileOpen(false)}
           />
         </div>
       </aside>

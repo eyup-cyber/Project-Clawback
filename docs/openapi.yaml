@@ -1,15 +1,22 @@
+# checkov:skip=CKV_OPENAPI_4:Global security with cookieAuth is defined - apiKey type does not use scopes
+# checkov:skip=CKV_OPENAPI_6:Global security field has rules defined below
+# trunk-ignore(checkov/CKV_OPENAPI_4)
+# trunk-ignore(checkov/CKV_OPENAPI_6)
 openapi: 3.1.0
+security:
+  - cookieAuth: []
+  - bearerAuth: []
 info:
   title: Scroungers Multimedia API
   description: |
     Backend API for Scroungers Multimedia platform.
-    
+
     ## Authentication
     Most endpoints require authentication via Supabase Auth. Include the session cookie or Bearer token in requests.
-    
+
     ## Rate Limiting
     Rate limiting is currently disabled.
-    
+
     ## Error Responses
     All errors follow a standard format:
     ```json
@@ -63,6 +70,8 @@ paths:
     get:
       tags: [Posts]
       summary: List posts
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - post listing is accessible without authentication
+      security: []
       parameters:
         - name: page
           in: query
@@ -129,6 +138,8 @@ paths:
     get:
       tags: [Posts]
       summary: Get post by ID
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - individual posts are publicly viewable
+      security: []
       parameters:
         - name: id
           in: path
@@ -196,6 +207,8 @@ paths:
     get:
       tags: [Posts]
       summary: Get post by slug
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - posts are accessible by slug without authentication
+      security: []
       parameters:
         - name: slug
           in: path
@@ -216,6 +229,8 @@ paths:
     get:
       tags: [Posts]
       summary: Get featured posts
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - featured posts are publicly viewable
+      security: []
       parameters:
         - name: limit
           in: query
@@ -225,11 +240,20 @@ paths:
       responses:
         '200':
           description: Featured posts list
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 20
+                items:
+                  $ref: '#/components/schemas/Post'
 
   /posts/trending:
     get:
       tags: [Posts]
       summary: Get trending posts
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - trending posts are publicly viewable
+      security: []
       parameters:
         - name: limit
           in: query
@@ -239,6 +263,13 @@ paths:
       responses:
         '200':
           description: Trending posts list
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 50
+                items:
+                  $ref: '#/components/schemas/Post'
 
   # =========================================================================
   # COMMENTS
@@ -247,6 +278,8 @@ paths:
     get:
       tags: [Comments]
       summary: List comments for a post
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - comments are publicly viewable
+      security: []
       parameters:
         - name: post_id
           in: query
@@ -272,6 +305,10 @@ paths:
       responses:
         '200':
           description: Comments list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCommentsResponse'
     post:
       tags: [Comments]
       summary: Create a comment
@@ -293,6 +330,8 @@ paths:
     get:
       tags: [Comments]
       summary: Get comment by ID
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - individual comments are publicly viewable
+      security: []
       parameters:
         - name: id
           in: path
@@ -303,6 +342,10 @@ paths:
       responses:
         '200':
           description: Comment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
         '404':
           $ref: '#/components/responses/NotFound'
     put:
@@ -360,6 +403,8 @@ paths:
     get:
       tags: [Reactions]
       summary: Get reaction summary for a post
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - reaction summaries are publicly viewable
+      security: []
       parameters:
         - name: post_id
           in: query
@@ -411,6 +456,10 @@ paths:
       responses:
         '200':
           description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/Unauthorized'
     put:
@@ -433,6 +482,8 @@ paths:
     get:
       tags: [Users]
       summary: Get user profile by username
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - user profiles are publicly viewable
+      security: []
       parameters:
         - name: username
           in: path
@@ -442,6 +493,10 @@ paths:
       responses:
         '200':
           description: Public user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -449,6 +504,8 @@ paths:
     get:
       tags: [Users]
       summary: Check if username is available
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - username availability check for registration
+      security: []
       parameters:
         - name: username
           in: query
@@ -473,6 +530,8 @@ paths:
     get:
       tags: [Categories]
       summary: List categories
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - categories are publicly viewable
+      security: []
       parameters:
         - name: with_counts
           in: query
@@ -482,6 +541,13 @@ paths:
       responses:
         '200':
           description: Categories list
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 100
+                items:
+                  $ref: '#/components/schemas/Category'
 
   # =========================================================================
   # AUTH
@@ -490,6 +556,8 @@ paths:
     get:
       tags: [Auth]
       summary: OAuth callback handler
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - OAuth callback must be accessible without authentication
+      security: []
       parameters:
         - name: code
           in: query
@@ -512,6 +580,8 @@ paths:
     post:
       tags: [Contact]
       summary: Submit contact form
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - contact form accessible without authentication
+      security: []
       requestBody:
         required: true
         content:
@@ -529,6 +599,8 @@ paths:
     post:
       tags: [Newsletter]
       summary: Subscribe to newsletter
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - newsletter subscription accessible without authentication
+      security: []
       requestBody:
         required: true
         content:
@@ -546,6 +618,8 @@ paths:
     delete:
       tags: [Newsletter]
       summary: Unsubscribe from newsletter
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - newsletter unsubscription accessible without authentication
+      security: []
       requestBody:
         required: true
         content:
@@ -648,6 +722,13 @@ paths:
       responses:
         '200':
           description: Users list
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 100
+                items:
+                  $ref: '#/components/schemas/User'
         '403':
           $ref: '#/components/responses/Forbidden'
 
@@ -667,6 +748,10 @@ paths:
       responses:
         '200':
           description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         '403':
           $ref: '#/components/responses/Forbidden'
     put:
@@ -681,6 +766,12 @@ paths:
           schema:
             type: string
             format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserInputAdmin'
       responses:
         '200':
           description: User updated
@@ -696,6 +787,10 @@ paths:
       responses:
         '200':
           description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardStats'
         '403':
           $ref: '#/components/responses/Forbidden'
 
@@ -714,6 +809,13 @@ paths:
       responses:
         '200':
           description: Applications list
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 100
+                items:
+                  $ref: '#/components/schemas/Application'
         '403':
           $ref: '#/components/responses/Forbidden'
 
@@ -733,6 +835,10 @@ paths:
       responses:
         '200':
           description: Application details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
         '403':
           $ref: '#/components/responses/Forbidden'
 
@@ -777,6 +883,10 @@ paths:
       responses:
         '200':
           description: Posts list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPostsResponse'
         '403':
           $ref: '#/components/responses/Forbidden'
 
@@ -789,6 +899,10 @@ paths:
       responses:
         '200':
           description: Pending posts list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPostsResponse'
         '403':
           $ref: '#/components/responses/Forbidden'
 
@@ -831,6 +945,8 @@ paths:
     get:
       tags: [Health]
       summary: Health check endpoint
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - health check for monitoring systems
+      security: []
       responses:
         '200':
           description: System is healthy
@@ -867,6 +983,8 @@ paths:
     get:
       tags: [Posts]
       summary: Search posts and users
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - search is accessible without authentication
+      security: []
       parameters:
         - name: q
           in: query
@@ -887,11 +1005,17 @@ paths:
       responses:
         '200':
           description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
 
   /homepage:
     get:
       tags: [Posts]
       summary: Get homepage data
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - homepage data is publicly accessible
+      security: []
       parameters:
         - name: limit
           in: query
@@ -901,19 +1025,31 @@ paths:
       responses:
         '200':
           description: Homepage data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HomepageResponse'
 
   /site/content:
     get:
       tags: [Posts]
       summary: Get site content
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - site content is publicly accessible
+      security: []
       responses:
         '200':
           description: Site content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiteContentResponse'
 
   /views:
     post:
       tags: [Posts]
       summary: Record a post view
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - anonymous view tracking for analytics
+      security: []
       requestBody:
         required: true
         content:
@@ -933,6 +1069,8 @@ paths:
     get:
       tags: [Posts]
       summary: Get YouTube playlist videos
+      # checkov:skip=CKV_OPENAPI_5:Public endpoint - YouTube playlist data is publicly accessible
+      security: []
       parameters:
         - name: max_results
           in: query
@@ -942,6 +1080,10 @@ paths:
       responses:
         '200':
           description: Playlist videos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YoutubePlaylistResponse'
 
 components:
   securitySchemes:
@@ -949,8 +1091,80 @@ components:
       type: apiKey
       in: cookie
       name: sb-access-token
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
 
   schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [user, moderator, admin]
+        is_banned:
+          type: boolean
+        display_name:
+          type: string
+        bio:
+          type: string
+        avatar_url:
+          type: string
+          format: uri
+        website:
+          type: string
+          format: uri
+        twitter_username:
+          type: string
+        kofi_username:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        author_id:
+          type: string
+          format: uuid
+        post_id:
+          type: string
+          format: uuid
+        parent_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
     Post:
       type: object
       properties:
@@ -1002,7 +1216,7 @@ components:
           type: string
           maxLength: 300
         content:
-          type: string
+          type: object
         content_type:
           type: string
           enum: [written, video, audio, visual]
@@ -1024,7 +1238,7 @@ components:
           type: string
         status:
           type: string
-          enum: [draft, pending]
+          enum: [draft, pending, published, rejected, archived]
 
     CreateCommentInput:
       type: object
@@ -1060,6 +1274,48 @@ components:
           type: string
         kofi_username:
           type: string
+
+    UpdateUserInputAdmin:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [user, moderator, admin]
+        is_banned:
+          type: boolean
+
+    DashboardStats:
+      type: object
+      properties:
+        userCount:
+          type: integer
+        postCount:
+          type: integer
+        commentCount:
+          type: integer
+        pendingApplicationCount:
+          type: integer
+
+    Application:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        notes:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
 
     ContactSubmission:
       type: object
@@ -1098,8 +1354,9 @@ components:
             think:
               type: integer
         userReaction:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
 
     HealthStatus:
       type: object
@@ -1113,6 +1370,85 @@ components:
         checks:
           type: object
 
+    SearchResponse:
+      type: object
+      properties:
+        posts:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/Post'
+        users:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/User'
+
+    HomepageResponse:
+      type: object
+      properties:
+        featuredPosts:
+          type: array
+          maxItems: 20
+          items:
+            $ref: '#/components/schemas/Post'
+        trendingPosts:
+          type: array
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/Post'
+        recentPosts:
+          type: array
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/Post'
+
+    SiteContentResponse:
+      type: object
+      properties:
+        categories:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/Category'
+        tags:
+          type: array
+          maxItems: 500
+          items:
+            $ref: '#/components/schemas/Tag'
+
+    Tag:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+
+    YoutubePlaylistResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/YoutubeVideo'
+
+    YoutubeVideo:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        thumbnail:
+          type: string
+        url:
+          type: string
+
     PostResponse:
       type: object
       properties:
@@ -1121,6 +1457,32 @@ components:
         data:
           $ref: '#/components/schemas/Post'
 
+    PaginatedCommentsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/Comment'
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+            limit:
+              type: integer
+            total:
+              type: integer
+            totalPages:
+              type: integer
+            hasNext:
+              type: boolean
+            hasPrev:
+              type: boolean
+
     PaginatedPostsResponse:
       type: object
       properties:
@@ -1128,6 +1490,7 @@ components:
           type: boolean
         data:
           type: array
+          maxItems: 100
           items:
             $ref: '#/components/schemas/Post'
         pagination:
@@ -1181,4 +1544,3 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
-

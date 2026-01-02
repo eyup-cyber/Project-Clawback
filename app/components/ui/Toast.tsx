@@ -1,27 +1,27 @@
-"use client";
+'use client';
 
 import {
-  useState,
-  useEffect,
   createContext,
-  useContext,
   useCallback,
+  useContext,
+  useEffect,
   useRef,
+  useState,
   useSyncExternalStore,
-} from "react";
-import { createPortal } from "react-dom";
+} from 'react';
+import { createPortal } from 'react-dom';
 
 // Hook to check if we're on the client side (hydration-safe)
 const emptySubscribe = () => () => {};
 function useIsMounted() {
   return useSyncExternalStore(
     emptySubscribe,
-    () => true,  // Client: mounted
-    () => false  // Server: not mounted
+    () => true, // Client: mounted
+    () => false // Server: not mounted
   );
 }
 
-type ToastType = "success" | "error" | "info" | "warning";
+type ToastType = 'success' | 'error' | 'info' | 'warning';
 
 interface ToastData {
   id: string;
@@ -107,44 +107,35 @@ const icons: Record<ToastType, React.ReactNode> = {
 };
 
 // Toast colors
-const colors: Record<
-  ToastType,
-  { bg: string; border: string; text: string; icon: string }
-> = {
+const colors: Record<ToastType, { bg: string; border: string; text: string; icon: string }> = {
   success: {
-    bg: "rgba(50, 205, 50, 0.1)",
-    border: "var(--primary)",
-    text: "var(--foreground)",
-    icon: "var(--primary)",
+    bg: 'rgba(50, 205, 50, 0.1)',
+    border: 'var(--primary)',
+    text: 'var(--foreground)',
+    icon: 'var(--primary)',
   },
   error: {
-    bg: "rgba(255, 0, 255, 0.1)",
-    border: "var(--accent)",
-    text: "var(--foreground)",
-    icon: "var(--accent)",
+    bg: 'rgba(255, 0, 255, 0.1)',
+    border: 'var(--accent)',
+    text: 'var(--foreground)',
+    icon: 'var(--accent)',
   },
   info: {
-    bg: "rgba(255, 215, 0, 0.1)",
-    border: "var(--secondary)",
-    text: "var(--foreground)",
-    icon: "var(--secondary)",
+    bg: 'rgba(255, 215, 0, 0.1)',
+    border: 'var(--secondary)',
+    text: 'var(--foreground)',
+    icon: 'var(--secondary)',
   },
   warning: {
-    bg: "rgba(255, 165, 0, 0.1)",
-    border: "#FFA500",
-    text: "var(--foreground)",
-    icon: "#FFA500",
+    bg: 'rgba(255, 165, 0, 0.1)',
+    border: '#FFA500',
+    text: 'var(--foreground)',
+    icon: '#FFA500',
   },
 };
 
 // Individual Toast component
-export function Toast({
-  toast,
-  onRemove,
-}: {
-  toast: ToastData;
-  onRemove: (id: string) => void;
-}) {
+export function Toast({ toast, onRemove }: { toast: ToastData; onRemove: (id: string) => void }) {
   const [isVisible, setIsVisible] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -180,26 +171,22 @@ export function Toast({
         background: color.bg,
         border: `1px solid ${color.border}`,
         transform:
-          isVisible && !isExiting
-            ? "translateX(0) scale(1)"
-            : "translateX(100%) scale(0.95)",
+          isVisible && !isExiting ? 'translateX(0) scale(1)' : 'translateX(100%) scale(0.95)',
         opacity: isVisible && !isExiting ? 1 : 0,
-        maxWidth: "400px",
+        maxWidth: '400px',
       }}
       onClick={handleDismiss}
       role="alert"
     >
       {/* Icon */}
-      <span style={{ color: color.icon, flexShrink: 0 }}>
-        {icons[toast.type]}
-      </span>
+      <span style={{ color: color.icon, flexShrink: 0 }}>{icons[toast.type]}</span>
 
       {/* Message */}
       <p
         className="text-sm font-medium flex-1"
         style={{
           color: color.text,
-          fontFamily: "var(--font-body)",
+          fontFamily: 'var(--font-body)',
         }}
       >
         {toast.message}
@@ -268,7 +255,7 @@ export function ToastContainer({
   return createPortal(
     <div
       className="fixed top-4 right-4 z-[9999] flex flex-col gap-3 pointer-events-auto"
-      style={{ maxWidth: "calc(100vw - 2rem)" }}
+      style={{ maxWidth: 'calc(100vw - 2rem)' }}
     >
       {toasts.map((toast) => (
         <Toast key={toast.id} toast={toast} onRemove={onRemove} />
@@ -282,13 +269,10 @@ export function ToastContainer({
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
-  const addToast = useCallback(
-    (type: ToastType, message: string, duration?: number) => {
-      const id = generateId();
-      setToasts((prev) => [...prev, { id, type, message, duration }]);
-    },
-    []
-  );
+  const addToast = useCallback((type: ToastType, message: string, duration?: number) => {
+    const id = generateId();
+    setToasts((prev) => [...prev, { id, type, message, duration }]);
+  }, []);
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -296,36 +280,34 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const success = useCallback(
     (message: string, duration?: number) => {
-      addToast("success", message, duration);
+      addToast('success', message, duration);
     },
     [addToast]
   );
 
   const error = useCallback(
     (message: string, duration?: number) => {
-      addToast("error", message, duration);
+      addToast('error', message, duration);
     },
     [addToast]
   );
 
   const info = useCallback(
     (message: string, duration?: number) => {
-      addToast("info", message, duration);
+      addToast('info', message, duration);
     },
     [addToast]
   );
 
   const warning = useCallback(
     (message: string, duration?: number) => {
-      addToast("warning", message, duration);
+      addToast('warning', message, duration);
     },
     [addToast]
   );
 
   return (
-    <ToastContext.Provider
-      value={{ toasts, addToast, removeToast, success, error, info, warning }}
-    >
+    <ToastContext.Provider value={{ toasts, addToast, removeToast, success, error, info, warning }}>
       {children}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </ToastContext.Provider>
@@ -336,7 +318,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 export function useToast() {
   const context = useContext(ToastContext);
   if (!context) {
-    throw new Error("useToast must be used within a ToastProvider");
+    throw new Error('useToast must be used within a ToastProvider');
   }
   return context;
 }

@@ -1,11 +1,25 @@
 # Local development environment template
+# Copy this file to .env.local and fill in your values
 
-# Core
+# ============================================================================
+# CORE CONFIGURATION
+# ============================================================================
 NODE_ENV=development
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_APP_NAME=Scroungers Multimedia (Local)
 
-# Supabase (use dev project or local emulator)
+# ============================================================================
+# SUPABASE (Required)
+# ============================================================================
+# Option 1: Use Supabase Cloud (recommended for development)
+#   Get these values from: https://app.supabase.com → Your Project → Settings → API
+#   - Project URL → NEXT_PUBLIC_SUPABASE_URL
+#   - anon/public key → NEXT_PUBLIC_SUPABASE_ANON_KEY (safe for client-side)
+#   - service_role key → SUPABASE_SERVICE_ROLE_KEY (SERVER-SIDE ONLY - never commit!)
+#
+# Option 2: Use local Supabase emulator
+#   Run: supabase start
+#   Then use the localhost URL and keys printed by the CLI
 NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
@@ -29,16 +43,24 @@ REDIS_URL=redis://localhost:6379
 CSRF_SECRET=change_me_32_chars_min
 JWT_SECRET=change_me_64_chars_min
 
-# Monitoring / Analytics (optional)
+# ============================================================================
+# MONITORING & ANALYTICS (Optional)
+# ============================================================================
+# Sentry: Error tracking - https://sentry.io → Create Project → Get DSN
+# LogRocket: Session replay - https://logrocket.com → Get App ID
+# Google Analytics: https://analytics.google.com → Get Tracking ID
+# Plausible: Privacy-friendly analytics - https://plausible.io → Get Domain
 SENTRY_DSN=
 LOGROCKET_APP_ID=
 NEXT_PUBLIC_GA_ID=
 PLAUSIBLE_DOMAIN=localhost
 
-# Feature flags / logging
+# ============================================================================
+# FEATURE FLAGS & LOGGING
+# ============================================================================
 FEATURE_EMAIL_NOTIFICATIONS=false
 FEATURE_REDIS_CACHE=false
 FEATURE_MONITORING=false
 RATE_LIMIT_ENABLED=false
-LOG_LEVEL=debug
+LOG_LEVEL=debug  # debug, info, warn, error
 

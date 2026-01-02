@@ -3,7 +3,7 @@
  * Phase 1.1.3: Complete bookmarks management page
  */
 
-import { type Metadata } from 'next';
+import type { Metadata } from 'next';
 import { BookmarksPageClient } from './BookmarksPageClient';
 
 export const metadata: Metadata = {

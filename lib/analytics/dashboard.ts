@@ -3,8 +3,8 @@
  * Phase 21: Views, engagement, conversion tracking, dashboards
  */
 
-import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/server';
 
 // ============================================================================
 // TYPES

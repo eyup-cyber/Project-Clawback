@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef, useCallback, type RefObject } from "react";
-import { prefersReducedMotion } from "../animations/gsap-config";
+import { type RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { prefersReducedMotion } from '../animations/gsap-config';
 
 interface MousePosition {
   x: number;
@@ -25,9 +25,7 @@ const defaultPosition: MousePosition = {
   isInside: false,
 };
 
-export function useMousePosition(
-  options: UseMousePositionOptions = {}
-): MousePosition {
+export function useMousePosition(options: UseMousePositionOptions = {}): MousePosition {
   const { includeTouch = true, smoothing = 0, targetRef } = options;
   const [position, setPosition] = useState<MousePosition>(defaultPosition);
   const frameRef = useRef<number | undefined>(undefined);
@@ -44,8 +42,7 @@ export function useMousePosition(
         const y = clientY - rect.top;
         const normalizedX = (x / rect.width) * 2 - 1;
         const normalizedY = (y / rect.height) * 2 - 1;
-        const isInside =
-          x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
+        const isInside = x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
 
         if (smoothing > 0) {
           targetPosition.current = { x, y };
@@ -135,9 +132,9 @@ export function useMousePosition(
 
     const target = targetRef?.current || window;
 
-    target.addEventListener("mousemove", handleMouseMove as EventListener);
+    target.addEventListener('mousemove', handleMouseMove as EventListener);
     if (includeTouch) {
-      target.addEventListener("touchmove", handleTouchMove as EventListener, {
+      target.addEventListener('touchmove', handleTouchMove as EventListener, {
         passive: true,
       });
     }
@@ -145,19 +142,16 @@ export function useMousePosition(
     const targetElement = targetRef?.current;
 
     if (targetElement) {
-      targetElement.addEventListener("mouseleave", handleMouseLeave);
+      targetElement.addEventListener('mouseleave', handleMouseLeave);
     }
 
     return () => {
-      target.removeEventListener("mousemove", handleMouseMove as EventListener);
+      target.removeEventListener('mousemove', handleMouseMove as EventListener);
       if (includeTouch) {
-        target.removeEventListener(
-          "touchmove",
-          handleTouchMove as EventListener
-        );
+        target.removeEventListener('touchmove', handleTouchMove as EventListener);
       }
       if (targetElement) {
-        targetElement.removeEventListener("mouseleave", handleMouseLeave);
+        targetElement.removeEventListener('mouseleave', handleMouseLeave);
       }
     };
   }, [includeTouch, targetRef, updatePosition]);
@@ -184,12 +178,7 @@ export function useTilt3D(options: UseTilt3DOptions = {}): {
   tilt: Tilt3D;
   style: React.CSSProperties;
 } {
-  const {
-    maxTilt = 15,
-    scale = 1.02,
-    perspective = 1000,
-    disabled = false,
-  } = options;
+  const { maxTilt = 15, scale = 1.02, perspective = 1000, disabled = false } = options;
   const ref = useRef<HTMLElement>(null);
   const [tilt, setTilt] = useState<Tilt3D>({
     rotateX: 0,
@@ -223,19 +212,19 @@ export function useTilt3D(options: UseTilt3DOptions = {}): {
     const element = ref.current;
     if (!element) return;
 
-    element.addEventListener("mousemove", handleMouseMove);
-    element.addEventListener("mouseleave", handleMouseLeave);
+    element.addEventListener('mousemove', handleMouseMove);
+    element.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
-      element.removeEventListener("mousemove", handleMouseMove);
-      element.removeEventListener("mouseleave", handleMouseLeave);
+      element.removeEventListener('mousemove', handleMouseMove);
+      element.removeEventListener('mouseleave', handleMouseLeave);
     };
   }, [handleMouseMove, handleMouseLeave]);
 
   const style: React.CSSProperties = {
     transform: `perspective(${perspective}px) rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg) scale(${tilt.scale})`,
-    transition: "transform 0.15s ease-out",
-    transformStyle: "preserve-3d",
+    transition: 'transform 0.15s ease-out',
+    transformStyle: 'preserve-3d',
   };
 
   return { ref: ref as RefObject<HTMLElement | null>, tilt, style };

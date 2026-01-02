@@ -1,10 +1,10 @@
 'use client';
 
+import type { User } from '@supabase/supabase-js';
 import Link from 'next/link';
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/lib/hooks';
 import { getInitials } from '@/lib/utils';
-import { type User } from '@supabase/supabase-js';
 
 interface DashboardHeaderProps {
   user: User;
@@ -36,29 +36,26 @@ export default function DashboardHeader({ user, profile }: DashboardHeaderProps)
   return (
     <header
       className="fixed top-0 left-0 right-0 h-16 z-50 flex items-center justify-between px-4 lg:px-6"
-      style={{ 
-        background: 'var(--surface)', 
-        borderBottom: '1px solid var(--border)' 
+      style={{
+        background: 'var(--surface)',
+        borderBottom: '1px solid var(--border)',
       }}
     >
       {/* Logo */}
-      <Link
-        href="/dashboard"
-        className="flex items-center gap-3"
-      >
+      <Link href="/dashboard" className="flex items-center gap-3">
         <div className="flex flex-col items-center">
-          <span 
+          <span
             className="text-lg sm:text-xl font-bold tracking-wider"
-            style={{ 
+            style={{
               fontFamily: 'var(--font-kindergarten)',
-              color: 'var(--primary)' 
+              color: 'var(--primary)',
             }}
           >
             scroungers
           </span>
-          <span 
+          <span
             className="text-[7px] sm:text-[9px] uppercase tracking-[0.25em] -mt-1"
-            style={{ 
+            style={{
               fontFamily: 'var(--font-body)',
               color: 'var(--accent)',
               fontWeight: 500,
@@ -67,10 +64,10 @@ export default function DashboardHeader({ user, profile }: DashboardHeaderProps)
             MULTIMEDIA
           </span>
         </div>
-        <span 
-          className="text-xs sm:text-sm px-2 py-0.5 rounded hidden sm:inline-block" 
-          style={{ 
-            background: 'var(--primary)', 
+        <span
+          className="text-xs sm:text-sm px-2 py-0.5 rounded hidden sm:inline-block"
+          style={{
+            background: 'var(--primary)',
             color: 'var(--background)',
             fontFamily: 'var(--font-body)',
             fontWeight: 500,
@@ -86,10 +83,10 @@ export default function DashboardHeader({ user, profile }: DashboardHeaderProps)
         <Link
           href="/dashboard/posts/new"
           className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
-          style={{ 
-            background: 'var(--primary)', 
+          style={{
+            background: 'var(--primary)',
             color: 'var(--background)',
-            fontFamily: 'var(--font-body)'
+            fontFamily: 'var(--font-body)',
           }}
         >
           <span>✨</span>
@@ -105,10 +102,12 @@ export default function DashboardHeader({ user, profile }: DashboardHeaderProps)
             {/* Avatar */}
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium"
-              style={{ background: 'var(--primary)', color: 'var(--background)' }}
+              style={{
+                background: 'var(--primary)',
+                color: 'var(--background)',
+              }}
             >
               {profile.avatar_url ? (
-                 
                 <img
                   src={profile.avatar_url}
                   alt={displayName}
@@ -122,7 +121,10 @@ export default function DashboardHeader({ user, profile }: DashboardHeaderProps)
               <p className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>
                 {displayName}
               </p>
-              <p className="text-xs capitalize" style={{ color: 'var(--foreground)', opacity: 0.6 }}>
+              <p
+                className="text-xs capitalize"
+                style={{ color: 'var(--foreground)', opacity: 0.6 }}
+              >
                 {profile.role}
               </p>
             </div>
@@ -144,9 +146,9 @@ export default function DashboardHeader({ user, profile }: DashboardHeaderProps)
           {dropdownOpen && (
             <div
               className="absolute right-0 top-full mt-2 w-48 rounded-lg shadow-lg py-2"
-              style={{ 
-                background: 'var(--surface-elevated)', 
-                border: '1px solid var(--border)' 
+              style={{
+                background: 'var(--surface-elevated)',
+                border: '1px solid var(--border)',
               }}
             >
               <Link
@@ -180,6 +182,3 @@ export default function DashboardHeader({ user, profile }: DashboardHeaderProps)
     </header>
   );
 }
-
-
-

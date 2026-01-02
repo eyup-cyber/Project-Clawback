@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { createClient } from '@/lib/supabase/server';
 import { success, handleApiError, requireEditor } from '@/lib/api';
 import { getApplicationStats } from '@/lib/db';
@@ -28,14 +30,18 @@ export async function GET() {
       supabase.from('posts').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
       supabase.from('comments').select('*', { count: 'exact', head: true }),
       supabase.from('post_views').select('*', { count: 'exact', head: true }),
-      supabase.from('profiles').select('*', { count: 'exact', head: true }).in('role', ['contributor', 'editor', 'admin']),
+      supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
+        .in('role', ['contributor', 'editor', 'admin']),
       getApplicationStats(),
     ]);
 
     // Get recent activity
     const { data: recentPosts } = await supabase
       .from('posts')
-      .select(`
+      .select(
+        `
         id,
         title,
         status,
@@ -44,13 +50,15 @@ export async function GET() {
           username,
           display_name
         )
-      `)
+      `
+      )
       .order('created_at', { ascending: false })
       .limit(5);
 
     const { data: recentComments } = await supabase
       .from('comments')
-      .select(`
+      .select(
+        `
         id,
         content,
         created_at,
@@ -58,7 +66,8 @@ export async function GET() {
           username,
           display_name
         )
-      `)
+      `
+      )
       .order('created_at', { ascending: false })
       .limit(5);
 
@@ -89,9 +98,3 @@ export async function GET() {
     return handleApiError(err);
   }
 }
-
-
-
-
-
-

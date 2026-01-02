@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * Advanced Search API
  * Full-text search with filters, facets, and suggestions

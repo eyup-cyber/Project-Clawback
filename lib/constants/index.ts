@@ -1,14 +1,35 @@
 // Site information
 export const SITE_NAME = 'Scroungers Multimedia';
-export const SITE_DESCRIPTION = 'Political journalism from the people who live it. No credentials required. 100% your revenue.';
+export const SITE_DESCRIPTION =
+  'Political journalism from the people who live it. No credentials required. 100% your revenue.';
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
 // Content types
 export const CONTENT_TYPES = [
-  { id: 'written', label: 'Written', description: 'Articles, essays, poetry, screenplays, theses', icon: '📝' },
-  { id: 'video', label: 'Video', description: 'Essays, documentaries, sketches, montages', icon: '🎬' },
-  { id: 'audio', label: 'Audio', description: 'Podcasts, music, spoken word', icon: '🎙️' },
-  { id: 'visual', label: 'Visual', description: 'Art, photography, cartoons, graphics', icon: '🎨' },
+  {
+    id: 'written',
+    label: 'Written',
+    description: 'Articles, essays, poetry, screenplays, theses',
+    icon: '📝',
+  },
+  {
+    id: 'video',
+    label: 'Video',
+    description: 'Essays, documentaries, sketches, montages',
+    icon: '🎬',
+  },
+  {
+    id: 'audio',
+    label: 'Audio',
+    description: 'Podcasts, music, spoken word',
+    icon: '🎙️',
+  },
+  {
+    id: 'visual',
+    label: 'Visual',
+    description: 'Art, photography, cartoons, graphics',
+    icon: '🎨',
+  },
 ] as const;
 
 // Topics for contributors
@@ -36,7 +57,12 @@ export const DEFAULT_CATEGORIES = [
   { name: 'Culture', slug: 'culture', color: '#FFD700', icon: '🎭' },
   { name: 'Work', slug: 'work', color: '#32CD32', icon: '⚒️' },
   { name: 'Environment', slug: 'environment', color: '#32CD32', icon: '🌍' },
-  { name: 'International', slug: 'international', color: '#FFD700', icon: '🌐' },
+  {
+    name: 'International',
+    slug: 'international',
+    color: '#FFD700',
+    icon: '🌐',
+  },
 ] as const;
 
 // Reaction types
@@ -135,9 +161,3 @@ export const EDITOR_LIMITS = {
   commentMax: 2000,
   bioMax: 500,
 } as const;
-
-
-
-
-
-

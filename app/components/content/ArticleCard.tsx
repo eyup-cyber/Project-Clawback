@@ -1,8 +1,8 @@
-"use client";
-import Link from "next/link";
-import Image from "next/image";
-import { useRef, useEffect } from "react";
-import gsap from "gsap";
+'use client';
+import gsap from 'gsap';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 
 interface ArticleCardProps {
   slug: string;
@@ -13,7 +13,7 @@ interface ArticleCardProps {
   date: string;
   category: string;
   imageUrl: string;
-  contentType?: "written" | "video" | "audio" | "visual";
+  contentType?: 'written' | 'video' | 'audio' | 'visual';
 }
 
 export default function ArticleCard({
@@ -25,15 +25,15 @@ export default function ArticleCard({
   date,
   category,
   imageUrl,
-  contentType = "written",
+  contentType = 'written',
 }: ArticleCardProps) {
   const cardRef = useRef<HTMLElement>(null);
 
   const contentTypeIcons = {
-    written: "📝",
-    video: "🎬",
-    audio: "🎙️",
-    visual: "🎨",
+    written: '📝',
+    video: '🎬',
+    audio: '🎙️',
+    visual: '🎨',
   };
 
   useEffect(() => {
@@ -45,14 +45,14 @@ export default function ArticleCard({
         scale: 1.02,
         y: -5,
         duration: 0.3,
-        ease: "power2.out",
+        ease: 'power2.out',
       });
-      gsap.to(card.querySelector(".card-image"), {
+      gsap.to(card.querySelector('.card-image'), {
         scale: 1.1,
         duration: 0.4,
-        ease: "power2.out",
+        ease: 'power2.out',
       });
-      gsap.to(card.querySelector(".card-glow"), {
+      gsap.to(card.querySelector('.card-glow'), {
         opacity: 1,
         duration: 0.3,
       });
@@ -63,38 +63,38 @@ export default function ArticleCard({
         scale: 1,
         y: 0,
         duration: 0.3,
-        ease: "power2.out",
+        ease: 'power2.out',
       });
-      gsap.to(card.querySelector(".card-image"), {
+      gsap.to(card.querySelector('.card-image'), {
         scale: 1,
         duration: 0.4,
-        ease: "power2.out",
+        ease: 'power2.out',
       });
-      gsap.to(card.querySelector(".card-glow"), {
+      gsap.to(card.querySelector('.card-glow'), {
         opacity: 0,
         duration: 0.3,
       });
     };
 
-    card.addEventListener("mouseenter", handleMouseEnter);
-    card.addEventListener("mouseleave", handleMouseLeave);
+    card.addEventListener('mouseenter', handleMouseEnter);
+    card.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
-      card.removeEventListener("mouseenter", handleMouseEnter);
-      card.removeEventListener("mouseleave", handleMouseLeave);
+      card.removeEventListener('mouseenter', handleMouseEnter);
+      card.removeEventListener('mouseleave', handleMouseLeave);
     };
   }, []);
 
   return (
-    <article 
+    <article
       ref={cardRef}
       className="group bg-[var(--background-card)] border border-[var(--border)] rounded-lg overflow-hidden relative"
     >
       {/* Glow effect */}
-      <div 
+      <div
         className="card-glow absolute inset-0 opacity-0 pointer-events-none z-10"
         style={{
-          boxShadow: "inset 0 0 30px rgba(190, 255, 58, 0.1), 0 0 20px rgba(190, 255, 58, 0.2)",
+          boxShadow: 'inset 0 0 30px rgba(190, 255, 58, 0.1), 0 0 20px rgba(190, 255, 58, 0.2)',
         }}
       />
 
@@ -118,16 +118,12 @@ export default function ArticleCard({
       {/* Content */}
       <div className="p-5 relative z-20">
         <Link href={`/articles/${slug}`}>
-          <h3 
-            className="text-lg font-semibold text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors line-clamp-2 mb-2"
-          >
+          <h3 className="text-lg font-semibold text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors line-clamp-2 mb-2">
             {title}
           </h3>
         </Link>
-        
-        <p className="text-[var(--foreground-muted)] text-sm line-clamp-2 mb-4">
-          {excerpt}
-        </p>
+
+        <p className="text-[var(--foreground-muted)] text-sm line-clamp-2 mb-4">{excerpt}</p>
 
         {/* Meta */}
         <div className="flex items-center justify-between text-xs text-[var(--foreground-muted)]">
@@ -136,7 +132,7 @@ export default function ArticleCard({
             <span>•</span>
             <span>{date}</span>
           </div>
-          
+
           {authorKofi && (
             <a
               href={`https://ko-fi.com/${authorKofi}`}

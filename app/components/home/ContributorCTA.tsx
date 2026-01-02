@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -37,18 +37,19 @@ export default function ContributorCTA() {
 
       // Animate content types
       const items = contentRef.current?.querySelectorAll('.content-type');
-      if (items) gsap.from(items, {
-        scale: 0.8,
-        opacity: 0,
-        duration: 0.6,
-        stagger: 0.08,
-        ease: 'back.out(1.7)',
-        scrollTrigger: {
-          trigger: contentRef.current,
-          start: 'top 70%',
-          toggleActions: 'play none none reverse',
-        },
-      });
+      if (items)
+        gsap.from(items, {
+          scale: 0.8,
+          opacity: 0,
+          duration: 0.6,
+          stagger: 0.08,
+          ease: 'back.out(1.7)',
+          scrollTrigger: {
+            trigger: contentRef.current,
+            start: 'top 70%',
+            toggleActions: 'play none none reverse',
+          },
+        });
     }, sectionRef);
 
     return () => ctx.revert();
@@ -59,14 +60,16 @@ export default function ContributorCTA() {
       ref={sectionRef}
       className="py-24 px-4 md:px-8 relative overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, var(--background) 0%, rgba(1, 60, 35, 0.8) 50%, var(--background) 100%)',
+        background:
+          'linear-gradient(180deg, var(--background) 0%, rgba(1, 60, 35, 0.8) 50%, var(--background) 100%)',
       }}
     >
       {/* Background glow */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(50, 205, 50, 0.1) 0%, transparent 60%)',
+          background:
+            'radial-gradient(ellipse at center, rgba(50, 205, 50, 0.1) 0%, transparent 60%)',
         }}
       />
 
@@ -80,7 +83,10 @@ export default function ContributorCTA() {
         </h2>
 
         {/* Subheading */}
-        <p className="text-xl md:text-2xl mb-12" style={{ color: 'var(--foreground)', opacity: 0.9 }}>
+        <p
+          className="text-xl md:text-2xl mb-12"
+          style={{ color: 'var(--foreground)', opacity: 0.9 }}
+        >
           No degrees. No connections. No gatekeepers.
           <span className="block mt-2" style={{ color: 'var(--primary)' }}>
             Just you and your story.
@@ -126,6 +132,3 @@ export default function ContributorCTA() {
     </section>
   );
 }
-
-
-
